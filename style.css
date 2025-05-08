@@ -53,21 +53,21 @@ h1 {
 .site-header {
     background-color: #777;
     color: #f1f1f1;
-    padding: 0.75rem 2rem 0; /* Remove bottom padding */
+    padding: 0.5rem 1rem 0.25rem;
     text-align: center;
 }
 
     .site-header h1 {
         margin: 0;
-        font-size: 1.8rem;
-        padding-bottom: 0.25rem;
+        font-size: 1.75rem;
+        padding-bottom: 0;
+        line-height: 1.1;
     }
 
 /* Main nav (now visually separate) */
 .main-nav {
     background-color: #fff;
-    padding: 0.4rem 1rem 0.3rem;
-    /* Remove this: */
+    padding: 0.25rem 1rem 0.3rem;
     /* border-bottom: 1px solid #ccc; */
     margin-top: 0;
 }
