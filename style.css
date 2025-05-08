@@ -8,67 +8,33 @@ body {
     line-height: 1.6;
 }
 
-/* Content Container */
+/* Content container */
 main {
-    max-width: 700px;
+    max-width: 720px;
     margin: 2rem auto;
     padding: 0 1rem;
 }
 
-/* Typography */
-h1 {
-    font-size: 2rem;
-    margin: 0;
-    padding: 0;
-}
-
-.notice {
-    margin-bottom: 2rem;
-    padding: 1rem;
-    border-left: 4px solid #888;
-    background: #f7f7f7;
-}
-
-    .notice h2 {
-        margin-top: 0;
-        font-size: 1.25rem;
-    }
-
-.date {
-    font-style: italic;
-    color: #555;
-    margin-bottom: 0.5rem;
-}
-
-/* Announcement (blue-highlight box) */
-.announce {
-    background-color: #e6f4ff;
-    border-left: 4px solid #3399cc;
-    padding: 1rem;
-    margin: 1.5rem 0;
-    border-radius: 6px;
-}
-
-/* Site header (just the title bar) */
+/* Header */
 .site-header {
     background-color: #777;
     color: #f1f1f1;
-    padding: 1rem 1rem 0.6rem;
+    padding: 1rem 1rem 0; /* No bottom padding */
     text-align: center;
 }
 
     .site-header h1 {
-        margin: 0;
-        padding: 0;
+        margin: 0 auto;
         font-size: 1.75rem;
-        line-height: 1.1;
+        line-height: 1.2;
+        max-width: 720px;
     }
 
-/* Main nav (now visually separate) */
+/* Navigation */
 .main-nav {
     background-color: #fff;
-    padding: 0.3rem 1rem 0.4rem;
-    margin-top: 0;
+    padding: 0;
+    margin: 0;
     display: flex;
     justify-content: center;
 }
@@ -76,36 +42,38 @@ h1 {
     .main-nav > ul {
         max-width: 720px;
         width: 100%;
-        padding: 0;
         margin: 0 auto;
+        padding: 0.4rem 1rem 0.5rem;
         display: flex;
         gap: 1.25rem;
         list-style: none;
     }
 
-        .main-nav ul li a {
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            transition: background-color 0.2s ease;
+    .main-nav ul li a {
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+
+        .main-nav ul li a:hover {
+            background-color: #f0f8ff;
         }
 
-            .main-nav ul li a:hover {
-                background-color: #f0f8ff;
-            }
-
-            .main-nav ul li a.active {
-                background-color: #777;
-                color: #f1f1f1;
-                font-weight: bold;
-                padding: 0.3rem 0.75rem;
-                border-top-left-radius: 6px;
-                border-top-right-radius: 6px;
-                border-bottom: none;
-                margin-bottom: -3px;
-            }
+        /* Active tab style - merged with header */
+        .main-nav ul li a.active {
+            background-color: #777;
+            color: #f1f1f1;
+            font-weight: bold;
+            padding: 0.4rem 0.75rem;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            margin-bottom: -4px; /* Merge into header */
+            position: relative;
+            z-index: 2;
+        }
 
 /* Footer */
 .site-footer {
@@ -119,51 +87,29 @@ h1 {
     line-height: 1.6;
 }
 
-/* Gutter */
-main {
-    max-width: 720px;
-    margin: 2rem auto;
-    padding: 0 1rem; /* Adds left and right gutter on all screens */
-}
-
-/* Responsive */
+/* Responsive Enhancements */
 @media (max-width: 600px) {
-    /* Typography scale-up for readability */
     body {
-        font-size: 1.05rem; /* ~16.8px */
+        font-size: 1.05rem;
         line-height: 1.7;
     }
 
-    h1, .site-header h1 {
-        font-size: 1.6rem;
-    }
-
-    .notice h2 {
-        font-size: 1.15rem;
-    }
-
-    /* Increase button/tap padding in nav */
-    .main-nav ul {
+    .main-nav > ul {
         flex-direction: column;
+        align-items: flex-start;
         gap: 0.5rem;
-        padding: 0.5rem 0;
     }
 
-        .main-nav ul li a {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
-        }
+    .main-nav ul li a {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
 
-    /* Re-center and space out footer */
     .site-footer {
         font-size: 0.85rem;
         padding: 2rem 1rem;
-        text-align: center;
-        line-height: 1.5;
     }
 
-    /* Add extra gutter if screen is very tight */
     main {
         padding: 0 1.25rem;
     }
