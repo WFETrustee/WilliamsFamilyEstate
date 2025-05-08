@@ -94,8 +94,8 @@ h1 {
             }
 
             .main-nav ul li a.active {
-                background-color: #e6f2ff;
-                color: #222;
+                background-color: #777;
+                color: #f1f1f1;
                 font-weight: bold;
                 padding: 0.2rem 0.75rem;
                 #border-left: 4px solid #336699;
