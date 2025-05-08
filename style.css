@@ -68,17 +68,18 @@ nav ul li a {
 }
 
     nav ul li a:hover {
-        text-decoration: underline;
+        background-color: #f0f8ff;
     }
 
     nav ul li a.active {
-        background-color: #f4f4cc;
+        background-color: #e6f2ff; /* Light blue background */
         color: #222;
         font-weight: bold;
-        padding: 0.15rem 0.6rem;
+        padding: 0.2rem 0.75rem;
+        border-left: 4px solid #336699; /* Darker blue highlight */
         border-radius: 6px;
         line-height: 1.2;
-        box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.15);
+        box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.08);
         transition: background-color 0.2s ease;
     }
 
