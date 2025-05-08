@@ -71,11 +71,14 @@ nav ul li a {
         text-decoration: underline;
     }
 
-nav ul li a.active {
-    color: #006699; /* your highlight color */
-    border-bottom: 2px solid #006699;
-    font-weight: bold;
-}
+    nav ul li a.active {
+        background-color: #e6f4ff; /* soft blue */
+        border-left: 4px solid #3399cc;
+        padding: 1rem;
+        margin: 1.5rem 0;
+        border-radius: 6px;
+        font-weight: bold;
+    }
 
 /* Footer */
 .site-footer {
