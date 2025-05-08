@@ -52,11 +52,10 @@ h1 {
 
 /* Site header (just the title bar) */
 .site-header {
-    background-color: #888;
+    background-color: #777;
     color: #f1f1f1;
     padding: 1rem 2rem;
     width: 100%;
-    border-bottom: 1px solid #888;
     text-align: center;
 }
 
@@ -107,13 +106,13 @@ h1 {
 
 /* Footer */
 .site-footer {
-    background-color: #888;
+    background-color: #777;
     color: #f1f1f1;
     text-align: center;
     font-size: 0.9rem;
     padding: 1.25rem 1rem;
     margin-top: 2rem;
-    border-top: 1px solid #888;
+    border-top: 1px solid #777;
     line-height: 1.6;
 }
 
@@ -121,7 +120,7 @@ h1 {
 main {
     max-width: 720px;
     margin: 2rem auto;
-    padding: 0 1rem;
+    padding: 0;
 }
 
 /* Responsive */
