@@ -67,9 +67,9 @@ h1 {
 .main-nav {
     background-color: #fff;
     padding: 0.4rem 1rem 0.3rem;
-    border-bottom: 1px solid #ccc;
-    margin-top: 0; /* Add this line */
-    border-top: 1px solid #666; /* optional for definition */
+    /* Remove this: */
+    /* border-bottom: 1px solid #ccc; */
+    margin-top: 0;
 }
     .main-nav ul {
         list-style: none;
@@ -101,8 +101,7 @@ h1 {
                 border-top-left-radius: 6px;
                 border-top-right-radius: 6px;
                 border-bottom: none;
-                margin-bottom: -1px; /* Helps overlap the nav border */
-                box-shadow: none;
+                margin-bottom: -1px;
             }
 
 /* Footer */
