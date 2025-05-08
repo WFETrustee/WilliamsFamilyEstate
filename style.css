@@ -83,6 +83,23 @@ main {
     border-radius: 4px;
 }
 
+/*Notice entries*/
+.notice {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border-left: 4px solid #888;
+  background: #f7f7f7;
+}
+.notice h2 {
+  margin-top: 0;
+  font-size: 1.25rem;
+}
+.date {
+  font-style: italic;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
 /* Footer */
 .site-footer {
     background-color: #777;
