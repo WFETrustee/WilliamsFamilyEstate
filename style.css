@@ -79,7 +79,6 @@ main {
 .announce {
     background-color: #e6f2ff;
     color: #222;
-    font-weight: bold;
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
 }
