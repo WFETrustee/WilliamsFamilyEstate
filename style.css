@@ -72,12 +72,14 @@ nav ul li a {
     }
 
     nav ul li a.active {
-        background-color: #e6f4ff; /* soft blue */
-        border-left: 4px solid #3399cc;
-        padding: 1rem;
-        margin: 1.5rem 0;
-        border-radius: 6px;
+        background-color: #f4f4cc;
+        color: #222;
         font-weight: bold;
+        padding: 0.15rem 0.6rem;
+        border-radius: 6px;
+        line-height: 1.2;
+        box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.15);
+        transition: background-color 0.2s ease;
     }
 
 /* Footer */
