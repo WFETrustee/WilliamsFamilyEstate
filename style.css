@@ -18,9 +18,8 @@ main {
 /* Typography */
 h1 {
     font-size: 2rem;
-    margin-bottom: 1rem;
-    border-bottom: 2px solid #444;
-    padding-bottom: 0.5rem;
+    margin: 0;
+    padding: 0;
 }
 
 .notice {
@@ -54,20 +53,20 @@ h1 {
 .site-header {
     background-color: #777;
     color: #f1f1f1;
-    padding: 1rem 2rem;
-    width: 100%;
+    padding: 0.75rem 2rem 0.5rem; /* top, sides, bottom */
     text-align: center;
 }
 
     .site-header h1 {
         margin: 0;
         font-size: 1.8rem;
+        padding-bottom: 0.25rem;
     }
 
 /* Main nav (now visually separate) */
 .main-nav {
     background-color: #fff;
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 1rem 0.3rem;
     border-bottom: 1px solid #ccc;
 }
 
@@ -120,24 +119,48 @@ h1 {
 main {
     max-width: 720px;
     margin: 2rem auto;
-    padding: 0;
+    padding: 0 1rem; /* Adds left and right gutter on all screens */
 }
 
 /* Responsive */
 @media (max-width: 600px) {
-    .header-container {
-        flex-direction: column;
-        align-items: flex-start;
+    /* Typography scale-up for readability */
+    body {
+        font-size: 1.05rem; /* ~16.8px */
+        line-height: 1.7;
     }
 
-    nav ul {
+    h1, .site-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .notice h2 {
+        font-size: 1.15rem;
+    }
+
+    /* Increase button/tap padding in nav */
+    .main-nav ul {
         flex-direction: column;
         gap: 0.5rem;
-        margin-top: 0.5rem;
+        padding: 0.5rem 0;
     }
 
+        .main-nav ul li a {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+        }
+
+    /* Re-center and space out footer */
     .site-footer {
-        padding-top: 1rem;
         font-size: 0.85rem;
+        padding: 2rem 1rem;
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    /* Add extra gutter if screen is very tight */
+    main {
+        padding: 0 1.25rem;
     }
 }
