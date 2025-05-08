@@ -76,13 +76,13 @@ main {
             z-index: 2;
         }
 
-    .announce {
-        background-color: #f4f4cc;
-        color: #222;
-        font-weight: bold;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-    }
+.announce {
+    background-color: #e6f2ff;
+    color: #222;
+    font-weight: bold;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
 
 /* Footer */
 .site-footer {
