@@ -60,7 +60,7 @@ main {
     }
 
         .main-nav ul li a:hover {
-            background-color: #f0f8ff;
+            background-color: #777;
         }
 
         /* Active tab style - merged with header */
