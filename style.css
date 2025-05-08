@@ -19,7 +19,7 @@ main {
 .site-header {
     background-color: #777;
     color: #f1f1f1;
-    padding: 1rem 1rem 0; /* No bottom padding */
+    padding: 1rem 1rem; 
     text-align: center;
 }
 
@@ -70,10 +70,18 @@ main {
             padding: 0.4rem 0.75rem;
             border-top-left-radius: 6px;
             border-top-right-radius: 6px;
-            margin-bottom: -4px; /* Merge into header */
+            margin-top: -4px; /* Merge into header */
             position: relative;
             z-index: 2;
         }
+
+    .announce {
+        background-color: #f4f4cc;
+        color: #222;
+        font-weight: bold;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+    }
 
 /* Footer */
 .site-footer {
