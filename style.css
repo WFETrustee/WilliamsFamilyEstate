@@ -103,7 +103,8 @@ main {
 
 /* Footer */
 .site-footer {
-    background-color: #777;
+    #background-color: #777;
+    background: radial-gradient(ellipse, center, #999, #777);    
     color: #f1f1f1;
     text-align: center;
     font-size: 0.9rem;
@@ -111,6 +112,8 @@ main {
     margin-top: 2rem;
     border-top: 1px solid #777;
     line-height: 1.6;
+    /* Top shadow line */
+    box-shadow: inset 0 8px 10px -8px rgba(0, 0, 0, 0.25);    
 }
 
 /* Responsive Enhancements */
