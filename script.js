@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       })
       .catch(err => {
-        document.getElementById("live-notices").textContent = "Failed to load notices.";
+        document.getElementById("live-notices").textContent = "Failed to load automated notices.";
         console.error("Manifest load error:", err);
       });
   }
