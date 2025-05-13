@@ -55,9 +55,86 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Load header and highlight the active menu item ---
+// --- Load header and footer and highlight the active menu item ---
   loadHTML("site-header", "/header.html", highlightActiveMenuItem);
-
-  // --- Load footer and insert the current year ---
   loadHTML("site-footer", "/footer.html", insertFooterYear);
+
+  // --- Dynamic Notice Rendering ---
+  if (document.getElementById("live-notices")) {
+    fetch("/notices/manifest.json")
+      .then(res => res.json())
+      .then(filenames => {
+        const noticePromises = filenames.map(file =>
+          fetch(`/notices/${file}`)
+            .then(res => res.text())
+            .then(html => {
+              const temp = document.createElement("html");
+              temp.innerHTML = html;
+              const title = temp.querySelector('meta[name="notice-title"]')?.content || "Untitled";
+              const date = temp.querySelector('meta[name="notice-date"]')?.content || "0000-00-00";
+              const id = temp.querySelector('meta[name="notice-id"]')?.content || "";
+              const venue = temp.querySelector('meta[name="notice-venue"]')?.content || "";
+              const summary = temp.querySelector('meta[name="notice-summary"]')?.content || "";
+              const pinned = temp.querySelector('meta[name="notice-pinned"]')?.content === "true";
+
+              return {
+                filename: file,
+                title,
+                date,
+                id,
+                venue,
+                summary,
+                pinned
+              };
+            })
+            .catch(err => {
+              console.warn(`Failed to load notice: ${file}`, err);
+              return null;
+            })
+        );
+
+        Promise.all(noticePromises).then(notices => {
+          const container = document.getElementById("live-notices");
+          container.innerHTML = "";
+
+          // Filter out nulls and sort: pinned first (desc), then unpinned (desc)
+          const validNotices = notices.filter(n => n);
+
+          validNotices.sort((a, b) => {
+            if (a.pinned !== b.pinned) return b.pinned - a.pinned;
+            return new Date(b.date) - new Date(a.date);
+          });
+
+          validNotices.forEach(n => {
+            const wrapper = document.createElement("div");
+            wrapper.className = n.pinned ? "notice pinned" : "notice";
+
+            const h2 = document.createElement("h2");
+            h2.textContent = n.title;
+
+            const meta = document.createElement("div");
+            meta.className = "date";
+            meta.textContent = `${n.date} | ${n.venue}`;
+
+            const p = document.createElement("p");
+            p.textContent = n.summary;
+
+            const link = document.createElement("a");
+            link.href = `/notices/${n.filename}`;
+            link.textContent = "View Full Notice →";
+
+            wrapper.appendChild(h2);
+            wrapper.appendChild(meta);
+            wrapper.appendChild(p);
+            wrapper.appendChild(link);
+            container.appendChild(wrapper);
+          });
+        });
+      })
+      .catch(err => {
+        document.getElementById("live-notices").textContent = "Failed to load notices.";
+        console.error("Manifest load error:", err);
+      });
+  }
 });
+
