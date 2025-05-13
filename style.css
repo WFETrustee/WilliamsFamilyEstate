@@ -101,6 +101,11 @@ main {
   margin-bottom: 0.5rem;
 }
 
+.notice.pinned {
+  border-left-color: #663399;
+  background-color: #f9f9f9;
+}
+
 /* Footer */
 .site-footer {
     background: radial-gradient(ellipse at center, #888, #777);
