@@ -1,0 +1,26 @@
+name: Auto-generate Notice Manifest
+
+on:
+  push:
+    paths:
+      - 'docs/notices/*.html'
+
+jobs:
+  build-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate manifest.json
+        run: |
+          cd docs/notices
+          ls *.html | jq -R -s -c 'split("\n") | map(select(. != ""))' > manifest.json
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "AutoBot"
+          git config user.email "autobot@github.com"
+          git add docs/notices/manifest.json
+          git commit -m "Auto-update manifest.json" || echo "No changes to commit"
+          git push
