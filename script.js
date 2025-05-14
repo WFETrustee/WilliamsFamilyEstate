@@ -130,9 +130,9 @@ document.addEventListener("DOMContentLoaded", () => {
             link.href = `/notices/${n.filename}`;
             link.textContent = "View Full Notice →";
 
+            wrapper.appendChild(h2);
             wrapper.appendChild(dateDiv);
             if (n.venue) wrapper.appendChild(venueP);
-            wrapper.appendChild(h2);
             wrapper.appendChild(summaryP);
             wrapper.appendChild(link);
             container.appendChild(wrapper);
