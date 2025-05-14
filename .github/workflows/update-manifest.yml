@@ -28,6 +28,11 @@ jobs:
       - name: Confirm interpolated push URL
         run: echo "https://x-access-token:${{ secrets.WFE_AUTOPUSH_TOKEN }}@github.com/${{ github.repository }}" | sed 's/x-access-token:.*/x-access-token:***@github.com/'
 
+      - name: Confirm git remote from correct directory
+        run: |
+          cd $GITHUB_WORKSPACE
+          git remote -v
+
       - name: Commit and push updated manifest
         run: |
           cd $GITHUB_WORKSPACE
