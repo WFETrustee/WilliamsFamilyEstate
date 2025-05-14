@@ -97,7 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
           const container = document.getElementById("live-notices");
           container.innerHTML = "";
 
-          // Filter out nulls and sort: pinned first (desc), then unpinned (desc)
           const validNotices = notices.filter(n => n);
 
           validNotices.sort((a, b) => {
@@ -112,20 +111,28 @@ document.addEventListener("DOMContentLoaded", () => {
             const h2 = document.createElement("h2");
             h2.textContent = n.title;
 
-            const meta = document.createElement("div");
-            meta.className = "date";
-            meta.textContent = `${n.date} | ${n.venue}`;
+            const dateDiv = document.createElement("div");
+            dateDiv.className = "date";
+            dateDiv.textContent = `Published: ${new Date(n.date).toLocaleDateString("en-US", {
+              year: "numeric", month: "long", day: "2-digit"
+            })}`;
 
-            const p = document.createElement("p");
-            p.textContent = n.summary;
+            if (n.venue) {
+              const venueP = document.createElement("p");
+              venueP.textContent = `Recorded in: ${n.venue}`;
+              wrapper.appendChild(venueP);
+            }
+
+            const summaryP = document.createElement("p");
+            summaryP.textContent = n.summary;
 
             const link = document.createElement("a");
             link.href = `/notices/${n.filename}`;
             link.textContent = "View Full Notice →";
 
             wrapper.appendChild(h2);
-            wrapper.appendChild(meta);
-            wrapper.appendChild(p);
+            wrapper.appendChild(dateDiv);
+            wrapper.appendChild(summaryP);
             wrapper.appendChild(link);
             container.appendChild(wrapper);
           });
@@ -137,4 +144,3 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 });
-
