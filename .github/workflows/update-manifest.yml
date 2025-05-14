@@ -5,6 +5,9 @@ on:
     paths:
       - 'notices/*.html'
 
+  workflow_dispatch:
+
+
 jobs:
   build-manifest:
     runs-on: ubuntu-latest
