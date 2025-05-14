@@ -27,4 +27,4 @@ jobs:
           git config user.email "autobot@williamsfamilyestate.org"
           git add notices/manifest.json
           git commit -m "Auto-update manifest.json" || echo "No changes to commit"
-          git push
+          git push origin HEAD:main
