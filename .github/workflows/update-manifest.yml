@@ -11,9 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Show git remote URL
-        run: git remote -v
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -30,6 +27,9 @@ jobs:
           ls *.html | jq -R -s -c 'split("\n") | map(select(. != ""))' > manifest.json
           echo "Generated manifest.json:"
           cat manifest.json
+
+      - name: Show git remote URL
+        run: git remote -v
 
       - name: Set up Git auth with token
         run: |
