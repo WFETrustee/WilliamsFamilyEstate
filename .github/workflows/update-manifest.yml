@@ -25,6 +25,9 @@ jobs:
           ls notices/*.html | xargs -n1 basename | jq -R -s -c 'split("\n") | map(select(. != ""))' > notices/manifest.json
           cat notices/manifest.json
 
+      - name: Confirm interpolated push URL
+        run: echo "https://x-access-token:${{ secrets.WFE_AUTOPUSH_TOKEN }}@github.com/${{ github.repository }}" | sed 's/x-access-token:.*/x-access-token:***@github.com/'
+
       - name: Commit and push updated manifest
         run: |
           git config user.name "AutoBot"
