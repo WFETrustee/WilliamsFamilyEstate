@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch("/notices/manifest.json")
       .then(res => res.json())
       .then(filenames => {
-        const filtered = filenames.filter(f => f !== "index.html");
+        const filtered = filenames.filter(f => (f !== "index.html" && f!== "Notice_Template.html"));
 
         const noticePromises = filtered.map(file =>
           fetch(`/notices/${file}`)
