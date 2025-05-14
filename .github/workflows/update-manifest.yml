@@ -1,26 +1,51 @@
 name: Auto-generate Notice Manifest
 
+# ---------------------------------------------
+# TRIGGERS: When should this workflow run?
+# ---------------------------------------------
 on:
+  # Trigger automatically when any HTML file is added/changed in /notices/
   push:
     paths:
       - 'notices/*.html'
-
+  # Allow manual triggering from GitHub's Actions tab
   workflow_dispatch:
 
-
+# ---------------------------------------------
+# JOBS: Define what the workflow does
+# ---------------------------------------------
 jobs:
   build-manifest:
     runs-on: ubuntu-latest
 
     steps:
+      # ✅ Step 1: Checkout the current repo contents
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ✅ Step 2: Debug — show current directory and files
+      - name: Debug: show current folder contents
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "List contents:"
+          ls -al
+
+      # ✅ Step 3: Generate manifest.json from all HTML files in /notices/
       - name: Generate manifest.json from notice files
         run: |
           cd notices
           ls *.html | jq -R -s -c 'split("\n") | map(select(. != ""))' > manifest.json
+          echo "Generated manifest.json:"
+          cat manifest.json
 
+      # ✅ Step 4: Set up Git to use a Personal Access Token stored as a secret
+      # Required to push back to the repo (github-actions[bot] cannot push by default)
+      - name: Set up Git auth with token
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.WFE_AUTOPUSH_TOKEN }}@github.com/${{ github.repository }}
+
+      # ✅ Step 5: Commit and push the updated manifest.json back to the repo
       - name: Commit and push updated manifest
         run: |
           git config user.name "AutoBot"
