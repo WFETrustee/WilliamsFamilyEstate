@@ -1,37 +1,32 @@
 name: Auto-generate Notice Manifest
 
-# ---------------------------------------------
-# TRIGGERS: When should this workflow run?
-# ---------------------------------------------
 on:
-  # Trigger automatically when any HTML file is added/changed in /notices/
+  # Trigger when any .html file is pushed inside the /notices/ folder
   push:
     paths:
       - 'notices/*.html'
-  # Allow manual triggering from GitHub's Actions tab
+
+  # Allow manual runs from the GitHub Actions UI
   workflow_dispatch:
 
-# ---------------------------------------------
-# JOBS: Define what the workflow does
-# ---------------------------------------------
 jobs:
   build-manifest:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ Step 1: Checkout the current repo contents
+      # Step 1: Clone repo into the runner
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ✅ Step 2: Debug — show current directory and files
+      # Step 2: Print current working directory and file tree
       - name: Debug: show current folder contents
         run: |
           echo "Current directory:"
           pwd
-          echo "List contents:"
+          echo "List of files:"
           ls -al
 
-      # ✅ Step 3: Generate manifest.json from all HTML files in /notices/
+      # Step 3: Create manifest.json from all .html files inside /notices
       - name: Generate manifest.json from notice files
         run: |
           cd notices
@@ -39,13 +34,12 @@ jobs:
           echo "Generated manifest.json:"
           cat manifest.json
 
-      # ✅ Step 4: Set up Git to use a Personal Access Token stored as a secret
-      # Required to push back to the repo (github-actions[bot] cannot push by default)
+      # Step 4: Set Git remote to use a GitHub personal access token (stored in secret)
       - name: Set up Git auth with token
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.WFE_AUTOPUSH_TOKEN }}@github.com/${{ github.repository }}
 
-      # ✅ Step 5: Commit and push the updated manifest.json back to the repo
+      # Step 5: Commit and push manifest.json back to the main branch
       - name: Commit and push updated manifest
         run: |
           git config user.name "AutoBot"
