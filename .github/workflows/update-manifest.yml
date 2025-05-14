@@ -1,5 +1,8 @@
 name: Auto-generate Notice Manifest
 
+permissions:
+  contents: write
+  
 on:
   push:
     paths:
