@@ -14,26 +14,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Debug - show current folder contents
+      - name: Debug - show working directory
         run: |
-          echo "Current directory:"
+          echo "Working directory:"
           pwd
-          echo "List of files:"
           ls -al
 
       - name: Generate manifest.json from notice files
         run: |
-          cd notices
-          ls *.html | jq -R -s -c 'split("\n") | map(select(. != ""))' > manifest.json
-          echo "Generated manifest.json:"
-          cat manifest.json
-
-      - name: Show git remote URL
-        run: git remote -v
-
-      - name: Set up Git auth with token
-        run: |
-          git remote set-url origin https://x-access-token:${{ secrets.WFE_AUTOPUSH_TOKEN }}@github.com/${{ github.repository }}
+          ls notices/*.html | xargs -n1 basename | jq -R -s -c 'split("\n") | map(select(. != ""))' > notices/manifest.json
+          cat notices/manifest.json
 
       - name: Commit and push updated manifest
         run: |
@@ -41,4 +31,4 @@ jobs:
           git config user.email "autobot@williamsfamilyestate.org"
           git add notices/manifest.json
           git commit -m "Auto-update manifest.json" || echo "No changes to commit"
-          git push origin HEAD:main
+          git push https://x-access-token:${{ secrets.WFE_AUTOPUSH_TOKEN }}@github.com/${{ github.repository }} HEAD:main
