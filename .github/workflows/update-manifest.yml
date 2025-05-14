@@ -1,12 +1,9 @@
 name: Auto-generate Notice Manifest
 
 on:
-  # Trigger when any .html file is pushed inside the /notices/ folder
   push:
     paths:
       - 'notices/*.html'
-
-  # Allow manual runs from the GitHub Actions UI
   workflow_dispatch:
 
 jobs:
@@ -14,11 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Clone repo into the runner
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Print current working directory and file tree
       - name: Debug: show current folder contents
         run: |
           echo "Current directory:"
@@ -26,7 +21,6 @@ jobs:
           echo "List of files:"
           ls -al
 
-      # Step 3: Create manifest.json from all .html files inside /notices
       - name: Generate manifest.json from notice files
         run: |
           cd notices
@@ -34,12 +28,10 @@ jobs:
           echo "Generated manifest.json:"
           cat manifest.json
 
-      # Step 4: Set Git remote to use a GitHub personal access token (stored in secret)
       - name: Set up Git auth with token
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.WFE_AUTOPUSH_TOKEN }}@github.com/${{ github.repository }}
 
-      # Step 5: Commit and push manifest.json back to the main branch
       - name: Commit and push updated manifest
         run: |
           git config user.name "AutoBot"
