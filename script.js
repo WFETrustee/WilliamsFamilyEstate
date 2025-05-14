@@ -1,13 +1,7 @@
 // Run when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
-
   /**
    * Loads external HTML into a container by ID.
-   * Optionally runs a callback function after the content is inserted.
-   *
-   * @param {string} id - The ID of the container element (e.g. 'site-header').
-   * @param {string} url - The URL or path to the HTML file (e.g. '/header.html').
-   * @param {function} [callback] - Optional callback to run after load.
    */
   function loadHTML(id, url, callback) {
     fetch(url)
@@ -19,15 +13,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const container = document.getElementById(id);
         if (container) {
           container.innerHTML = html;
-          if (callback) callback(); // run after DOM injection
+          if (callback) callback();
         }
       })
       .catch(error => console.error(`Error loading ${url}:`, error));
   }
 
   /**
-   * Highlights the currently active menu item in the nav
-   * based on the page's pathname.
+   * Highlights the active menu item based on the current path.
    */
   function highlightActiveMenuItem() {
     const links = document.querySelectorAll("nav ul li a");
@@ -45,8 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Inserts the current year into the footer
-   * by targeting the <span id="footer-year"> placeholder.
+   * Inserts current year into the footer.
    */
   function insertFooterYear() {
     const yearSpan = document.getElementById("footer-year");
@@ -55,19 +47,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-// --- Load header and footer and highlight the active menu item ---
+  // --- Load header, footer, and activate nav highlighting
   loadHTML("site-header", "/header.html", highlightActiveMenuItem);
   loadHTML("site-footer", "/footer.html", insertFooterYear);
 
-
-  // --- Dynamic Notice Rendering ---const containerPinned = document.getElementById("pinned-notices");
+  // --- Dynamic Notice Rendering ---
   if (document.getElementById("live-notices")) {
     fetch("/notices/manifest.json")
       .then(res => res.json())
       .then(filenames => {
-        // FILTER OUT index.html
         const filtered = filenames.filter(f => f !== "index.html");
-  
+
         const noticePromises = filtered.map(file =>
           fetch(`/notices/${file}`)
             .then(res => res.text())
@@ -80,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
               const venue = temp.querySelector('meta[name="notice-venue"]')?.content || "";
               const summary = temp.querySelector('meta[name="notice-summary"]')?.content || "";
               const pinned = temp.querySelector('meta[name="notice-pinned"]')?.content === "true";
-  
+
               return { filename: file, title, date, id, venue, summary, pinned };
             })
             .catch(err => {
@@ -88,47 +78,47 @@ document.addEventListener("DOMContentLoaded", () => {
               return null;
             })
         );
-  
+
         Promise.all(noticePromises).then(notices => {
           const pinnedContainer = document.getElementById("pinned-notices");
           const regularContainer = document.getElementById("regular-notices");
-  
+
           const valid = notices.filter(n => n);
           const pinned = valid.filter(n => n.pinned).sort((a, b) => new Date(b.date) - new Date(a.date));
           const unpinned = valid.filter(n => !n.pinned).sort((a, b) => new Date(b.date) - new Date(a.date));
-  
+
           const renderNotice = n => {
             const wrapper = document.createElement("div");
             wrapper.className = "notice";
-  
+
             const h2 = document.createElement("h2");
             h2.textContent = n.title;
-  
+
             const dateDiv = document.createElement("div");
             dateDiv.className = "date";
             dateDiv.textContent = `Published: ${new Date(n.date).toLocaleDateString(undefined, {
               year: "numeric", month: "long", day: "2-digit"
             })}${n.pinned ? " (pinned)" : ""}`;
-  
+
             const venueP = document.createElement("p");
             venueP.textContent = `Recorded in: ${n.venue}`;
-  
+
             const summaryP = document.createElement("p");
             summaryP.textContent = n.summary;
-  
+
             const link = document.createElement("a");
             link.href = `/notices/${n.filename}`;
             link.textContent = "View Full Notice →";
-  
+
             wrapper.appendChild(h2);
             wrapper.appendChild(dateDiv);
             wrapper.appendChild(venueP);
             wrapper.appendChild(summaryP);
             wrapper.appendChild(link);
-  
+
             return wrapper;
           };
-  
+
           pinned.forEach(n => pinnedContainer.appendChild(renderNotice(n)));
           unpinned.forEach(n => regularContainer.appendChild(renderNotice(n)));
         });
@@ -137,4 +127,5 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("live-notices").textContent = "Failed to load automated notices.";
         console.error("Manifest load error:", err);
       });
-}
+  }
+});
