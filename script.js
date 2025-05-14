@@ -59,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadHTML("site-header", "/header.html", highlightActiveMenuItem);
   loadHTML("site-footer", "/footer.html", insertFooterYear);
 
+
   // --- Dynamic Notice Rendering ---
   if (document.getElementById("live-notices")) {
     fetch("/notices/manifest.json")
@@ -117,10 +118,9 @@ document.addEventListener("DOMContentLoaded", () => {
               year: "numeric", month: "long", day: "2-digit"
             })}`;
 
+            const venueP = document.createElement("p");
             if (n.venue) {
-              const venueP = document.createElement("p");
               venueP.textContent = `Recorded in: ${n.venue}`;
-              wrapper.appendChild(venueP);
             }
 
             const summaryP = document.createElement("p");
@@ -130,8 +130,9 @@ document.addEventListener("DOMContentLoaded", () => {
             link.href = `/notices/${n.filename}`;
             link.textContent = "View Full Notice →";
 
-            wrapper.appendChild(h2);
             wrapper.appendChild(dateDiv);
+            if (n.venue) wrapper.appendChild(venueP);
+            wrapper.appendChild(h2);
             wrapper.appendChild(summaryP);
             wrapper.appendChild(link);
             container.appendChild(wrapper);
