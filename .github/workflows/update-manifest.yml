@@ -3,7 +3,7 @@ name: Auto-generate Notice Manifest
 on:
   push:
     paths:
-      - '/notices/*.html'
+      - 'notices/*.html'
 
 jobs:
   build-manifest:
@@ -15,13 +15,13 @@ jobs:
 
       - name: Generate manifest.json from notice files
         run: |
-          cd docs/notices
+          cd notices
           ls *.html | jq -R -s -c 'split("\n") | map(select(. != ""))' > manifest.json
 
       - name: Commit and push updated manifest
         run: |
           git config user.name "AutoBot"
           git config user.email "autobot@williamsfamilyestate.org"
-          git add /notices/manifest.json
+          git add notices/manifest.json
           git commit -m "Auto-update manifest.json" || echo "No changes to commit"
           git push
