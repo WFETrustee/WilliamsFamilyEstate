@@ -30,6 +30,7 @@ jobs:
 
       - name: Commit and push updated manifest
         run: |
+          cd $GITHUB_WORKSPACE
           git config user.name "AutoBot"
           git config user.email "autobot@williamsfamilyestate.org"
           git add notices/manifest.json
