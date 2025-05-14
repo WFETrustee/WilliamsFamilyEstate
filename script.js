@@ -2,6 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   /**
    * Loads external HTML into a container by ID.
+   * Optionally runs a callback after insertion.
    */
   function loadHTML(id, url, callback) {
     fetch(url)
@@ -20,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Highlights the active menu item based on the current path.
+   * Highlights the current page in the main nav menu.
    */
   function highlightActiveMenuItem() {
     const links = document.querySelectorAll("nav ul li a");
@@ -38,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Inserts current year into the footer.
+   * Replaces span#footer-year with the current year.
    */
   function insertFooterYear() {
     const yearSpan = document.getElementById("footer-year");
@@ -47,11 +48,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Load header, footer, and activate nav highlighting
+  // Load header/footer and activate menu
   loadHTML("site-header", "/header.html", highlightActiveMenuItem);
   loadHTML("site-footer", "/footer.html", insertFooterYear);
 
-  // --- Dynamic Notice Rendering ---
+  // Handle dynamic rendering of public notices
   if (document.getElementById("live-notices")) {
     fetch("/notices/manifest.json")
       .then(res => res.json())
@@ -64,12 +65,15 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(html => {
               const temp = document.createElement("html");
               temp.innerHTML = html;
+
               const title = temp.querySelector('meta[name="notice-title"]')?.content || "Untitled";
               const date = temp.querySelector('meta[name="notice-date"]')?.content || "0000-00-00";
               const id = temp.querySelector('meta[name="notice-id"]')?.content || "";
               const venue = temp.querySelector('meta[name="notice-venue"]')?.content || "";
               const summary = temp.querySelector('meta[name="notice-summary"]')?.content || "";
-              const pinned = temp.querySelector('meta[name="notice-pinned"]')?.content === "true";
+
+              const pinnedContent = temp.querySelector('meta[name="notice-pinned"]')?.content || "false";
+              const pinned = pinnedContent.toLowerCase() === "true";
 
               return { filename: file, title, date, id, venue, summary, pinned };
             })
