@@ -37,7 +37,7 @@ jobs:
         run: |
           git add notices/manifest.json
           git commit -m "Auto-update manifest.json" || echo "No changes to commit"
-          git checkout main
-          git pull origin main
-          git push origin main
-          # git push origin HEAD:main
+          git checkout master
+          git pull origin master
+          git push origin master
+          # git push origin HEAD:master
