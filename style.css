@@ -86,11 +86,14 @@ main {
 
 /*Notice entries*/
 .notice {
+  position: relative;
   margin-bottom: 2rem;
   padding: 1rem;
   border-left: 4px solid #888;
+  border-radius: 6px;
   background: #f7f7f7;
 }
+
 .notice h2 {
   margin-top: 0;
   font-size: 1.25rem;
