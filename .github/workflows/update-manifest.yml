@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Show git remote URL
+        run: git remote -v
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
