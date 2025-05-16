@@ -102,6 +102,19 @@ document.addEventListener("DOMContentLoaded", () => {
           const renderNotice = n => {
             const wrapper = document.createElement("div");
             wrapper.className = "notice";
+            wrapper.style.position = "relative"; // make sure child pin icon can absolutely position
+            
+            if (n.pinned) {
+              const pin = document.createElement("img");
+              pin.src = "pushpin.png";
+              pin.alt = "Pinned";
+              pin.style.position = "absolute";
+              pin.style.top = "0.5em";
+              pin.style.right = "0.5em";
+              pin.style.height = "1.25em";
+              pin.style.opacity = "0.75"; // optional styling
+              wrapper.appendChild(pin);
+            }
 
             const h2 = document.createElement("h2");
             h2.textContent = n.title;
@@ -119,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
             summaryP.textContent = n.summary;
 
             const link = document.createElement("a");
-            link.href = `/notices/${n.filename}?v=${encodeURIComponent(n.lastModified)}`;
+            link.href = `/notices/${n.filename}`;
             link.textContent = "View Full Notice →";
 
             wrapper.appendChild(h2);
