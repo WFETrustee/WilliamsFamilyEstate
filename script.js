@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch("/notices/manifest.json")
       .then(res => res.json())
       .then(filenames => {
-        const filtered = filenames.filter(f => (f !== "index.html" && f!== "Notice_Template.html"));
+        const filtered = filenames.filter(f => f !== "index.html" && f !== "Notice_Template.html");
 
         const noticePromises = filtered.map(file =>
           fetch(`/notices/${file}`)
@@ -71,11 +71,19 @@ document.addEventListener("DOMContentLoaded", () => {
               const id = temp.querySelector('meta[name="notice-id"]')?.content || "";
               const venue = temp.querySelector('meta[name="notice-venue"]')?.content || "";
               const summary = temp.querySelector('meta[name="notice-summary"]')?.content || "";
-
               const pinnedContent = temp.querySelector('meta[name="notice-pinned"]')?.content || "false";
               const pinned = pinnedContent.toLowerCase() === "true";
 
-              return { filename: file, title, date, id, venue, summary, pinned };
+              return {
+                filename: file,
+                title,
+                date,
+                id,
+                venue,
+                summary,
+                pinned,
+                lastModified: new Date().toISOString() // Replace with real hash or timestamp in manifest
+              };
             })
             .catch(err => {
               console.warn(`Failed to load notice: ${file}`, err);
@@ -94,19 +102,6 @@ document.addEventListener("DOMContentLoaded", () => {
           const renderNotice = n => {
             const wrapper = document.createElement("div");
             wrapper.className = "notice";
-            wrapper.style.position = "relative"; // make sure child pin icon can absolutely position
-            
-            if (n.pinned) {
-              const pin = document.createElement("img");
-              pin.src = "pushpin.png";
-              pin.alt = "Pinned";
-              pin.style.position = "absolute";
-              pin.style.top = "0.5em";
-              pin.style.right = "0.5em";
-              pin.style.height = "1.25em";
-              pin.style.opacity = "0.75"; // optional styling
-              wrapper.appendChild(pin);
-            }
 
             const h2 = document.createElement("h2");
             h2.textContent = n.title;
@@ -124,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
             summaryP.textContent = n.summary;
 
             const link = document.createElement("a");
-            link.href = `/notices/${n.filename}`;
+            link.href = `/notices/${n.filename}?v=${encodeURIComponent(n.lastModified)}`;
             link.textContent = "View Full Notice →";
 
             wrapper.appendChild(h2);
