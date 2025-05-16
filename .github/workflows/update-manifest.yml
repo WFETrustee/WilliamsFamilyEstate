@@ -17,16 +17,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Generate manifest.json from notice files
+      - name: Generate manifest.json from notice files (with lastModified)
         run: |
           cd notices
-          ls *.html | xargs -n1 basename | jq -R -s -c 'split("\n") | map(select(. != ""))' > manifest.json
-          echo "Generated manifest:"
+          echo "[" > manifest.json
+          FIRST=true
+          for f in *.html; do
+            if [[ "$f" != "index.html" && "$f" != "Notice_Template.html" ]]; then
+              if [ "$FIRST" = false ]; then echo "," >> manifest.json; fi
+              MODIFIED=$(git log -1 --format="%cI" -- "$f")
+              echo "  {\"filename\": \"$f\", \"lastModified\": \"$MODIFIED\"}" >> manifest.json
+              FIRST=false
+            fi
+          done
+          echo "]" >> manifest.json
+          echo "Generated manifest.json:"
           cat manifest.json
 
       - name: Configure Git identity
         run: |
-          git config user.name "WFETrustee"
+          git config user.name "WFETrustee Auto"
           git config user.email "trustee@williamsfamilyestate.org"
 
       - name: Force set origin to use PAT
@@ -36,8 +46,6 @@ jobs:
       - name: Commit and push updated manifest
         run: |
           git add notices/manifest.json
-          git commit -m "Auto-update manifest.json" || echo "No changes to commit"
-          git checkout master
-          git pull origin master
-          git push origin master
-          # git push origin HEAD:master
+          git commit -m "Auto-update manifest.json with lastModified timestamps" || echo "No changes to commit"
+          git pull origin main
+          git push origin main
