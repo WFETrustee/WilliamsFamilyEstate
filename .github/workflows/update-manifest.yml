@@ -47,5 +47,5 @@ jobs:
         run: |
           git add notices/manifest.json
           git commit -m "Auto-update manifest.json with lastModified timestamps" || echo "No changes to commit"
-          git pull origin main
+          git pull --rebase origin main
           git push origin main
