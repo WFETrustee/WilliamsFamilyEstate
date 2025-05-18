@@ -46,9 +46,11 @@ jobs:
 
       - name: Commit and push updated manifest
         run: |
+          cd $GITHUB_WORKSPACE
           git add notices/manifest.json
           git commit -m "Auto-update manifest.json with lastModified timestamps" || echo "No changes to commit"
-          git fetch origin main
-          git reset --hard origin/main
-          git push origin HEAD:main
+          git fetch origin master
+          git reset --hard origin/master
+          git push origin HEAD:master
+
 
