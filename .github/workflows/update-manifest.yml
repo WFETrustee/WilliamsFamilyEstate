@@ -22,14 +22,16 @@ jobs:
           echo "[" > notices/manifest.json
           FIRST=true
           for f in notices/*.html; do
-            if [[ "$f" != "notices/index.html" && "$f" != "notices/Notice_Template.html" ]]; then
+            base=$(basename "$f")
+            if [[ "$base" != "index.html" && "$base" != "Notice_Template.html" ]]; then
               MODIFIED=$(date -Iseconds)
               if [ "$FIRST" = false ]; then echo "," >> notices/manifest.json; fi
-              echo "  {\"filename\": \"$(basename "$f")\", \"lastModified\": \"$MODIFIED\"}" >> notices/manifest.json
+              echo "  {\"filename\": \"$base\", \"lastModified\": \"$MODIFIED\"}" >> notices/manifest.json
               FIRST=false
             fi
           done
           echo "]" >> notices/manifest.json
+          echo "Generated notices/manifest.json:"
           cat notices/manifest.json
 
       - name: Configure Git identity
