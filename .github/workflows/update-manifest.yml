@@ -23,7 +23,7 @@ jobs:
           FIRST=true
           for f in notices/*.html; do
             if [[ "$f" != "notices/index.html" && "$f" != "notices/Notice_Template.html" ]]; then
-              MODIFIED=$(git log -1 --format="%cI" -- "$f" || date -Iseconds)
+              MODIFIED=$(date -Iseconds)
               if [ "$FIRST" = false ]; then echo "," >> notices/manifest.json; fi
               echo "  {\"filename\": \"$(basename "$f")\", \"lastModified\": \"$MODIFIED\"}" >> notices/manifest.json
               FIRST=false
