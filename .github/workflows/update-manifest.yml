@@ -24,8 +24,9 @@ jobs:
           FIRST=true
           for f in *.html; do
             if [[ "$f" != "index.html" && "$f" != "Notice_Template.html" ]]; then
+              # Get last commit timestamp for this file (ISO 8601 format)
+              MODIFIED=$(git log -1 --format="%cI" -- "$f" || echo "$(date -Iseconds)")
               if [ "$FIRST" = false ]; then echo "," >> manifest.json; fi
-              MODIFIED=$(git log -1 --format="%cI" -- "$f")
               echo "  {\"filename\": \"$f\", \"lastModified\": \"$MODIFIED\"}" >> manifest.json
               FIRST=false
             fi
@@ -33,7 +34,7 @@ jobs:
           echo "]" >> manifest.json
           echo "Generated manifest.json:"
           cat manifest.json
-
+    
       - name: Configure Git identity
         run: |
           git config user.name "WFETrustee Auto"
