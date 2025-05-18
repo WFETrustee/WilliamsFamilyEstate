@@ -19,22 +19,19 @@ jobs:
 
       - name: Generate manifest.json from notice files (with lastModified)
         run: |
-          cd notices
-          echo "[" > manifest.json
+          echo "[" > notices/manifest.json
           FIRST=true
-          for f in *.html; do
-            if [[ "$f" != "index.html" && "$f" != "Notice_Template.html" ]]; then
-              # Get last commit timestamp for this file (ISO 8601 format)
-              MODIFIED=$(git log -1 --format="%cI" -- "$f" || echo "$(date -Iseconds)")
-              if [ "$FIRST" = false ]; then echo "," >> manifest.json; fi
-              echo "  {\"filename\": \"$f\", \"lastModified\": \"$MODIFIED\"}" >> manifest.json
+          for f in notices/*.html; do
+            if [[ "$f" != "notices/index.html" && "$f" != "notices/Notice_Template.html" ]]; then
+              MODIFIED=$(git log -1 --format="%cI" -- "$f" || date -Iseconds)
+              if [ "$FIRST" = false ]; then echo "," >> notices/manifest.json; fi
+              echo "  {\"filename\": \"$(basename "$f")\", \"lastModified\": \"$MODIFIED\"}" >> notices/manifest.json
               FIRST=false
             fi
           done
-          echo "]" >> manifest.json
-          echo "Generated manifest.json:"
-          cat manifest.json
-    
+          echo "]" >> notices/manifest.json
+          cat notices/manifest.json
+
       - name: Configure Git identity
         run: |
           git config user.name "WFETrustee Auto"
