@@ -1,7 +1,20 @@
 // Run when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
   /**
+   * Enables the use of Google fonts in the site.
+   */
+  function enableGoogleFonts(font_family = 'Spectral+SC') {
+    if (!document.querySelector(`link[href*='${font_family}']`)) {
+      const link = document.createElement("link");
+      link.href = `https://fonts.googleapis.com/css?family=${font_family}`;
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
+  }
+  
+  /**
    * Loads external HTML into a container by ID.
+   * Automatically loads Google Fonts if the container is the site header.
    * Optionally runs a callback after insertion.
    */
   function loadHTML(id, url, callback) {
@@ -14,12 +27,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const container = document.getElementById(id);
         if (container) {
           container.innerHTML = html;
+  
+          // If header, enable fonts
+          if (id === "site-header") {
+            enableGoogleFonts('Spectral+SC');
+          }
+  
           if (callback) callback();
         }
       })
       .catch(error => console.error(`Error loading ${url}:`, error));
   }
-
+  
+   
   /**
    * Highlights the current page in the main nav menu.
    */
