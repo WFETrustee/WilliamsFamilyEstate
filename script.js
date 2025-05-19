@@ -56,37 +56,40 @@ document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("live-notices")) {
     fetch("/notices/manifest.json")
       .then(res => res.json())
-      .then(filenames => {
-        const filtered = filenames.filter(f => f !== "index.html" && f !== "Notice_Template.html");
+      .then(manifest => {
+        // Filter out unwanted filenames
+        const filtered = manifest.filter(
+          entry => entry.filename !== "index.html" && entry.filename !== "Notice_Template.html"
+        );
 
-        const noticePromises = filtered.map(file =>
-          fetch(`/notices/${file}`)
+        const noticePromises = filtered.map(({ filename, lastModified }) =>
+          fetch(`/notices/${filename}`)
             .then(res => res.text())
             .then(html => {
               const temp = document.createElement("html");
               temp.innerHTML = html;
 
-              const title = temp.querySelector('meta[name="notice-title"]')?.content || "Untitled";
-              const date = temp.querySelector('meta[name="notice-date"]')?.content || "0000-00-00";
-              const id = temp.querySelector('meta[name="notice-id"]')?.content || "";
-              const venue = temp.querySelector('meta[name="notice-venue"]')?.content || "";
-              const summary = temp.querySelector('meta[name="notice-summary"]')?.content || "";
-              const pinnedContent = temp.querySelector('meta[name="notice-pinned"]')?.content || "false";
+              const title = temp.querySelector('meta[name="title"]')?.content || "Untitled";
+              const date = temp.querySelector('meta[name="date"]')?.content || "0000-00-00";
+              const id = temp.querySelector('meta[name="identifier"]')?.content || "";
+              const venue = temp.querySelector('meta[name="venue"]')?.content || "";
+              const summary = temp.querySelector('meta[name="summary"]')?.content || "";
+              const pinnedContent = temp.querySelector('meta[name="pinned"]')?.content || "false";
               const pinned = pinnedContent.toLowerCase() === "true";
 
               return {
-                filename: file,
+                filename,
                 title,
                 date,
                 id,
                 venue,
                 summary,
                 pinned,
-                lastModified: new Date().toISOString() // Replace with real hash or timestamp in manifest
+                lastModified
               };
             })
             .catch(err => {
-              console.warn(`Failed to load notice: ${file}`, err);
+              console.warn(`Failed to load notice: ${filename}`, err);
               return null;
             })
         );
@@ -102,8 +105,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const renderNotice = n => {
             const wrapper = document.createElement("div");
             wrapper.className = "notice";
-            wrapper.style.position = "relative"; // make sure child pin icon can absolutely position
-            
+            wrapper.style.position = "relative";
+
             if (n.pinned) {
               const pin = document.createElement("img");
               pin.src = "pushpin.png";
@@ -112,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
               pin.style.top = "0.5em";
               pin.style.right = "0.5em";
               pin.style.height = "1.25em";
-              pin.style.opacity = "0.75"; // optional styling
+              pin.style.opacity = "0.75";
               wrapper.appendChild(pin);
             }
 
@@ -153,4 +156,3 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Manifest load error:", err);
       });
   }
-});
