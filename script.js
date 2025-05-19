@@ -180,3 +180,4 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Manifest load error:", err);
       });
   }
+});
