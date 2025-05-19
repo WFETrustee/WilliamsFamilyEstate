@@ -1,15 +1,28 @@
+// Global list of Google Fonts used across the site
+const GOOGLE_FONTS = [
+  "Spectral+SC",
+  "Roboto:400,700"
+];
+
 // Run when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
   /**
-   * Enables the use of Google fonts in the site.
+   * Enables one or more Google Fonts on the page.
+   * Accepts either a single font or an array of font names (e.g., 'Spectral+SC' or ['Spectral+SC', 'Roboto:400,700']).
    */
-  function enableGoogleFonts(font_family = 'Spectral+SC') {
-    if (!document.querySelector(`link[href*='${font_family}']`)) {
-      const link = document.createElement("link");
-      link.href = `https://fonts.googleapis.com/css?family=${font_family}`;
-      link.rel = "stylesheet";
-      document.head.appendChild(link);
-    }
+  function enableGoogleFonts(fonts) {
+    // Normalize input to array
+    const fontList = Array.isArray(fonts) ? fonts : [fonts];
+  
+    fontList.forEach(font_family => {
+      // Prevent duplicate <link> insertion
+      if (!document.querySelector(`link[href*='${font_family}']`)) {
+        const link = document.createElement("link");
+        link.href = `https://fonts.googleapis.com/css?family=${font_family}`;
+        link.rel = "stylesheet";
+        document.head.appendChild(link);
+      }
+    });
   }
   
   /**
@@ -17,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
    * Automatically loads Google Fonts if the container is the site header.
    * Optionally runs a callback after insertion.
    */
-  function loadHTML(id, url, callback) {
+  function loadHTML(id, url, callback, googleFonts = GOOGLE_FONTS) {
     fetch(url)
       .then(response => {
         if (!response.ok) throw new Error(`Failed to load ${url}`);
@@ -28,9 +41,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (container) {
           container.innerHTML = html;
   
-          // If header, enable fonts
-          if (id === "site-header") {
-            enableGoogleFonts('Spectral+SC');
+          if (googleFonts?.length) {
+            enableGoogleFonts(googleFonts);
           }
   
           if (callback) callback();
