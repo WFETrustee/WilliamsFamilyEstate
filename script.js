@@ -86,12 +86,12 @@ document.addEventListener("DOMContentLoaded", () => {
               const temp = document.createElement("html");
               temp.innerHTML = html;
   
-              const title = temp.querySelector('meta[name="title"]')?.content || "Untitled";
-              const date = temp.querySelector('meta[name="date"]')?.content || "0000-00-00";
-              const id = temp.querySelector('meta[name="identifier"]')?.content || "";
-              const venue = temp.querySelector('meta[name="venue"]')?.content || "";
-              const summary = temp.querySelector('meta[name="summary"]')?.content || "";
-              const pinnedContent = temp.querySelector('meta[name="pinned"]')?.content || "false";
+              const title = temp.querySelector('meta[name="notice-title"]')?.content || "Untitled";
+              const date = temp.querySelector('meta[name="notice-date"]')?.content || "0000-00-00";
+              const id = temp.querySelector('meta[name="notice-id"]')?.content || "";
+              const venue = temp.querySelector('meta[name="notice-venue"]')?.content || "";
+              const summary = temp.querySelector('meta[name="notice-summary"]')?.content || "";
+              const pinnedContent = temp.querySelector('meta[name="notice-pinned"]')?.content || "false";
               const pinned = pinnedContent.toLowerCase() === "true";
   
               const noticeData = {
