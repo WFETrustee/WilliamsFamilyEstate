@@ -57,9 +57,11 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch("/notices/manifest.json")
       .then(res => res.json())
       .then(manifest => {
+        console.log("Loaded manifest:", manifest);
         const filtered = manifest.filter(
           entry => entry.filename !== "index.html" && entry.filename !== "Notice_Template.html"
         );
+        console.log("Filtered manifest:", filtered);
   
         const noticePromises = filtered.map(({ filename, lastModified }) => {
           const cacheKey = `notice:${filename}`;
@@ -88,6 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
               const title = temp.querySelector('meta[name="notice-title"]')?.content || "Untitled";
               const date = temp.querySelector('meta[name="notice-date"]')?.content || "0000-00-00";
+              console.log(`Parsed title for ${filename}: ${title}`);
               const id = temp.querySelector('meta[name="notice-id"]')?.content || "";
               const venue = temp.querySelector('meta[name="notice-venue"]')?.content || "";
               const summary = temp.querySelector('meta[name="notice-summary"]')?.content || "";
