@@ -1,0 +1,41 @@
+name: Build Manifest
+description: Generates a manifest.json for a folder of HTML files
+
+inputs:
+  folder:
+    description: Target folder (e.g., 'notices' or 'emergency')
+    required: true
+  template_ignore:
+    description: File to ignore (e.g., 'Notice_Template.html')
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - run: |
+        FOLDER="${{ inputs.folder }}"
+        TEMPLATE_IGNORE="${{ inputs.template_ignore }}"
+
+        echo "[" > "$FOLDER/manifest.json"
+        FIRST=true
+
+        for f in "$FOLDER"/*.html; do
+          base=$(basename "$f")
+
+          if [[ "$base" != "index.html" && "$base" != "$TEMPLATE_IGNORE" ]]; then
+            MODIFIED=$(date -Iseconds)
+
+            if [[ "$FIRST" == false ]]; then
+              echo "," >> "$FOLDER/manifest.json"
+            fi
+
+            echo "  {\"filename\": \"$base\", \"lastModified\": \"$MODIFIED\"}" >> "$FOLDER/manifest.json"
+            FIRST=false
+          fi
+        done
+
+        echo "]" >> "$FOLDER/manifest.json"
+        echo "Generated $FOLDER/manifest.json:"
+        cat "$FOLDER/manifest.json"
+      shell: bash
