@@ -1,38 +1,38 @@
-name: Auto-generate Notice Manifest
+name: Auto-generate Manifest Files
 
 permissions:
   contents: write
-  
+  packages: read
+  issues: read
+  pull-requests: read
+
 on:
   push:
+    branches:
+      - master
     paths:
       - 'notices/*.html'
+      - 'emergency/*.html'
   workflow_dispatch:
 
 jobs:
-  build-manifest:
+  build-manifests:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Generate manifest.json from notice files (with lastModified)
-        run: |
-          echo "[" > notices/manifest.json
-          FIRST=true
-          for f in notices/*.html; do
-            base=$(basename "$f")
-            if [[ "$base" != "index.html" && "$base" != "Notice_Template.html" ]]; then
-              MODIFIED=$(date -Iseconds)
-              if [ "$FIRST" = false ]; then echo "," >> notices/manifest.json; fi
-              echo "  {\"filename\": \"$base\", \"lastModified\": \"$MODIFIED\"}" >> notices/manifest.json
-              FIRST=false
-            fi
-          done
-          echo "]" >> notices/manifest.json
-          echo "Generated notices/manifest.json:"
-          cat notices/manifest.json
+      - name: Generate notices manifest
+        uses: ./.github/actions/build-manifest
+        with:
+          folder: notices
+          template_ignore: Notice_Template.html
+
+      - name: Generate emergency manifest
+        uses: ./.github/actions/build-manifest
+        with:
+          folder: emergency
+          template_ignore: Emergency_Template.html
 
       - name: Configure Git identity
         run: |
@@ -43,12 +43,9 @@ jobs:
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.WFE_AUTOPUSH_TOKEN }}@github.com/${{ github.repository }}
 
-      - name: Commit and push updated manifest
+      - name: Commit and push updated manifests
         run: |
-          cd $GITHUB_WORKSPACE
           git fetch origin master
-          git add notices/manifest.json
-          git commit -m "Auto-update manifest.json with lastModified timestamps" || echo "No changes to commit"
+          git add notices/manifest.json emergency/manifest.json
+          git commit -m "Auto-update manifests" || echo "No changes to commit"
           git push origin HEAD:master
-
-
