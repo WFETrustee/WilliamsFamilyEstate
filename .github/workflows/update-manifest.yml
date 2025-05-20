@@ -23,18 +23,42 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Generate notices manifest
+        run: |
+          if compgen -G "notices/*.html" > /dev/null; then
+            echo "HTML files found in notices/, generating manifest..."
+            mkdir -p .github/actions/build-manifest/temp
+            cp -r .github/actions/build-manifest/* .github/actions/build-manifest/temp/
+            chmod +x .github/actions/build-manifest/temp/action.yml
+            echo "Using composite action"
+          else
+            echo "No notice HTML files found. Skipping manifest generation."
+            exit 0
+          fi
+
+      - name: Generate notices manifest
+        if: ${{ success() }}
         uses: ./.github/actions/build-manifest
         with:
           folder: notices
           template_ignore: Notice_Template.html
 
+- name: Generate emergency manifest
+        run: |
+          if compgen -G "emergency/*.html" > /dev/null; then
+            echo "HTML files found in emergency/, generating manifest..."
+          else
+            echo "No emergency HTML files found. Skipping manifest generation."
+            exit 0
+          fi
+
       - name: Generate emergency manifest
+        if: ${{ success() }}
         uses: ./.github/actions/build-manifest
         with:
           folder: emergency
           template_ignore: Emergency_Template.html
 
-      - name: Configure Git identity
+- name: Configure Git identity
         run: |
           git config user.name "WFE Bot"
           git config user.email "trustee@williamsfamilyestate.org"
@@ -46,6 +70,7 @@ jobs:
       - name: Commit and push updated manifests
         run: |
           git fetch origin master
-          git add notices/manifest.json emergency/manifest.json
+          if [ -f notices/manifest.json ]; then git add notices/manifest.json; fi
+          if [ -f emergency/manifest.json ]; then git add emergency/manifest.json; fi
           git commit -m "Auto-update manifests" || echo "No changes to commit"
           git push origin HEAD:master
