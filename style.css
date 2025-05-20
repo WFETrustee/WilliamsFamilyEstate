@@ -41,6 +41,16 @@ main {
     text-align: center;
 }
 
+    .main-nav img {
+      height: 1.25em;
+      vertical-align: middle;
+      transition: transform 0.2s ease;
+    }
+    
+    .main-nav a:hover img {
+      transform: scale(1.3); /* Grows 30% larger on hover */
+    }
+
     .main-nav > ul {
         max-width: 720px;
         width: 100%;
