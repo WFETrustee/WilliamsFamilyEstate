@@ -1,41 +1,55 @@
 name: Build Manifest
-description: Generates a manifest.json for a folder of HTML files
+description: Generates a manifest.json for a folder of HTML files if any exist.
 
 inputs:
   folder:
     description: Target folder (e.g., 'notices' or 'emergency')
     required: true
+
   template_ignore:
-    description: File to ignore (e.g., 'Notice_Template.html')
+    description: A specific HTML file to ignore (e.g., 'Notice_Template.html')
     required: false
     default: ''
 
 runs:
   using: composite
   steps:
-    - run: |
+    - name: Check for HTML files and build manifest if any
+      shell: bash
+      run: |
+        # Set variables from inputs
         FOLDER="${{ inputs.folder }}"
         TEMPLATE_IGNORE="${{ inputs.template_ignore }}"
 
-        echo "[" > "$FOLDER/manifest.json"
-        FIRST=true
-
+        # Find all .html files excluding known templates and index.html
+        HTML_FILES=()
         for f in "$FOLDER"/*.html; do
           base=$(basename "$f")
-
           if [[ "$base" != "index.html" && "$base" != "$TEMPLATE_IGNORE" ]]; then
-            MODIFIED=$(date -Iseconds)
-
-            if [[ "$FIRST" == false ]]; then
-              echo "," >> "$FOLDER/manifest.json"
-            fi
-
-            echo "  {\"filename\": \"$base\", \"lastModified\": \"$MODIFIED\"}" >> "$FOLDER/manifest.json"
-            FIRST=false
+            HTML_FILES+=("$base")
           fi
         done
 
+        # If no valid files found, skip manifest generation
+        if [[ ${#HTML_FILES[@]} -eq 0 ]]; then
+          echo "⚠️ No eligible .html files found in $FOLDER. Skipping manifest.json generation."
+          exit 0
+        fi
+
+        echo "✅ Found ${#HTML_FILES[@]} eligible file(s) in $FOLDER. Generating manifest..."
+
+        # Create the manifest.json
+        echo "[" > "$FOLDER/manifest.json"
+        FIRST=true
+
+        for base in "${HTML_FILES[@]}"; do
+          MODIFIED=$(date -Iseconds)  # Timestamp of this run; can be replaced with Git metadata if desired
+          if [[ "$FIRST" == false ]]; then echo "," >> "$FOLDER/manifest.json"; fi
+          echo "  {\"filename\": \"$base\", \"lastModified\": \"$MODIFIED\"}" >> "$FOLDER/manifest.json"
+          FIRST=false
+        done
+
         echo "]" >> "$FOLDER/manifest.json"
-        echo "Generated $FOLDER/manifest.json:"
+        echo "📦 Finished $FOLDER/manifest.json:"
         cat "$FOLDER/manifest.json"
-      shell: bash
+
