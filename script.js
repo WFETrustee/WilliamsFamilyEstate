@@ -7,7 +7,6 @@ const GOOGLE_FONTS = [
 
 // Run when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
-  /** Enables Google Fonts */
   function enableGoogleFonts(fonts) {
     const fontList = Array.isArray(fonts) ? fonts : [fonts];
     fontList.forEach(font_family => {
@@ -20,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /** Loads external HTML */
   function loadHTML(id, url, callback, googleFonts = GOOGLE_FONTS) {
     fetch(url)
       .then(response => {
@@ -38,7 +36,6 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch(error => console.error(`Error loading ${url}:`, error));
   }
 
-  /** Highlights active nav item */
   function highlightActiveMenuItem() {
     const links = document.querySelectorAll("nav ul li a");
     const path = location.pathname.replace(/\/$/, "");
@@ -53,17 +50,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /** Sets current year in footer */
   function insertFooterYear() {
     const yearSpan = document.getElementById("footer-year");
     if (yearSpan) yearSpan.textContent = new Date().getFullYear();
   }
 
-  // Load layout
   loadHTML("site-header", "/header.html", highlightActiveMenuItem);
   loadHTML("site-footer", "/footer.html", insertFooterYear);
 
-  /** Parse metadata depending on folder */
   function parseMetadata(html, folder) {
     const temp = document.createElement("html");
     temp.innerHTML = html;
@@ -71,12 +65,19 @@ document.addEventListener("DOMContentLoaded", () => {
     switch (folder) {
       case "emergency":
         return {
-          title: temp.querySelector('meta[name="emergency-title"]')?.content || "Untitled Emergency",
-          date: temp.querySelector('meta[name="emergency-date"]')?.content || "0000-00-00",
-          id: temp.querySelector('meta[name="emergency-id"]')?.content || "",
+          title: temp.querySelector('meta[name="notice-title"]')?.content || "Untitled Emergency",
+          date: temp.querySelector('meta[name="notice-date"]')?.content || "0000-00-00",
+          id: temp.querySelector('meta[name="notice-id"]')?.content || "",
+          author: temp.querySelector('meta[name="notice-author"]')?.content || "",
+          trigger: temp.querySelector('meta[name="notice-use-trigger"]')?.content || "",
+          filer: temp.querySelector('meta[name="notice-filer"]')?.content || "",
+          instructions: temp.querySelector('meta[name="notice-instructions"]')?.content || "",
+          version: temp.querySelector('meta[name="notice-version"]')?.content || "",
+          category: temp.querySelector('meta[name="notice-category"]')?.content || "",
+          status: temp.querySelector('meta[name="notice-status"]')?.content || "",
+          pinned: temp.querySelector('meta[name="notice-pinned"]')?.content?.toLowerCase() === "true",
           venue: "Emergency Registry",
-          summary: temp.querySelector('meta[name="emergency-summary"]')?.content || "",
-          pinned: false
+          summary: temp.querySelector('meta[name="notice-summary"]')?.content || ""
         };
       case "notices":
       default:
@@ -91,7 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Handle dynamic notice rendering
   if (document.getElementById("live-notices")) {
     const pathParts = window.location.pathname.split("/");
     const baseFolder = pathParts.find(part => part === "notices" || part === "emergency") || "notices";
