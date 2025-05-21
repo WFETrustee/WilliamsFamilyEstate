@@ -48,7 +48,7 @@ main {
     }
     
     .main-nav a:hover img {
-      transform: scale(1.3); /* Grows 30% larger on hover */
+      transform: scale(1.5); /* Grows 50% larger on hover */
     }
 
     .main-nav > ul {
