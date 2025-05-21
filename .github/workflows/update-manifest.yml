@@ -29,12 +29,13 @@ jobs:
       - name: Generate manifests
         run: |
           for folder in $(find . -type f -name '*_Template.html' | sed -E 's|\./([^/]+)/[^/]+_Template.html|\1|' | sort -u); do
+            TEMPLATE_FILE="${folder}_Template.html"
             echo "Generating manifest for: $folder"
             echo "[" > "$folder/manifest.json"
             FIRST=true
             for file in $folder/*.html; do
               base=$(basename "$file")
-              if [[ "$base" != "index.html" && "$base" != "${folder}_Template.html" ]]; then
+              if [[ "$base" != "index.html" && "$base" != "$TEMPLATE_FILE" ]]; then
                 MODIFIED=$(date -Iseconds -r "$file")
                 if [ "$FIRST" = false ]; then echo "," >> "$folder/manifest.json"; fi
                 echo "  {\"filename\": \"$base\", \"lastModified\": \"$MODIFIED\"}" >> "$folder/manifest.json"
