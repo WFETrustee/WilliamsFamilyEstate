@@ -5,7 +5,6 @@ const GOOGLE_FONTS = [
   "Scope+One"
 ];
 
-// Run when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
   function enableGoogleFonts(fonts) {
     const fontList = Array.isArray(fonts) ? fonts : [fonts];
@@ -41,10 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const path = location.pathname.replace(/\/$/, "");
     links.forEach(link => {
       const href = link.getAttribute("href").replace(/\/$/, "");
-      if (
-        href === path ||
-        (href.endsWith("index.html") && (path === "" || path === "/index.html"))
-      ) {
+      if (href === path || (href.endsWith("index.html") && (path === "" || path === "/index.html"))) {
         link.classList.add("active");
       }
     });
@@ -58,156 +54,123 @@ document.addEventListener("DOMContentLoaded", () => {
   loadHTML("site-header", "/header.html", highlightActiveMenuItem);
   loadHTML("site-footer", "/footer.html", insertFooterYear);
 
-  function parseMetadata(html, folder) {
-    const temp = document.createElement("html");
-    temp.innerHTML = html;
-
-    switch (folder) {
-      case "emergency":
-        return {
-          title: temp.querySelector('meta[name="notice-title"]')?.content || "Untitled Emergency",
-          date: temp.querySelector('meta[name="notice-date"]')?.content || "0000-00-00",
-          id: temp.querySelector('meta[name="notice-id"]')?.content || "",
-          author: temp.querySelector('meta[name="notice-author"]')?.content || "",
-          trigger: temp.querySelector('meta[name="notice-use-trigger"]')?.content || "",
-          filer: temp.querySelector('meta[name="notice-filer"]')?.content || "",
-          instructions: temp.querySelector('meta[name="notice-instructions"]')?.content || "",
-          version: temp.querySelector('meta[name="notice-version"]')?.content || "",
-          category: temp.querySelector('meta[name="notice-category"]')?.content || "",
-          status: temp.querySelector('meta[name="notice-status"]')?.content || "",
-          pinned: temp.querySelector('meta[name="notice-pinned"]')?.content?.toLowerCase() === "true",
-          venue: "Emergency Registry",
-          summary: temp.querySelector('meta[name="notice-summary"]')?.content || ""
-        };
-      case "notices":
-      default:
-        return {
-          title: temp.querySelector('meta[name="notice-title"]')?.content || "Untitled",
-          date: temp.querySelector('meta[name="notice-date"]')?.content || "0000-00-00",
-          id: temp.querySelector('meta[name="notice-id"]')?.content || "",
-          venue: temp.querySelector('meta[name="notice-venue"]')?.content || "",
-          summary: temp.querySelector('meta[name="notice-summary"]')?.content || "",
-          pinned: temp.querySelector('meta[name="notice-pinned"]')?.content?.toLowerCase() === "true"
-        };
-    }
-  }
-
   if (document.getElementById("live-notices")) {
     const pathParts = window.location.pathname.split("/");
-    const baseFolder = pathParts.find(part => part === "notices" || part === "emergency") || "notices";
+    const baseFolder = pathParts.find(part => part && part !== "index.html") || "notices";
+    const templatePath = `/${baseFolder}/${baseFolder}_template.html`;
 
-    fetch(`/${baseFolder}/manifest.json`)
-      .then(res => res.json())
-      .then(manifest => {
-        const filtered = manifest.filter(entry =>
-          entry.filename !== "index.html" &&
-          entry.filename !== "Notice_Template.html" &&
-          entry.filename !== "Emergency_Template.html"
-        );
+    fetch(templatePath)
+      .then(res => res.text())
+      .then(templateHTML => {
+        const templateDoc = document.createElement("html");
+        templateDoc.innerHTML = templateHTML;
 
-        const noticePromises = filtered.map(({ filename, lastModified }) => {
-          const cacheKey = `${baseFolder}:${filename}`;
-          const cached = localStorage.getItem(cacheKey);
-          let cachedData = null;
+        const metaElements = Array.from(templateDoc.querySelectorAll('meta[name^="doc-"]'));
+        const metaFields = metaElements.map(meta => meta.getAttribute("name")).filter(Boolean);
 
-          if (cached) {
-            try {
-              cachedData = JSON.parse(cached);
-            } catch (e) {
-              console.warn(`Failed to parse cached ${cacheKey}`, e);
-            }
-          }
+        fetch(`/${baseFolder}/manifest.json`)
+          .then(res => res.json())
+          .then(manifest => {
+            const filtered = manifest.filter(entry =>
+              entry.filename !== "index.html" && entry.filename !== `${baseFolder}_template.html`
+            );
 
-          if (cachedData && cachedData.lastModified === lastModified) {
-            return Promise.resolve(cachedData);
-          }
+            const noticePromises = filtered.map(({ filename, lastModified }) => {
+              const cacheKey = `${baseFolder}:${filename}`;
+              const cached = localStorage.getItem(cacheKey);
+              let cachedData = null;
 
-          return fetch(`/${baseFolder}/${filename}`)
-            .then(res => res.text())
-            .then(html => {
-              const meta = parseMetadata(html, baseFolder);
-              const noticeData = {
-                filename,
-                ...meta,
-                lastModified
-              };
-              localStorage.setItem(cacheKey, JSON.stringify(noticeData));
-              return noticeData;
-            })
-            .catch(err => {
-              console.warn(`Failed to load ${filename}`, err);
-              return null;
+              if (cached) {
+                try {
+                  cachedData = JSON.parse(cached);
+                } catch (e) {
+                  console.warn(`Failed to parse cached ${cacheKey}`, e);
+                }
+              }
+
+              if (cachedData && cachedData.lastModified === lastModified) {
+                return Promise.resolve(cachedData);
+              }
+
+              return fetch(`/${baseFolder}/${filename}`)
+                .then(res => res.text())
+                .then(html => {
+                  const temp = document.createElement("html");
+                  temp.innerHTML = html;
+
+                  const data = { filename, lastModified };
+                  metaElements.forEach(meta => {
+                    const name = meta.getAttribute("name");
+                    const key = name.replace("doc-", "");
+                    const el = temp.querySelector(`meta[name='${name}']`);
+                    if (el) {
+                      data[key] = el.getAttribute("content") || "";
+                    }
+                  });
+
+                  localStorage.setItem(cacheKey, JSON.stringify(data));
+                  return data;
+                })
+                .catch(err => {
+                  console.warn(`Failed to load ${filename}`, err);
+                  return null;
+                });
             });
-        });
 
-        Promise.all(noticePromises).then(notices => {
-          const pinnedContainer = document.getElementById("pinned-notices");
-          const regularContainer = document.getElementById("regular-notices");
+            Promise.all(noticePromises).then(notices => {
+              const pinnedContainer = document.getElementById("pinned-notices");
+              const regularContainer = document.getElementById("regular-notices");
 
-          const valid = notices.filter(n => n);
-          const pinned = valid.filter(n => n.pinned).sort((a, b) => new Date(b.date) - new Date(a.date));
-          const unpinned = valid.filter(n => !n.pinned).sort((a, b) => new Date(b.date) - new Date(a.date));
+              const valid = notices.filter(n => n);
+              const pinned = valid.filter(n => n.pinned === "true" || n.pinned === true)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+              const unpinned = valid.filter(n => !(n.pinned === "true" || n.pinned === true))
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-          const renderNotice = n => {
-            const wrapper = document.createElement("div");
-            wrapper.className = "notice";
-            wrapper.style.position = "relative";
+              const renderNotice = n => {
+                const wrapper = document.createElement("div");
+                wrapper.className = "notice";
+                wrapper.style.position = "relative";
 
-            if (n.pinned) {
-              const pin = document.createElement("img");
-              pin.src = "/images/pushpin.png";
-              pin.alt = "Pinned";
-              pin.style.position = "absolute";
-              pin.style.top = "0.5em";
-              pin.style.right = "0.5em";
-              pin.style.height = "1.25em";
-              pin.style.opacity = "0.75";
-              wrapper.appendChild(pin);
-            }
+                if (n.pinned === "true" || n.pinned === true) {
+                  const pin = document.createElement("img");
+                  pin.src = "/images/pushpin.png";
+                  pin.alt = "Pinned";
+                  pin.style.position = "absolute";
+                  pin.style.top = "0.5em";
+                  pin.style.right = "0.5em";
+                  pin.style.height = "1.25em";
+                  pin.style.opacity = "0.75";
+                  wrapper.appendChild(pin);
+                }
 
-            const h2 = document.createElement("h2");
-            h2.textContent = n.title;
+                const h2 = document.createElement("h2");
+                h2.textContent = n.title || "Untitled";
+                wrapper.appendChild(h2);
 
-            const dateDiv = document.createElement("div");
-            dateDiv.className = "date";
-            const dateParsed = new Date(n.date);
-            dateDiv.textContent = `Published: ${isNaN(dateParsed) ? "Invalid Date" : dateParsed.toLocaleDateString(undefined, {
-              year: "numeric", month: "long", day: "2-digit"
-            })}${n.pinned ? " (pinned)" : ""}`;
+                metaElements.forEach(meta => {
+                  const name = meta.getAttribute("name");
+                  const key = name.replace("doc-", "");
+                  if (key !== "title" && key !== "pinned") {
+                    const label = meta.getAttribute("data-label") || key.charAt(0).toUpperCase() + key.slice(1);
+                    const div = document.createElement("p");
+                    div.textContent = `${label}: ${n[key] || ""}`;
+                    wrapper.appendChild(div);
+                  }
+                });
 
-            const venueP = document.createElement("p");
-            venueP.textContent = `Recorded in: ${n.venue}`;
+                const link = document.createElement("a");
+                link.href = `/${baseFolder}/${n.filename}`;
+                link.textContent = "View Full Document →";
+                wrapper.appendChild(link);
 
-            const summaryP = document.createElement("p");
-            summaryP.textContent = n.summary;
+                return wrapper;
+              };
 
-            // Emergency-specific extra metadata
-            if (baseFolder === "emergency") {
-              if (n.author) wrapper.appendChild(document.createElement("p")).textContent = `Author: ${n.author}`;
-              if (n.trigger) wrapper.appendChild(document.createElement("p")).textContent = `Trigger: ${n.trigger}`;
-              if (n.filer) wrapper.appendChild(document.createElement("p")).textContent = `Filed by: ${n.filer}`;
-              if (n.instructions) wrapper.appendChild(document.createElement("p")).textContent = `Instructions: ${n.instructions}`;
-              if (n.category) wrapper.appendChild(document.createElement("p")).textContent = `Category: ${n.category}`;
-              if (n.status) wrapper.appendChild(document.createElement("p")).textContent = `Status: ${n.status}`;
-              if (n.version) wrapper.appendChild(document.createElement("p")).textContent = `Version: ${n.version}`;
-            }
-
-            const link = document.createElement("a");
-            link.href = `/${baseFolder}/${n.filename}`;
-            link.textContent = "View Full Document →";
-
-            wrapper.appendChild(h2);
-            wrapper.appendChild(dateDiv);
-            wrapper.appendChild(venueP);
-            wrapper.appendChild(summaryP);
-            wrapper.appendChild(link);
-
-            return wrapper;
-          };
-
-          pinned.forEach(n => pinnedContainer.appendChild(renderNotice(n)));
-          unpinned.forEach(n => regularContainer.appendChild(renderNotice(n)));
-        });
+              pinned.forEach(n => pinnedContainer.appendChild(renderNotice(n)));
+              unpinned.forEach(n => regularContainer.appendChild(renderNotice(n)));
+            });
+          });
       })
       .catch(err => {
         const fallback = document.getElementById("live-notices");
