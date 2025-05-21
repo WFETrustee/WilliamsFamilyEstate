@@ -157,7 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
                   const key = name.replace("doc-", "");
                   if (key !== "title" && key !== "pinned" && n[key]) {
                     const label = meta.getAttribute("data-label") || key.charAt(0).toUpperCase() + key.slice(1);
+                    const styleClass = meta.getAttribute("data-style") || "";
                     const div = document.createElement("p");
+                    if (styleClass) div.className = styleClass;
                     div.innerHTML = `${label}: ${n[key]}`;
                     wrapper.appendChild(div);
                   }
