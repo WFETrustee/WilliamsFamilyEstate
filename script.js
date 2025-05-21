@@ -88,8 +88,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Handle dynamic rendering of public notices
   if (document.getElementById("live-notices")) {
     const currentPath = window.location.pathname;
-    const isEmergencyPage = currentPath.includes("/emergencies/");
-    const baseFolder = isEmergencyPage ? "emergencies" : "notices";
+    const isEmergencyPage = currentPath.includes("/emergency/");
+    const baseFolder = isEmergencyPage ? "emergency" : "notices";
     
     fetch(`/${baseFolder}/manifest.json`)
       .then(res => res.json())
