@@ -94,12 +94,9 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch(`/${baseFolder}/manifest.json`)
       .then(res => res.json())
       .then(manifest => {
-        console.log(`📦 Loaded manifest from: ${baseFolder}`);
-        console.log("📄 Files in manifest:", manifest.map(m => m.filename));
         const filtered = manifest.filter(
           entry => entry.filename !== "index.html" && entry.filename !== "Notice_Template.html" && entry.filename !== "Emergency_Template.html"
         );
-        //console.log("Filtered manifest:", filtered);
   
         const noticePromises = filtered.map(({ filename, lastModified }) => {
           const cacheKey = `${baseFolder}:${filename}`;
@@ -128,7 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
               const title = temp.querySelector('meta[name="notice-title"]')?.content || "Untitled";
               const date = temp.querySelector('meta[name="notice-date"]')?.content || "0000-00-00";
-              //console.log(`Parsed title for ${filename}: ${title}`);
               const id = temp.querySelector('meta[name="notice-id"]')?.content || "";
               const venue = temp.querySelector('meta[name="notice-venue"]')?.content || "";
               const summary = temp.querySelector('meta[name="notice-summary"]')?.content || "";
@@ -163,8 +159,6 @@ document.addEventListener("DOMContentLoaded", () => {
           const valid = notices.filter(n => n);
           const pinned = valid.filter(n => n.pinned).sort((a, b) => new Date(b.date) - new Date(a.date));
           const unpinned = valid.filter(n => !n.pinned).sort((a, b) => new Date(b.date) - new Date(a.date));
-
-          console.log("📑 Final list to render:", valid.map(v => v.filename));
 
           const renderNotice = n => {
             const wrapper = document.createElement("div");
