@@ -9,9 +9,9 @@ body {
 }
 
 .tm {
-  font-size: 50%;
+  font-size: 66%;
   vertical-align: super; /* optional: lifts it like a superscript */
-  opacity: 0.75;         /* optional: soften it visually */
+  /* opacity: 0.75;         /* optional: soften it visually */
 }
 
 /* Content container */
