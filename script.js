@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
             if (n.pinned) {
               const pin = document.createElement("img");
-              pin.src = "pushpin.png";
+              pin.src = "images/pushpin.png";
               pin.alt = "Pinned";
               pin.style.position = "absolute";
               pin.style.top = "0.5em";
