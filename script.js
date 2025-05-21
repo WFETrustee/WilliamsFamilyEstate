@@ -106,7 +106,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (el) {
                       let content = el.getAttribute("content");
                       if (content?.trim()) {
-                        content = content.replace(/<span class=['"]tm['"]><\/span>/gi, '<span class="tm">™</span>');
+                        const div = document.createElement("div");
+                        div.innerHTML = content;
+                        content = div.innerHTML; // safely preserve inner HTML like span.tm
                         data[key] = content;
                       }
                     }
