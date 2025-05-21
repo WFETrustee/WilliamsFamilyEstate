@@ -8,6 +8,12 @@ body {
     line-height: 1.6;
 }
 
+.tm {
+  font-size: 50%;
+  vertical-align: super; /* optional: lifts it like a superscript */
+  opacity: 0.75;         /* optional: soften it visually */
+}
+
 /* Content container */
 main {
     max-width: 720px;
