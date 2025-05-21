@@ -2,38 +2,47 @@ name: Auto-generate Manifest Files
 
 permissions:
   contents: write
-  packages: read
-  issues: read
-  pull-requests: read
 
 on:
   push:
     branches:
       - master
     paths:
-      - 'notices/*.html'
-      - 'emergency/*.html'
+      - '**/*.html'
   workflow_dispatch:
 
 jobs:
-  build-manifests:
+  generate-manifests:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Generate notices manifest
-        uses: ./.github/actions/build-manifest
-        with:
-          folder: notices
-          template_ignore: Notice_Template.html
+      - name: Discover template folders
+        id: discover
+        run: |
+          echo "folders=[]" >> $GITHUB_ENV
+          FOLDERS=$(find . -type f -name '*_Template.html' | sed -E 's|\./([^/]+)/[^/]+_Template.html|\1|' | sort -u)
+          echo "Found folders: $FOLDERS"
+          echo "folders=[$(echo $FOLDERS | sed 's/ /,/g')]" >> $GITHUB_ENV
 
-      - name: Generate emergency manifest
-        uses: ./.github/actions/build-manifest
-        with:
-          folder: emergency
-          template_ignore: Emergency_Template.html
+      - name: Generate manifests
+        run: |
+          for folder in $(find . -type f -name '*_Template.html' | sed -E 's|\./([^/]+)/[^/]+_Template.html|\1|' | sort -u); do
+            echo "Generating manifest for: $folder"
+            echo "[" > "$folder/manifest.json"
+            FIRST=true
+            for file in $folder/*.html; do
+              base=$(basename "$file")
+              if [[ "$base" != "index.html" && "$base" != "${folder}_Template.html" ]]; then
+                MODIFIED=$(date -Iseconds -r "$file")
+                if [ "$FIRST" = false ]; then echo "," >> "$folder/manifest.json"; fi
+                echo "  {\"filename\": \"$base\", \"lastModified\": \"$MODIFIED\"}" >> "$folder/manifest.json"
+                FIRST=false
+              fi
+            done
+            echo "]" >> "$folder/manifest.json"
+          done
 
       - name: Configure Git identity
         run: |
@@ -47,20 +56,6 @@ jobs:
       - name: Commit and push updated manifests
         run: |
           git fetch origin master
-          
-          if [ -f notices/manifest.json ]; then
-            echo "Adding notices manifest"
-            git add notices/manifest.json
-          else
-            echo "⚠️ No notices manifest found"
-          fi
-          
-          if [ -f emergency/manifest.json ]; then
-            echo "Adding emergency manifest"
-            git add emergency/manifest.json
-          else
-            echo "⚠️ No emergency manifest found"
-          fi
-
-          git commit -m "Auto-update manifests" || echo "No changes to commit"
+          git add */manifest.json
+          git commit -m "Auto-update manifest.json for all folders" || echo "No changes to commit"
           git push origin HEAD:master
