@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
   
           // Otherwise fetch, parse, and store
-          return fetch(`/notices/${filename}`)
+          return fetch(`/${baseFolder}/${filename}`) 
             .then(res => res.text())
             .then(html => {
               const temp = document.createElement("html");
@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
             summaryP.textContent = n.summary;
   
             const link = document.createElement("a");
-            link.href = `/notices/${n.filename}`;
+            link.href = `/${baseFolder}/${n.filename}`;
             link.textContent = "View Full Notice →";
   
             wrapper.appendChild(h2);
