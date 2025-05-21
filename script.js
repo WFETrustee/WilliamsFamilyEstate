@@ -87,7 +87,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Handle dynamic rendering of public notices
   if (document.getElementById("live-notices")) {
-    fetch("/notices/manifest.json")
+    const currentPath = window.location.pathname;
+    const isEmergencyPage = currentPath.includes("/emergencies/");
+    const baseFolder = isEmergencyPage ? "emergencies" : "notices";
+    
+    fetch(`/${baseFolder}/manifest.json`)
       .then(res => res.json())
       .then(manifest => {
         //console.log("Loaded manifest:", manifest);
