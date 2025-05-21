@@ -22,14 +22,14 @@ jobs:
         id: discover
         run: |
           echo "folders=[]" >> $GITHUB_ENV
-          FOLDERS=$(find . -type f -name '*_Template.html' | sed -E 's|\./([^/]+)/[^/]+_Template.html|\1|' | sort -u)
+          FOLDERS=$(find . -type f -name '*_template.html' | sed -E 's|\./([^/]+)/[^/]+_template.html|\1|' | sort -u)
           echo "Found folders: $FOLDERS"
           echo "folders=[$(echo $FOLDERS | sed 's/ /,/g')]" >> $GITHUB_ENV
 
       - name: Generate manifests
         run: |
-          for folder in $(find . -type f -name '*_Template.html' | sed -E 's|\./([^/]+)/[^/]+_Template.html|\1|' | sort -u); do
-            TEMPLATE_FILE="${folder}_Template.html"
+          for folder in $(find . -type f -name '*_template.html' | sed -E 's|\./([^/]+)/[^/]+_template.html|\1|' | sort -u); do
+            TEMPLATE_FILE="${folder}_template.html"
             echo "Generating manifest for: $folder"
             echo "[" > "$folder/manifest.json"
             FIRST=true
