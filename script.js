@@ -106,10 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (el) {
                       let content = el.getAttribute("content");
                       if (content?.trim()) {
-                        const div = document.createElement("div");
-                        div.innerHTML = content;
-                        content = div.innerHTML; // safely preserve inner HTML like span.tm
-                        data[key] = content;
+                        data[key] = content; // Preserve raw HTML
                       }
                     }
                   });
