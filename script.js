@@ -94,7 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch(`/${baseFolder}/manifest.json`)
       .then(res => res.json())
       .then(manifest => {
-        //console.log("Loaded manifest:", manifest);
+        console.log(`📦 Loaded manifest from: ${baseFolder}`);
+        console.log("📄 Files in manifest:", manifest.map(m => m.filename));
         const filtered = manifest.filter(
           entry => entry.filename !== "index.html" && entry.filename !== "Notice_Template.html" && entry.filename !== "Emergency_Template.html"
         );
@@ -162,7 +163,9 @@ document.addEventListener("DOMContentLoaded", () => {
           const valid = notices.filter(n => n);
           const pinned = valid.filter(n => n.pinned).sort((a, b) => new Date(b.date) - new Date(a.date));
           const unpinned = valid.filter(n => !n.pinned).sort((a, b) => new Date(b.date) - new Date(a.date));
-  
+
+          console.log("📑 Final list to render:", valid.map(v => v.filename));
+
           const renderNotice = n => {
             const wrapper = document.createElement("div");
             wrapper.className = "notice";
