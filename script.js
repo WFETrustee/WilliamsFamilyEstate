@@ -1,7 +1,8 @@
 // Global list of Google Fonts used across the site
 const GOOGLE_FONTS = [
   "Spectral+SC",
-  "Playfair+Display"
+  "Playfair+Display",
+  "Scope+One"
 ];
 
 // Run when the DOM is fully loaded
