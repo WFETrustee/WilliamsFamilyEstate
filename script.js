@@ -104,8 +104,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     const key = name.replace("doc-", "");
                     const el = temp.querySelector(`meta[name='${name}']`);
                     if (el) {
-                      const content = el.getAttribute("content");
+                      let content = el.getAttribute("content");
                       if (content?.trim()) {
+                        content = content.replace(/<span class=['"]tm['"]><\/span>/gi, '<span class="tm">™</span>');
                         data[key] = content;
                       }
                     }
@@ -157,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   if (key !== "title" && key !== "pinned" && n[key]) {
                     const label = meta.getAttribute("data-label") || key.charAt(0).toUpperCase() + key.slice(1);
                     const div = document.createElement("p");
-                    div.textContent = `${label}: ${n[key]}`;
+                    div.innerHTML = `${label}: ${n[key]}`;
                     wrapper.appendChild(div);
                   }
                 });
