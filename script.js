@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
         //console.log("Filtered manifest:", filtered);
   
         const noticePromises = filtered.map(({ filename, lastModified }) => {
-          const cacheKey = `notice:${filename}`;
+          const cacheKey = `${baseFolder}:${filename}`;
           const cached = localStorage.getItem(cacheKey);
           let cachedData = null;
   
