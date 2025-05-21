@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(manifest => {
         //console.log("Loaded manifest:", manifest);
         const filtered = manifest.filter(
-          entry => entry.filename !== "index.html" && entry.filename !== "Notice_Template.html"
+          entry => entry.filename !== "index.html" && entry.filename !== "Notice_Template.html" && entry.filename !== "Emergency_Template.html"
         );
         //console.log("Filtered manifest:", filtered);
   
