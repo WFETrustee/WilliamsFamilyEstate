@@ -170,7 +170,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const dateDiv = document.createElement("div");
             dateDiv.className = "date";
-            dateDiv.textContent = `Published: ${new Date(n.date).toLocaleDateString(undefined, {
+            const dateParsed = new Date(n.date);
+            dateDiv.textContent = `Published: ${isNaN(dateParsed) ? "Invalid Date" : dateParsed.toLocaleDateString(undefined, {
               year: "numeric", month: "long", day: "2-digit"
             })}${n.pinned ? " (pinned)" : ""}`;
 
@@ -179,6 +180,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const summaryP = document.createElement("p");
             summaryP.textContent = n.summary;
+
+            // Emergency-specific extra metadata
+            if (baseFolder === "emergency") {
+              if (n.author) wrapper.appendChild(document.createElement("p")).textContent = `Author: ${n.author}`;
+              if (n.trigger) wrapper.appendChild(document.createElement("p")).textContent = `Trigger: ${n.trigger}`;
+              if (n.filer) wrapper.appendChild(document.createElement("p")).textContent = `Filed by: ${n.filer}`;
+              if (n.instructions) wrapper.appendChild(document.createElement("p")).textContent = `Instructions: ${n.instructions}`;
+              if (n.category) wrapper.appendChild(document.createElement("p")).textContent = `Category: ${n.category}`;
+              if (n.status) wrapper.appendChild(document.createElement("p")).textContent = `Status: ${n.status}`;
+              if (n.version) wrapper.appendChild(document.createElement("p")).textContent = `Version: ${n.version}`;
+            }
 
             const link = document.createElement("a");
             link.href = `/${baseFolder}/${n.filename}`;
