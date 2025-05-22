@@ -116,15 +116,20 @@ main {
   margin-top: 0;
   font-size: 1.25rem;
 }
-.date {
-  font-style: italic;
-  color: #555;
-  margin-bottom: 0.5rem;
-}
 
 .notice.pinned {
   border-left-color: #663399;
   background-color: #f9f9f9;
+}
+
+.status {
+  display: none !important;
+}
+
+.date {
+  font-style: italic;
+  color: #555;
+  margin-bottom: 0.5rem;
 }
 
 /* Footer */
