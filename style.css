@@ -137,11 +137,6 @@ main {
   color: #333;
 }
 
-.meta-group .date {
-  font-style: italic;
-  color: #555;
-}
-
 /* Optional: visually separate grouped lines more cleanly */
 .meta-group + .meta-group {
   border-top: 1px dotted #ccc;
@@ -157,13 +152,10 @@ main {
   display: none !important;
 }
 
-/*
 .date {
   font-style: italic;
   color: #555;
-  margin-bottom: 0.5rem;
 }
-*/
 
 /* Footer */
 .site-footer {
