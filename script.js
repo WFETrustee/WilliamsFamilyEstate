@@ -7,6 +7,13 @@ const GOOGLE_FONTS = [
 
 const TM_MARKER = '<span class="tm">&trade;</span>';
 
+//pulled to global for access in multiple fucntions
+const decodeHTML = str => {
+  const txt = document.createElement("textarea");
+  txt.innerHTML = str;
+  return txt.value;
+};
+
 // Helper to render values, preserving raw HTML if *tm is detected
 function renderValue(label, value) {
   const isHTMLSafe = value.includes(TM_MARKER);
@@ -157,12 +164,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 .sort((a, b) => new Date(b.date) - new Date(a.date));
               const unpinned = valid.filter(n => !(n.pinned === "true" || n.pinned === true))
                 .sort((a, b) => new Date(b.date) - new Date(a.date));
-
-              const decodeHTML = str => {
-                const txt = document.createElement("textarea");
-                txt.innerHTML = str;
-                return txt.value;
-              };
 
               const renderNotice = n => {
                 const wrapper = document.createElement("div");
