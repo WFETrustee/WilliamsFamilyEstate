@@ -5,6 +5,14 @@ const GOOGLE_FONTS = [
   "Scope+One"
 ];
 
+const TM_MARKER = '<span class="tm">&trade;</span>';
+
+// Helper to render values, preserving raw HTML if *tm is detected
+function renderValue(label, value) {
+  const isHTMLSafe = value.includes(TM_MARKER);
+  return `${label}: ${isHTMLSafe ? value : decodeHTML(value)}`;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   function enableGoogleFonts(fonts) {
     const fontList = Array.isArray(fonts) ? fonts : [fonts];
@@ -78,9 +86,11 @@ document.addEventListener("DOMContentLoaded", () => {
           const metaDef = { key, name, line, style, label };
 
           if (line) {
+            // Use actual line value (e.g., "1", "summary", etc.)
             if (!groupedMeta[line]) groupedMeta[line] = [];
             groupedMeta[line].push(metaDef);
           } else {
+            // Use fallback "__solo__" if line is missing - means it is the only item in a group
             if (!groupedMeta["__solo__"]) groupedMeta["__solo__"] = [];
             groupedMeta["__solo__"].push(metaDef);
           }
@@ -175,25 +185,37 @@ document.addEventListener("DOMContentLoaded", () => {
                 h2.textContent = n.title || "Untitled";
                 wrapper.appendChild(h2);
 
-                Object.entries(groupedMeta).forEach(([lineKey, metas]) => {
+                // Filter out the 'title' key from all groupings first
+                const filteredMetaGroups = {};
+                for (const [lineKey, metas] of Object.entries(groupedMeta)) {
+                  const filtered = metas.filter(({ key }) => key !== "title");
+                  if (filtered.length) {
+                    filteredMetaGroups[lineKey] = filtered;
+                  }
+                }
+                
+                // Now render each group
+                Object.entries(filteredMetaGroups).forEach(([lineKey, metas]) => {
                   if (lineKey === "__solo__") {
-                    metas
-                      .filter(({ key }) => key !== "title") // skip rendering title again
-                      .forEach(({ key, label, style }) => {
-                        if (n[key]) {
-                          const p = document.createElement("p");
-                          if (style) p.className = style;
-                          p.innerHTML = `${label}: ${decodeHTML(n[key])}`;
-                          wrapper.appendChild(p);
-                        }
-                      });
+                    // Solo items rendered as separate <p> elements
+                    metas.forEach(({ key, label, style }) => {
+                      if (n[key]) {
+                        const p = document.createElement("p");
+                        if (style) p.className = style;
+                        //p.innerHTML = `${label}: ${decodeHTML(n[key])}`;
+                        p.innerHTML = renderValue(label, n[key]);
+                        wrapper.appendChild(p);
+                      }
+                    });
                   } else {
+                    // Grouped items rendered inside a single <div>
                     const group = document.createElement("div");
                     group.className = "meta-group";
                     metas.forEach(({ key, label, style }) => {
                       if (n[key]) {
                         const span = document.createElement("span");
-                        span.innerHTML = `${label}: ${decodeHTML(n[key])}`;
+                        //span.innerHTML = `${label}: ${decodeHTML(n[key])}`;
+                        span.innerHTML = renderValue(label, n[key]);
                         if (style) span.className = style;
                         span.style.marginRight = "1.5em";
                         group.appendChild(span);
