@@ -18,11 +18,10 @@ function renderValue(label, value) {
   const TM_MARKER = '<span class="tm">&trade;</span>';
   const isHTMLSafe = value.includes(TM_MARKER);
 
+  /*
   if (isHTMLSafe) {
     console.log(`[TM DETECTED] Label: "${label}", Value:`, value);
-  }
-
-  console.log(`Value: "${value}", Decoded: "${decodeHTML(value)}"`);
+  }*/
 
   return `${label}: ${isHTMLSafe ? value : decodeHTML(value)}`;
 }
