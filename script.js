@@ -177,14 +177,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 Object.entries(groupedMeta).forEach(([lineKey, metas]) => {
                   if (lineKey === "__solo__") {
-                    metas.forEach(({ key, label, style }) => {
-                      if (n[key]) {
-                        const p = document.createElement("p");
-                        if (style) p.className = style;
-                        p.innerHTML = `${label}: ${decodeHTML(n[key])}`;
-                        wrapper.appendChild(p);
-                      }
-                    });
+                    metas
+                      .filter(({ key }) => key !== "title") // skip rendering title again
+                      .forEach(({ key, label, style }) => {
+                        if (n[key]) {
+                          const p = document.createElement("p");
+                          if (style) p.className = style;
+                          p.innerHTML = `${label}: ${decodeHTML(n[key])}`;
+                          wrapper.appendChild(p);
+                        }
+                      });
                   } else {
                     const group = document.createElement("div");
                     group.className = "meta-group";
