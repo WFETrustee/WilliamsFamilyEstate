@@ -114,7 +114,13 @@ main {
 
 .notice h2 {
   margin-top: 0;
-  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.35rem;
+}
+
+.notice p {
+  margin: 0.25rem 0;
+  line-height: 1.5;
 }
 
 .notice.pinned {
@@ -124,17 +130,19 @@ main {
 
 .meta-group {
   display: flex;
+  justify-content: space-between; /* Spread evenly */
   flex-wrap: wrap;
-  gap: 1.5em;        /* spacing between inline elements */
-  margin-bottom: 0.75em;
-  align-items: baseline;
+  gap: 0.5rem 1rem;
+  border-bottom: 1px dotted #ccc;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: #444;
 }
 
 .meta-group span {
-  display: inline-block;
-  white-space: nowrap;
-  font-size: 0.90rem;
-  color: #333;
+  flex: 1 1 auto;
+  min-width: 100px;
 }
 
 /* Optional: visually separate grouped lines more cleanly */
