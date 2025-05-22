@@ -22,9 +22,10 @@ function renderValue(label, value) {
     console.log(`[TM DETECTED] Label: "${label}", Value:`, value);
   }
 
+  console.log(`Value: "${value}", Decoded: "${decodeHTML(value)}"`);
+
   return `${label}: ${isHTMLSafe ? value : decodeHTML(value)}`;
 }
-
 
 document.addEventListener("DOMContentLoaded", () => {
   function enableGoogleFonts(fonts) {
