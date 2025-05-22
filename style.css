@@ -137,6 +137,10 @@ main {
   display: none !important;
 }
 
+.pinned {
+  display: none !important;
+}
+
 .date {
   font-style: italic;
   color: #555;
