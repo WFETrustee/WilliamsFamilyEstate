@@ -133,13 +133,13 @@ main {
 .meta-group span {
   display: inline-block;
   white-space: nowrap;
-  font-size: 0.95rem;
+  font-size: 0.90rem;
   color: #333;
 }
 
 /* Optional: visually separate grouped lines more cleanly */
 .meta-group + .meta-group {
-  border-top: 1px dotted #ccc;
+  border-bottom: 1px dotted #ccc;
   padding-top: 0.5em;
   margin-top: 0.5em;
 }
