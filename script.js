@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (el) {
                       let content = el.getAttribute("content");
                       if (content?.trim()) {
-                        data[key] = content; // Preserve raw HTML
+                        data[key] = content;
                       }
                     }
                   });
@@ -129,6 +129,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 .sort((a, b) => new Date(b.date) - new Date(a.date));
               const unpinned = valid.filter(n => !(n.pinned === "true" || n.pinned === true))
                 .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+              const decodeHTML = str => {
+                const txt = document.createElement("textarea");
+                txt.innerHTML = str;
+                return txt.value;
+              };
 
               const renderNotice = n => {
                 const wrapper = document.createElement("div");
@@ -159,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const styleClass = meta.getAttribute("data-style") || "";
                     const div = document.createElement("p");
                     if (styleClass) div.className = styleClass;
-                    div.innerHTML = `${label}: ${n[key]}`;
+                    div.innerHTML = `${label}: ${decodeHTML(n[key])}`;
                     wrapper.appendChild(div);
                   }
                 });
