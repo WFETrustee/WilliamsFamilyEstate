@@ -14,11 +14,17 @@ const decodeHTML = str => {
   return txt.value;
 };
 
-// Helper to render values, preserving raw HTML if *tm is detected
 function renderValue(label, value) {
+  const TM_MARKER = '<span class="tm">&trade;</span>';
   const isHTMLSafe = value.includes(TM_MARKER);
+
+  if (isHTMLSafe) {
+    console.log(`[TM DETECTED] Label: "${label}", Value:`, value);
+  }
+
   return `${label}: ${isHTMLSafe ? value : decodeHTML(value)}`;
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
   function enableGoogleFonts(fonts) {
