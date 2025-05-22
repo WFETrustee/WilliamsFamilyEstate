@@ -66,7 +66,25 @@ document.addEventListener("DOMContentLoaded", () => {
         templateDoc.innerHTML = templateHTML;
 
         const metaElements = Array.from(templateDoc.querySelectorAll('meta[name^="doc-"]'));
-        const metaFields = metaElements.map(meta => meta.getAttribute("name")).filter(Boolean);
+        const groupedMeta = {};
+
+        metaElements.forEach(meta => {
+          const name = meta.getAttribute("name");
+          const key = name.replace("doc-", "");
+          const line = meta.getAttribute("data-line") || null;
+          const style = meta.getAttribute("data-style") || null;
+          const label = meta.getAttribute("data-label") || key.charAt(0).toUpperCase() + key.slice(1);
+
+          const metaDef = { key, name, line, style, label };
+
+          if (line) {
+            if (!groupedMeta[line]) groupedMeta[line] = [];
+            groupedMeta[line].push(metaDef);
+          } else {
+            if (!groupedMeta["__solo__"]) groupedMeta["__solo__"] = [];
+            groupedMeta["__solo__"].push(metaDef);
+          }
+        });
 
         fetch(`/${baseFolder}/manifest.json`)
           .then(res => res.json())
@@ -157,16 +175,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 h2.textContent = n.title || "Untitled";
                 wrapper.appendChild(h2);
 
-                metaElements.forEach(meta => {
-                  const name = meta.getAttribute("name");
-                  const key = name.replace("doc-", "");
-                  if (key !== "title" && key !== "pinned" && n[key]) {
-                    const label = meta.getAttribute("data-label") || key.charAt(0).toUpperCase() + key.slice(1);
-                    const styleClass = meta.getAttribute("data-style") || "";
-                    const div = document.createElement("p");
-                    if (styleClass) div.className = styleClass;
-                    div.innerHTML = `${label}: ${decodeHTML(n[key])}`;
-                    wrapper.appendChild(div);
+                Object.entries(groupedMeta).forEach(([lineKey, metas]) => {
+                  if (lineKey === "__solo__") {
+                    metas.forEach(({ key, label, style }) => {
+                      if (n[key]) {
+                        const p = document.createElement("p");
+                        if (style) p.className = style;
+                        p.innerHTML = `${label}: ${decodeHTML(n[key])}`;
+                        wrapper.appendChild(p);
+                      }
+                    });
+                  } else {
+                    const group = document.createElement("div");
+                    group.className = "meta-group";
+                    metas.forEach(({ key, label, style }) => {
+                      if (n[key]) {
+                        const span = document.createElement("span");
+                        span.innerHTML = `${label}: ${decodeHTML(n[key])}`;
+                        if (style) span.className = style;
+                        span.style.marginRight = "1.5em";
+                        group.appendChild(span);
+                      }
+                    });
+                    wrapper.appendChild(group);
                   }
                 });
 
