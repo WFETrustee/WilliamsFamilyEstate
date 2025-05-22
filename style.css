@@ -122,6 +122,17 @@ main {
   background-color: #f9f9f9;
 }
 
+.meta-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.meta-group span {
+  display: inline-block;
+}
+
 .status {
   display: none !important;
 }
