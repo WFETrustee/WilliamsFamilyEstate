@@ -149,6 +149,21 @@ main {
 }
 
 /*Format the instructions of emergency documents*/
+.print-divider {
+  border: 0;
+  border-top: 2px dashed #999;
+  margin: 2em 0;
+}
+
+.section-label {
+  font-weight: bold;
+  font-size: 0.85em;
+  color: #c00;
+  margin-bottom: 0.5em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
 .instructions-section {
   border-top: 3px double #333;
   margin-top: 3em;
@@ -168,19 +183,8 @@ main {
   margin-bottom: 0.75em;
 }
 
-.print-divider {
-  border: 0;
-  border-top: 2px dashed #999;
-  margin: 2em 0;
-}
-
-.section-label {
-  font-weight: bold;
-  font-size: 0.85em;
-  color: #c00;
-  margin-bottom: 0.5em;
-  text-align: center;
-  text-transform: uppercase;
+.instructions-section ul {
+  padding-bottom: 1.5em;
 }
 
 .meta-group {
