@@ -128,6 +128,26 @@ main {
   background-color: #f9f9f9;
 }
 
+/*Emergency entries*/
+.doc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.pdf-icon {
+  height: 2em;
+  opacity: 0.85;
+  margin-left: 1em;
+  transition: transform 0.2s ease;
+}
+
+.pdf-icon:hover {
+  transform: scale(1.3);
+  opacity: 1;
+}
+
 /*Format the instructions of emergency documents*/
 .instructions-section {
   border-top: 3px double #333;
