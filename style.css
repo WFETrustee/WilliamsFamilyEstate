@@ -136,6 +136,30 @@ main {
   position: relative;
 }
 
+.doc-title-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.pdf-link {
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-decoration: none;
+}
+
+.pdf-float-icon {
+  height: 2em;
+  opacity: 0.85;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.pdf-float-icon:hover {
+  transform: scale(1.1);
+  opacity: 1;
+}
+
 .pdf-icon {
   height: 2em;
   opacity: 0.85;
