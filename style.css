@@ -144,9 +144,9 @@ main {
 
 .pdf-link {
   position: absolute;
-  top: 0.50em;    
+  top: 0;
   right: 0;
-  text-decoration: none;
+  transform: translateY(-0.25em); 
 }
 
 .pdf-float-icon {
