@@ -144,25 +144,24 @@ main {
 
 .pdf-link {
   position: absolute;
-  top: 0.25em;    
+  top: 0.50em;    
   right: 0;
   text-decoration: none;
 }
 
 .pdf-float-icon {
   height: 2em;
-  opacity: 0.85;
+  opacity: 1.00;
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
 .pdf-float-icon:hover {
-  transform: scale(1.1);
+  transform: scale(1.3);
   opacity: 1;
 }
 
 .pdf-icon {
   height: 2em;
-  opacity: 0.85;
   margin-left: 1em;
   transition: transform 0.2s ease;
 }
