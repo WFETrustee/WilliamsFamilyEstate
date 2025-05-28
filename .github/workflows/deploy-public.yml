@@ -37,17 +37,18 @@ jobs:
             base=$(basename "$file")
             dir=$(dirname "$file")
 
-            # Skip templates and index
+            # Skip templates and index files
             if [[ "$base" == *_template.html || "$base" == index.html ]]; then continue; fi
 
-            # If the file is marked inactive, skip it
-            if grep -iq '<meta[^>]*name=["'\''"]doc-status["'\''"][^>]*content=["'\''"]inactive["'\''"]' "$file"; then
+            # If the file has both doc-status and content="inactive", skip it
+            if grep -iq 'name=["'\''"]doc-status["'\''"]' "$file" && grep -iq 'content=["'\''"]inactive["'\''"]' "$file"; then
               echo "Skipping inactive file: $file"
               continue
             fi
 
             mkdir -p "public/$dir"
             cp "$file" "public/$file"
+            echo "Included: $file"
           done
 
       - name: Configure Git identity
@@ -57,17 +58,9 @@ jobs:
 
       - name: Switch to public branch
         run: |
-          git fetch origin public || git checkout --orphan public
+          git fetch origin public || true
           git checkout public || git checkout -b public
           git reset --hard
-
-      - name: Move filtered output into working root
-        run: |
-          mkdir staging
-          cp -r public/* staging/
-          rm -rf *
-          cp -r staging/* ./
-          rm -rf staging public
 
       - name: Commit and push to public
         run: |
