@@ -63,7 +63,7 @@ jobs:
 
       - name: Sync public/ directory to root
         run: |
-          rsync -a --delete public/ ./
+          rsync -a --delete --ignore-missing-args --exclude='.git' public/ ./
 
       - name: Commit and push to public
         run: |
