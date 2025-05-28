@@ -61,14 +61,6 @@ jobs:
           git checkout public || git checkout -b public
           git reset --hard
 
-      - name: Move filtered output into working root
-        run: |
-          mkdir staging
-          cp -r public/* staging/
-          rm -rf *
-          cp -r staging/* ./
-          rm -rf staging public
-
       - name: Commit and push to public
         run: |
           git add .
