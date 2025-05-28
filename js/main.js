@@ -2,28 +2,26 @@
 // File: main.js
 // =============================
 
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = src;
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
+function loadScript(url, callback) {
+  const script = document.createElement("script");
+  script.src = url;
+  script.onload = () => callback?.();
+  script.onerror = () => console.error(`Failed to load script: ${url}`);
+  document.head.appendChild(script);
 }
 
-// Load dependencies and initialize
-(async () => {
-  try {
-    await loadScript("/js/core.js");
+document.addEventListener("DOMContentLoaded", () => {
+  // Load core.js first
+  loadScript("/js/core.js", () => {
+    // Then load header and footer
+    loadHTML("site-header", "/header.html", highlightActiveMenuItem);
+    loadHTML("site-footer", "/footer.html", insertFooterYear);
 
-    // If notices are being rendered, load publish.js
+    // Conditionally load publish.js if needed
     if (document.getElementById("live-notices")) {
-      await loadScript("/js/publish.js");
+      loadScript("/js/publish.js", () => {
+        if (typeof startPublish === "function") startPublish();
+      });
     }
-
-    if (typeof startCore === "function") startCore();
-  } catch (err) {
-    console.error("Script load error:", err);
-  }
-})();
+  });
+});
