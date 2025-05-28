@@ -25,32 +25,30 @@ jobs:
 
       - name: Copy all non-HTML assets to public/
         run: |
-          find . -type f \( ! -name '*.html' \) -exec bash -c '
-            for filepath; do
-              dir=$(dirname "$filepath")
-              mkdir -p "public/$dir"
-              cp "$filepath" "public/$filepath"
-            done
-          ' bash {} +
+          find . -type f ! -name '*.html' | while read filepath; do
+            dir=$(dirname "$filepath")
+            mkdir -p "public/$dir"
+            cp "$filepath" "public/$filepath"
+          done
 
-          - name: Copy only active HTML files
-            run: |
-              for file in $(find . -type f -name '*.html'); do
-                base=$(basename "$file")
-                dir=$(dirname "$file")
-          
-                # Skip templates and index
-                if [[ "$base" == *_template.html || "$base" == index.html ]]; then continue; fi
-          
-                # If the file is marked inactive, skip it
-                if grep -iq '<meta[^>]*name=["'\'']doc-status["'\''][^>]*content=["'\'']inactive["'\'']' "$file"; then
-                  echo "Skipping inactive file: $file"
-                  continue
-                fi
-          
-                mkdir -p "public/$dir"
-                cp "$file" "public/$file"
-              done
+      - name: Copy only active HTML files
+        run: |
+          for file in $(find . -type f -name '*.html'); do
+            base=$(basename "$file")
+            dir=$(dirname "$file")
+      
+            # Skip templates and index
+            if [[ "$base" == *_template.html || "$base" == index.html ]]; then continue; fi
+      
+            # If the file is marked inactive, skip it
+            if grep -iq '<meta[^>]*name=["'"'"']doc-status["'"'"'][^>]*content=["'"'"']inactive["'"'"']' "$file"; then
+              echo "Skipping inactive file: $file"
+              continue
+            fi
+      
+            mkdir -p "public/$dir"
+            cp "$file" "public/$file"
+          done
 
       - name: Configure Git identity
         run: |
