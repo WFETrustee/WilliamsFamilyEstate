@@ -2,29 +2,6 @@
 // File: publish.js
 // =============================
 
-const GOOGLE_FONTS = [
-  "Spectral+SC",
-  "Playfair+Display",
-  "Scope+One"
-];
-
-const TM_MARKER = '<span class="tm">&trade;</span>';
-
-const decodeHTML = str => {
-  const txt = document.createElement("textarea");
-  txt.innerHTML = str;
-  return txt.value;
-};
-
-function renderValue(label, value, solo) {
-  const isHTMLSafe = value.includes(TM_MARKER);
-  if (solo) {
-    return `<strong>${label}:</strong> ${isHTMLSafe ? value : decodeHTML(value)}`;
-  } else {
-    return `${label}: ${isHTMLSafe ? value : decodeHTML(value)}`;
-  }
-}
-
 function startPublish() {
   const pathParts = window.location.pathname.split("/");
   const baseFolder = pathParts.find(part => part && part !== "index.html") || "notices";
