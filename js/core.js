@@ -2,33 +2,28 @@
 // File: core.js
 // =============================
 
-// Global list of Google Fonts used across the site
 const GOOGLE_FONTS = [
   "Spectral+SC",
   "Playfair+Display",
   "Scope+One"
 ];
 
-// Decode HTML entities
+const TM_MARKER = '<span class="tm">&trade;</span>';
+
 const decodeHTML = str => {
   const txt = document.createElement("textarea");
   txt.innerHTML = str;
   return txt.value;
 };
 
-// Helper to render values with optional TM decoding
 function renderValue(label, value, solo) {
-  const TM_MARKER = '<span class="tm">&trade;</span>';
   const isHTMLSafe = value.includes(TM_MARKER);
-
-  if (solo) {
-    return `<strong>${label}:</strong> ${isHTMLSafe ? value : decodeHTML(value)}`;
-  } else {
-    return `${label}: ${isHTMLSafe ? value : decodeHTML(value)}`;
-  }
+  const decoded = isHTMLSafe ? value : decodeHTML(value);
+  return solo
+    ? `<strong>${label}:</strong> ${decoded}`
+    : `${label}: ${decoded}`;
 }
 
-// Load Google Fonts dynamically
 function enableGoogleFonts(fonts) {
   const fontList = Array.isArray(fonts) ? fonts : [fonts];
   fontList.forEach(font_family => {
@@ -41,8 +36,7 @@ function enableGoogleFonts(fonts) {
   });
 }
 
-// Load external HTML and insert it into a target container
-function loadHTML(id, url, callback, googleFonts = GOOGLE_FONTS) {
+function loadHTML(id, url, callback, fonts = GOOGLE_FONTS) {
   fetch(url)
     .then(response => {
       if (!response.ok) throw new Error(`Failed to load ${url}`);
@@ -52,14 +46,13 @@ function loadHTML(id, url, callback, googleFonts = GOOGLE_FONTS) {
       const container = document.getElementById(id);
       if (container) {
         container.innerHTML = html;
-        if (googleFonts?.length) enableGoogleFonts(googleFonts);
+        if (fonts?.length) enableGoogleFonts(fonts);
         if (callback) callback();
       }
     })
     .catch(error => console.error(`Error loading ${url}:`, error));
 }
 
-// Highlight the current nav item based on URL
 function highlightActiveMenuItem() {
   const links = document.querySelectorAll("nav ul li a");
   const path = location.pathname.replace(/\/$/, "");
@@ -71,14 +64,16 @@ function highlightActiveMenuItem() {
   });
 }
 
-// Inject the current year in the footer
 function insertFooterYear() {
   const yearSpan = document.getElementById("footer-year");
   if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 }
 
-// Entry point for general page setup
-function startCore() {
+document.addEventListener("DOMContentLoaded", () => {
   loadHTML("site-header", "/header.html", highlightActiveMenuItem);
   loadHTML("site-footer", "/footer.html", insertFooterYear);
-}
+
+  if (document.getElementById("live-notices") && typeof startPublish === "function") {
+    startPublish();
+  }
+});
