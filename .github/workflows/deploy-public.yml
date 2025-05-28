@@ -40,10 +40,9 @@ jobs:
             # Skip templates and index files
             if [[ "$base" == *_template.html || "$base" == index.html ]]; then continue; fi
 
-            # If the file has both doc-status and content="inactive", skip it
-            # pattern='<meta\b(?=[^>]*\bname\s*=\s*["'\'']doc-status["'\''])(?=[^>]*\bcontent\s*=\s*["'\'']inactive["'\''])'
+            # Match meta tags with content="inactive"
             pattern="(content)\\s*=\\s*[\"']inactive[\"']"
-            if grep -P "$pattern" "$file"; then
+            if grep -Pi "$pattern" "$file"; then
               echo "Skipping inactive file: $file"
               continue
             fi
@@ -53,17 +52,24 @@ jobs:
             echo "Included: $file"
           done
 
-      - name: Configure Git identity
-        run: |
-          git config user.name "WFE Bot"
-          git config user.email "trustee@williamsfamilyestate.org"
-
       - name: Switch to public branch and clean all old files
         run: |
           git fetch origin public || true
           git checkout public || git checkout -b public
-          git rm -r * || true
+
+          # Wipe all tracked and untracked files
+          git rm -rf . || true
           git clean -fdx
+
+      - name: Copy new public content to branch root
+        run: |
+          cp -r public/* ./
+          rm -rf public
+
+      - name: Configure Git identity
+        run: |
+          git config user.name "WFE Bot"
+          git config user.email "trustee@williamsfamilyestate.org"
 
       - name: Commit and push to public
         run: |
