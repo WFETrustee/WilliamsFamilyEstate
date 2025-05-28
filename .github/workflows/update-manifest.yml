@@ -14,6 +14,7 @@ on:
 jobs:
   generate-manifests:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,8 +24,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies (if needed)
-        run: npm install fs path cheerio --no-save
+      - name: Install dependencies
+        run: npm install cheerio --no-save
 
       - name: Generate manifests for active documents
         run: |
@@ -34,8 +35,7 @@ jobs:
           const cheerio = require('cheerio');
 
           function getAllTemplateFolders(startPath) {
-            const entries = fs.readdirSync(startPath, { withFileTypes: true });
-            return entries
+            return fs.readdirSync(startPath, { withFileTypes: true })
               .filter(entry => entry.isDirectory())
               .map(entry => entry.name)
               .filter(folder => fs.existsSync(path.join(startPath, folder, `${folder}_template.html`)));
@@ -50,8 +50,7 @@ jobs:
             const manifest = [];
 
             files.forEach(file => {
-              const ext = path.extname(file);
-              if (ext !== '.html' || file === 'index.html' || file === templateFile) return;
+              if (!file.endsWith('.html') || file === 'index.html' || file === templateFile) return;
 
               const fullPath = path.join(folderPath, file);
               const html = fs.readFileSync(fullPath, 'utf8');
@@ -70,13 +69,13 @@ jobs:
           });
           EOF
 
-      - name: Generate QR routing table
+      - name: 🛠 Generate QR routing table
         run: |
           echo "{" > qr-routes.json
           FIRST=true
           for file in $(find . -type f -name '*.html'); do
-            if grep -iq '<meta[^>]*name=["'\''"]content-certified["'\''"][^>]*content=["'\''"]true["'\''"]' "$file"; then
-              ID=$(grep -i '<meta[^>]*name=["'\''"]doc-id["'\''"]' "$file" | sed -E 's/.*content=["'\''"]([^"'\''"]+)["'\''"].*/\1/')
+            if grep -iq '<meta[^>]*name=["'\'']content-certified["'\''][^>]*content=["'\'']true["'\'']' "$file"; then
+              ID=$(grep -i '<meta[^>]*name=["'\'']doc-id["'\'']' "$file" | sed -E 's/.*content=["'\'']([^"'\''"]+)["'\'"].*/\1/')
               REL=$(realpath --relative-to=. "$file")
               if [ "$FIRST" = false ]; then echo "," >> qr-routes.json; fi
               echo "  \"$ID\": \"$REL\"" >> qr-routes.json
@@ -84,17 +83,13 @@ jobs:
             fi
           done
           echo "}" >> qr-routes.json
-          
-      - name: Configure Git identity
+
+      - name: 🧾 Configure Git identity
         run: |
           git config user.name "WFE Bot"
           git config user.email "trustee@williamsfamilyestate.org"
 
-      - name: Force set origin to use PAT
-        run: |
-          git remote set-url origin https://x-access-token:${{ secrets.WFE_AUTOPUSH_TOKEN }}@github.com/${{ github.repository }}
-
-      - name: Commit and push updated manifests
+      - name: Push updated manifests and QR routes
         run: |
           git fetch origin master
           git add */manifest.json
@@ -103,11 +98,8 @@ jobs:
           git push origin HEAD:master
 
       - name: Trigger deploy-public workflow
-        if: success()
         uses: peter-evans/workflow-dispatch@v1
         with:
           token: ${{ secrets.WFE_AUTOPUSH_TOKEN }}
           repository: ${{ github.repository }}
           workflow: deploy-public.yml
-          
-     
