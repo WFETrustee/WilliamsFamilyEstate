@@ -69,14 +69,14 @@ jobs:
           });
           EOF
 
-      - name: 🛠 Generate QR routing table
+      - name: Generate QR routing table
         run: |
           echo "{" > qr-routes.json
           FIRST=true
           for file in $(find . -type f -name '*.html'); do
-            if grep -iq '<meta[^>]*name=["'\'']content-certified["'\''][^>]*content=["'\'']true["'\'']' "$file"; then
-              ID=$(grep -i '<meta[^>]*name=["'\'']doc-id["'\'']' "$file" | sed -E 's/.*content=["'\'']([^"'\''"]+)["'\'"].*/\1/')
-              REL=$(realpath --relative-to=. "$file")
+            if grep -iq '<meta[^>]*name="content-certified"[^>]*content="true"' "$file"; then
+              ID=$(grep -i '<meta[^>]*name="doc-id"' "$file" | sed -E 's/.*content="([^"]+)".*/\1/')
+              REL="${file#./}"
               if [ "$FIRST" = false ]; then echo "," >> qr-routes.json; fi
               echo "  \"$ID\": \"$REL\"" >> qr-routes.json
               FIRST=false
@@ -84,7 +84,7 @@ jobs:
           done
           echo "}" >> qr-routes.json
 
-      - name: 🧾 Configure Git identity
+      - name: Configure Git identity
         run: |
           git config user.name "WFE Bot"
           git config user.email "trustee@williamsfamilyestate.org"
