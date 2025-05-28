@@ -14,19 +14,16 @@ const decodeHTML = str => {
   return txt.value;
 };
 
-function renderValue(label, value) {
+function renderValue(label, value, solo) {
   const TM_MARKER = '<span class="tm">&trade;</span>';
   const isHTMLSafe = value.includes(TM_MARKER);
 
-  /*
-  if (isHTMLSafe) {
-    console.log(`[TM DETECTED] Label: "${label}", Value:`, value);
-  }*/
-
-  return `<strong>${label}:</strong> ${isHTMLSafe ? value : decodeHTML(value)}`;
+  if (solo) {
+    return `<strong>${label}:</strong> ${isHTMLSafe ? value : decodeHTML(value)}`;
+  } else {
+    return `${label}: ${isHTMLSafe ? value : decodeHTML(value)}`;
+  }
 }
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
   function enableGoogleFonts(fonts) {
@@ -212,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         const p = document.createElement("p");
                         if (style) p.className = style;
                         //p.innerHTML = `${label}: ${decodeHTML(n[key])}`;
-                        p.innerHTML = renderValue(label, n[key]);
+                        p.innerHTML = renderValue(label, n[key], true);
                         wrapper.appendChild(p);
                       }
                     });
@@ -224,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
                       if (n[key]) {
                         const span = document.createElement("span");
                         //span.innerHTML = `${label}: ${decodeHTML(n[key])}`;
-                        span.innerHTML = renderValue(label, n[key]);
+                        span.innerHTML = renderValue(label, n[key], false);
                         if (style) span.className = style;
                         span.style.marginRight = "1.5em";
                         group.appendChild(span);
