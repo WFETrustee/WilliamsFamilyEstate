@@ -58,11 +58,12 @@ jobs:
           git config user.name "WFE Bot"
           git config user.email "trustee@williamsfamilyestate.org"
 
-      - name: Switch to public branch
+      - name: Switch to public branch and clean all old files
         run: |
           git fetch origin public || true
           git checkout public || git checkout -b public
-          git reset --hard
+          git rm -r * || true
+          git clean -fdx
 
       - name: Commit and push to public
         run: |
