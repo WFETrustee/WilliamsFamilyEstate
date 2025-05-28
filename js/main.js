@@ -2,16 +2,28 @@
 // File: main.js
 // =============================
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadHTML("site-header", "/header.html", highlightActiveMenuItem);
-  loadHTML("site-footer", "/footer.html", insertFooterYear);
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
 
-  if (document.getElementById("live-notices")) {
-    // Now delegated to publish.js
-    if (typeof initPublishing === 'function') {
-      initPublishing();
-    } else {
-      console.warn("Publishing module not loaded.");
+// Load dependencies and initialize
+(async () => {
+  try {
+    await loadScript("/js/core.js");
+
+    // If notices are being rendered, load publish.js
+    if (document.getElementById("live-notices")) {
+      await loadScript("/js/publish.js");
     }
+
+    if (typeof startCore === "function") startCore();
+  } catch (err) {
+    console.error("Script load error:", err);
   }
-});
+})();
