@@ -101,4 +101,13 @@ jobs:
           git add qr-routes.json
           git commit -m "Auto-update manifest.json (active only) and QR routes" || echo "No changes to commit"
           git push origin HEAD:master
+
+      - name: Trigger deploy-public workflow
+        if: success()
+        uses: peter-evans/workflow-dispatch@v1
+        with:
+          token: ${{ secrets.WFE_AUTOPUSH_TOKEN }}
+          repository: ${{ github.repository }}
+          workflow: deploy-public.yml
+          
      
