@@ -41,7 +41,7 @@ jobs:
             if [[ "$base" == *_template.html || "$base" == index.html ]]; then continue; fi
 
             # If the file has both doc-status and content="inactive", skip it
-            if grep -iq 'name=["'\''"]doc-status["'\''"]' "$file" && grep -iq 'content=["'\''"]inactive["'\''"]' "$file"; then
+            if grep -iq '<meta[^>]*doc-status[^>]*inactive' "$file"; then
               echo "Skipping inactive file: $file"
               continue
             fi
