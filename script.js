@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
               return fetch(`/${baseFolder}/${filename}`)
                 .then(res => res.text())
                 .then(html => {
-                  const temp = document.createElement("html");
+                  const temp = document.createElement("div");
                   temp.innerHTML = html;
 
                   const data = { filename, lastModified };
