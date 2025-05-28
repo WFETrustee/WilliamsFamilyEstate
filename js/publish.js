@@ -1,5 +1,5 @@
 // =============================
-// File: publish.js (NEW)
+// File: publish.js
 // =============================
 
 function initPublishing() {
