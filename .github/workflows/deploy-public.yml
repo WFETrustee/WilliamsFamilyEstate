@@ -1,75 +1,73 @@
 name: Deploy Active Content to Public Branch
 
 permissions:
-contents: write
+  contents: write
 
 on:
-push:
-branches:
-\- master
-paths:
-\- '\*\*/\*'
-workflow\_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - '**/*'
+  workflow_dispatch:
 
 jobs:
-publish-public-content:
-runs-on: ubuntu-latest
-steps:
-\- name: Checkout repository
-uses: actions/checkout\@v4
+  publish-public-content:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-```
-  - name: Clean public folder
-    run: |
-      rm -rf public
-      mkdir public
+      - name: Clean public folder
+        run: |
+          rm -rf public
+          mkdir public
 
-  - name: Copy all non-HTML assets to public/
-    run: |
-      find . -type f \( ! -name '*.html' \) -exec bash -c '
-        for filepath; do
-          dir=$(dirname "$filepath")
-          mkdir -p "public/$dir"
-          cp "$filepath" "public/$filepath"
-        done
-      ' bash {} +
+      - name: Copy all non-HTML assets to public/
+        run: |
+          find . -type f \( ! -name '*.html' \) -exec bash -c '
+            for filepath; do
+              dir=$(dirname "$filepath")
+              mkdir -p "public/$dir"
+              cp "$filepath" "public/$filepath"
+            done
+          ' bash {} +
 
-  - name: Copy only active HTML files
-    run: |
-      for file in $(find . -type f -name '*.html'); do
-        # Skip template, index, and files already in public
-        base=$(basename "$file")
-        dir=$(dirname "$file")
-        if [[ "$base" == *_template.html || "$base" == index.html ]]; then continue; fi
+      - name: Copy only active HTML files
+        run: |
+          for file in $(find . -type f -name '*.html'); do
+            # Skip template, index, and files already in public
+            base=$(basename "$file")
+            dir=$(dirname "$file")
+            if [[ "$base" == *_template.html || "$base" == index.html ]]; then continue; fi
 
-        # Skip if inactive
-        if grep -iq '<meta[^>]*name=["\']doc-status["\'][^>]*content=["\']inactive["\']' "$file"; then
-          echo "Skipping inactive file: $file"
-          continue
-        fi
+            # Skip if inactive
+            if grep -iq '<meta[^>]*name=["\']doc-status["\'][^>]*content=["\']inactive["\']' "$file"; then
+              echo "Skipping inactive file: $file"
+              continue
+            fi
 
-        mkdir -p "public/$dir"
-        cp "$file" "public/$file"
-      done
+            mkdir -p "public/$dir"
+            cp "$file" "public/$file"
+          done
 
-  - name: Configure Git identity
-    run: |
-      git config user.name "WFE Bot"
-      git config user.email "trustee@williamsfamilyestate.org"
+      - name: Configure Git identity
+        run: |
+          git config user.name "WFE Bot"
+          git config user.email "trustee@williamsfamilyestate.org"
 
-  - name: Switch to public branch
-    run: |
-      git fetch origin public || git checkout --orphan public
-      git checkout public || git checkout -b public
-      git reset --hard
+      - name: Switch to public branch
+        run: |
+          git fetch origin public || git checkout --orphan public
+          git checkout public || git checkout -b public
+          git reset --hard
 
-  - name: Sync public/ directory to root
-    run: |
-      rsync -a --delete public/ ./
+      - name: Sync public/ directory to root
+        run: |
+          rsync -a --delete public/ ./
 
-  - name: Commit and push to public
-    run: |
-      git add .
-      git commit -m "Deploy active content to public branch" || echo "No changes to commit"
-      git push origin HEAD:public --force
-```
+      - name: Commit and push to public
+        run: |
+          git add .
+          git commit -m "Deploy active content to public branch" || echo "No changes to commit"
+          git push origin HEAD:public --force
