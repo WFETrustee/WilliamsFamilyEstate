@@ -33,23 +33,24 @@ jobs:
             done
           ' bash {} +
 
-      - name: Copy only active HTML files
-        run: |
-          for file in $(find . -type f -name '*.html'); do
-            # Skip template, index, and files already in public
-            base=$(basename "$file")
-            dir=$(dirname "$file")
-            if [[ "$base" == *_template.html || "$base" == index.html ]]; then continue; fi
-
-            # Skip if inactive
-            if grep -iq '<meta[^>]*name=["\']doc-status["\'][^>]*content=["\']inactive["\']' "$file"; then
-              echo "Skipping inactive file: $file"
-              continue
-            fi
-
-            mkdir -p "public/$dir"
-            cp "$file" "public/$file"
-          done
+          - name: Copy only active HTML files
+            run: |
+              for file in $(find . -type f -name '*.html'); do
+                base=$(basename "$file")
+                dir=$(dirname "$file")
+          
+                # Skip templates and index
+                if [[ "$base" == *_template.html || "$base" == index.html ]]; then continue; fi
+          
+                # If the file is marked inactive, skip it
+                if grep -iq '<meta[^>]*name=["'\'']doc-status["'\''][^>]*content=["'\'']inactive["'\'']' "$file"; then
+                  echo "Skipping inactive file: $file"
+                  continue
+                fi
+          
+                mkdir -p "public/$dir"
+                cp "$file" "public/$file"
+              done
 
       - name: Configure Git identity
         run: |
