@@ -85,3 +85,19 @@ jobs:
           git add */manifest.json
           git commit -m "Auto-update manifest.json (active only)" || echo "No changes to commit"
           git push origin HEAD:master
+
+      - name: Generate QR routing table
+        run: |
+          echo "{" > qr-routes.json
+          FIRST=true
+          for file in $(find . -type f -name '*.html'); do
+            if grep -iq '<meta[^>]*name=["'\''"]content-certified["'\''"][^>]*content=["'\''"]true["'\''"]' "$file"; then
+              ID=$(grep -i '<meta[^>]*name=["'\''"]doc-id["'\''"]' "$file" | sed -E 's/.*content=["'\''"]([^"'\''"]+)["'\''"].*/\1/')
+              REL=$(realpath --relative-to=. "$file")
+              if [ "$FIRST" = false ]; then echo "," >> qr-routes.json; fi
+              echo "  \"$ID\": \"$REL\"" >> qr-routes.json
+              FIRST=false
+            fi
+          done
+          echo "}" >> qr-routes.json
+      
