@@ -43,7 +43,7 @@ jobs:
             # If the file has both doc-status and content="inactive", skip it
             # pattern='<meta\b(?=[^>]*\bname\s*=\s*["'\'']doc-status["'\''])(?=[^>]*\bcontent\s*=\s*["'\'']inactive["'\''])'
             pattern="(content)\\s*=\\s*[\"']inactive[\"']"
-            if grep -P pattern "$file"; then
+            if grep -P "$pattern" "$file"; then
               echo "Skipping inactive file: $file"
               continue
             fi
