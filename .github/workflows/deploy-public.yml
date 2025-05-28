@@ -36,16 +36,16 @@ jobs:
           for file in $(find . -type f -name '*.html'); do
             base=$(basename "$file")
             dir=$(dirname "$file")
-      
+
             # Skip templates and index
             if [[ "$base" == *_template.html || "$base" == index.html ]]; then continue; fi
-      
+
             # If the file is marked inactive, skip it
-            if grep -iq '<meta[^>]*name=["'"'"']doc-status["'"'"'][^>]*content=["'"'"']inactive["'"'"']' "$file"; then
+            if grep -iq '<meta[^>]*name=["'\''"]doc-status["'\''"][^>]*content=["'\''"]inactive["'\''"]' "$file"; then
               echo "Skipping inactive file: $file"
               continue
             fi
-      
+
             mkdir -p "public/$dir"
             cp "$file" "public/$file"
           done
@@ -61,9 +61,13 @@ jobs:
           git checkout public || git checkout -b public
           git reset --hard
 
-      - name: Sync public/ directory to root
+      - name: Move filtered output into working root
         run: |
-          rsync -a --delete --ignore-missing-args --exclude='.git' public/ ./
+          mkdir staging
+          cp -r public/* staging/
+          rm -rf *
+          cp -r staging/* ./
+          rm -rf staging public
 
       - name: Commit and push to public
         run: |
