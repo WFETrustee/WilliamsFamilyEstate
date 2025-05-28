@@ -2,7 +2,30 @@
 // File: publish.js
 // =============================
 
-function initPublishing() {
+const GOOGLE_FONTS = [
+  "Spectral+SC",
+  "Playfair+Display",
+  "Scope+One"
+];
+
+const TM_MARKER = '<span class="tm">&trade;</span>';
+
+const decodeHTML = str => {
+  const txt = document.createElement("textarea");
+  txt.innerHTML = str;
+  return txt.value;
+};
+
+function renderValue(label, value, solo) {
+  const isHTMLSafe = value.includes(TM_MARKER);
+  if (solo) {
+    return `<strong>${label}:</strong> ${isHTMLSafe ? value : decodeHTML(value)}`;
+  } else {
+    return `${label}: ${isHTMLSafe ? value : decodeHTML(value)}`;
+  }
+}
+
+function startPublish() {
   const pathParts = window.location.pathname.split("/");
   const baseFolder = pathParts.find(part => part && part !== "index.html") || "notices";
   const templatePath = `/${baseFolder}/${baseFolder}_template.html`;
@@ -10,10 +33,10 @@ function initPublishing() {
   fetch(templatePath)
     .then(res => res.text())
     .then(templateHTML => {
-      const tempDoc = document.createElement("div");
-      tempDoc.innerHTML = templateHTML;
+      const templateDoc = document.createElement("html");
+      templateDoc.innerHTML = templateHTML;
 
-      const metaElements = Array.from(tempDoc.querySelectorAll('meta[name^="doc-"]'));
+      const metaElements = Array.from(templateDoc.querySelectorAll('meta[name^="doc-"]'));
       const groupedMeta = {};
 
       metaElements.forEach(meta => {
@@ -22,6 +45,7 @@ function initPublishing() {
         const line = meta.getAttribute("data-line") || null;
         const style = meta.getAttribute("data-style") || null;
         const label = meta.getAttribute("data-label") || key.charAt(0).toUpperCase() + key.slice(1);
+
         const metaDef = { key, name, line, style, label };
 
         if (line) {
@@ -33,7 +57,7 @@ function initPublishing() {
         }
       });
 
-      return fetch(`/${baseFolder}/manifest.json`)
+      fetch(`/${baseFolder}/manifest.json`)
         .then(res => res.json())
         .then(manifest => {
           const filtered = manifest.filter(entry =>
@@ -76,7 +100,10 @@ function initPublishing() {
                   }
                 });
 
-                if (data.status?.toLowerCase() !== "active") return null;
+                if (data.status?.toLowerCase() !== "active") {
+                  return null;
+                }
+
                 localStorage.setItem(cacheKey, JSON.stringify(data));
                 return data;
               })
@@ -86,7 +113,7 @@ function initPublishing() {
               });
           });
 
-          return Promise.all(noticePromises).then(notices => {
+          Promise.all(noticePromises).then(notices => {
             const pinnedContainer = document.getElementById("pinned-notices");
             const regularContainer = document.getElementById("regular-notices");
 
@@ -120,7 +147,9 @@ function initPublishing() {
               const filteredMetaGroups = {};
               for (const [lineKey, metas] of Object.entries(groupedMeta)) {
                 const filtered = metas.filter(({ key }) => key !== "title");
-                if (filtered.length) filteredMetaGroups[lineKey] = filtered;
+                if (filtered.length) {
+                  filteredMetaGroups[lineKey] = filtered;
+                }
               }
 
               Object.entries(filteredMetaGroups).forEach(([lineKey, metas]) => {
