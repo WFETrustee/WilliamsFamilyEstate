@@ -1,4 +1,4 @@
-name: Auto-generate Manifest Files
+name: Auto-generate Manifest Files (Active Only)
 
 permissions:
   contents: write
@@ -18,32 +18,57 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Discover template folders
-        id: discover
-        run: |
-          echo "folders=[]" >> $GITHUB_ENV
-          FOLDERS=$(find . -type f -name '*_template.html' | sed -E 's|\./([^/]+)/[^/]+_template.html|\1|' | sort -u)
-          echo "Found folders: $FOLDERS"
-          echo "folders=[$(echo $FOLDERS | sed 's/ /,/g')]" >> $GITHUB_ENV
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Generate manifests
+      - name: Install dependencies (if needed)
+        run: npm install fs path cheerio --no-save
+
+      - name: Generate manifests for active documents
         run: |
-          for folder in $(find . -type f -name '*_template.html' | sed -E 's|\./([^/]+)/[^/]+_template.html|\1|' | sort -u); do
-            TEMPLATE_FILE="${folder}_template.html"
-            echo "Generating manifest for: $folder"
-            echo "[" > "$folder/manifest.json"
-            FIRST=true
-            for file in $folder/*.html; do
-              base=$(basename "$file")
-              if [[ "$base" != "index.html" && "$base" != "$TEMPLATE_FILE" ]]; then
-                MODIFIED=$(date -Iseconds -r "$file")
-                if [ "$FIRST" = false ]; then echo "," >> "$folder/manifest.json"; fi
-                echo "  {\"filename\": \"$base\", \"lastModified\": \"$MODIFIED\"}" >> "$folder/manifest.json"
-                FIRST=false
-              fi
-            done
-            echo "]" >> "$folder/manifest.json"
-          done
+          node <<'EOF'
+          const fs = require('fs');
+          const path = require('path');
+          const cheerio = require('cheerio');
+
+          function getAllTemplateFolders(startPath) {
+            const entries = fs.readdirSync(startPath, { withFileTypes: true });
+            return entries
+              .filter(entry => entry.isDirectory())
+              .map(entry => entry.name)
+              .filter(folder => fs.existsSync(path.join(startPath, folder, `${folder}_template.html`)));
+          }
+
+          const folders = getAllTemplateFolders('.');
+
+          folders.forEach(folder => {
+            const folderPath = path.join('.', folder);
+            const files = fs.readdirSync(folderPath);
+            const templateFile = `${folder}_template.html`;
+            const manifest = [];
+
+            files.forEach(file => {
+              const ext = path.extname(file);
+              if (ext !== '.html' || file === 'index.html' || file === templateFile) return;
+
+              const fullPath = path.join(folderPath, file);
+              const html = fs.readFileSync(fullPath, 'utf8');
+              const $ = cheerio.load(html);
+              const status = $('meta[name="doc-status"]').attr('content')?.toLowerCase();
+
+              if (status === 'active') {
+                const lastModified = fs.statSync(fullPath).mtime.toISOString();
+                manifest.push({ filename: file, lastModified });
+              }
+            });
+
+            const manifestPath = path.join(folderPath, 'manifest.json');
+            fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+            console.log(`Updated: ${manifestPath}`);
+          });
+          EOF
 
       - name: Configure Git identity
         run: |
@@ -58,5 +83,5 @@ jobs:
         run: |
           git fetch origin master
           git add */manifest.json
-          git commit -m "Auto-update manifest.json for all folders" || echo "No changes to commit"
+          git commit -m "Auto-update manifest.json (active only)" || echo "No changes to commit"
           git push origin HEAD:master
