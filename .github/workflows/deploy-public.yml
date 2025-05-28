@@ -37,9 +37,6 @@ jobs:
             base=$(basename "$file")
             dir=$(dirname "$file")
 
-            # Skip templates and index files
-            if [[ "$base" == *_template.html || "$base" == index.html ]]; then continue; fi
-
             # Match meta tags with content="inactive"
             pattern="(content)\\s*=\\s*[\"']inactive[\"']"
             if grep -Pi "$pattern" "$file"; then
