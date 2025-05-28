@@ -151,6 +151,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                   });
 
+                  // Skip notices that are not explicitly "Active"
+                  if (data.status?.toLowerCase() !== "active") {
+                    return null;
+                  }
+                
                   localStorage.setItem(cacheKey, JSON.stringify(data));
                   return data;
                 })
