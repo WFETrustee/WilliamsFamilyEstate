@@ -4,12 +4,9 @@ permissions:
   contents: write
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - '**/*'
-  workflow_dispatch:
+  repository_dispatch:
+    types: [deploy-public]
+  workflow_dispatch:  # Optional: for manual triggering
 
 jobs:
   publish-public-content:
