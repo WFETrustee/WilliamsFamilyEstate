@@ -102,9 +102,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger deploy-public workflow
-        uses: peter-evans/repository-dispatch@v3.0.0
+        uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.WFE_AUTOPUSH_TOKEN }}
           repository: ${{ github.repository }}
-          workflow: deploy-public.yml
+          event-type: deploy-public
+
 
