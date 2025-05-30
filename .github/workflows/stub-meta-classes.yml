@@ -1,0 +1,34 @@
+# .github/workflows/stub-meta-classes.yml
+
+name: Generate Missing CSS Metadata Stubs
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '**/*_template.html'
+      - '.github/workflows/stub-meta-classes.yml'
+      - 'generate-css-stubs.js'
+
+jobs:
+  generate-stubs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Run CSS stub generator
+        run: node generate-css-stubs.js
+
+      - name: Commit and push changes (if any)
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add **/style.css
+          git diff --cached --quiet || git commit -m "chore: auto-generate CSS stubs for metadata"
+          git push
