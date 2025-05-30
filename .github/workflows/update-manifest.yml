@@ -1,4 +1,4 @@
-name: Auto-generate Manifest Files (Active Only)
+name: Auto-generate Manifests and Metadata Stubs
 
 permissions:
   contents: write
@@ -9,10 +9,12 @@ on:
       - master
     paths:
       - '**/*.html'
+      - '.github/scripts/**'
+      - '.github/workflows/update-manifest.yml'
   workflow_dispatch:
 
 jobs:
-  generate-manifests:
+  update-site-data:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,88 +29,26 @@ jobs:
       - name: Install dependencies
         run: npm install cheerio --no-save
 
-      - name: Generate JSON file manifests
-        run: |
-          node <<'EOF'
-          const fs = require('fs');
-          const path = require('path');
-          const cheerio = require('cheerio');
-      
-          function getAllTemplateFolders(startPath) {
-            return fs.readdirSync(startPath, { withFileTypes: true })
-              .filter(entry => entry.isDirectory())
-              .map(entry => entry.name)
-              .filter(folder => fs.existsSync(path.join(startPath, folder, `${folder}_template.html`)));
-          }
-      
-          const folders = getAllTemplateFolders('.');
-      
-          folders.forEach(folder => {
-            const folderPath = path.join('.', folder);
-            const templatePath = path.join(folderPath, `${folder}_template.html`);
-            const files = fs.readdirSync(folderPath);
-            const templateHTML = fs.readFileSync(templatePath, 'utf8');
-            const $template = cheerio.load(templateHTML);
-            const expectedFields = $template('meta[name^="doc-"]').map((i, el) => $template(el).attr('name')).get();
+      - name: Generate CSS Metadata Stubs
+        run: node .github/scripts/generate-css-stubs.js
 
-            const output = [];
-      
-            files.forEach(file => {
-              if (!file.endsWith('.html') || file === 'index.html' || file === `${folder}_template.html`) return;
-      
-              const fullPath = path.join(folderPath, file);
-              const html = fs.readFileSync(fullPath, 'utf8');
-              const $ = cheerio.load(html);
-      
-              const status = $('meta[name="doc-status"]').attr('content')?.toLowerCase();
-              if (status && status !== 'active') return;
-      
-              const entry = { filename: file };
-      
-              expectedFields.forEach(field => {
-                const val = $(`meta[name="${field}"]`).attr('content') || '';
-                entry[field] = val;
-              });
-      
-              entry.lastModified = fs.statSync(fullPath).mtime.toISOString();
-              output.push(entry);
-            });
-      
-            const jsonPath = path.join(folderPath, `${folder}.json`);
-            fs.writeFileSync(jsonPath, JSON.stringify(output, null, 2), 'utf-8');
-            console.log(`✔ Created: ${jsonPath}`);
-          });
-          EOF
-
-      - name: Generate QR routing table
-        run: |
-          echo "{" > qr-routes.json
-          FIRST=true
-          for file in $(find . -type f -name '*.html'); do
-            if grep -iq '<meta[^>]*name="content-certified"[^>]*content="true"' "$file"; then
-              ID=$(grep -i '<meta[^>]*name="doc-id"' "$file" | sed -E 's/.*content="([^"]+)".*/\1/')
-              REL="${file#./}"
-              if [ "$FIRST" = false ]; then echo "," >> qr-routes.json; fi
-              echo "  \"$ID\": \"$REL\"" >> qr-routes.json
-              FIRST=false
-            fi
-          done
-          echo "}" >> qr-routes.json
+      - name: Generate Manifest Files and QR Routes
+        run: node .github/scripts/generate-manifests.js
 
       - name: Configure Git identity
         run: |
           git config user.name "WFE Bot"
           git config user.email "trustee@williamsfamilyestate.org"
 
-      - name: Push updated manifests and QR routes
+      - name: Commit and push updated manifests and styles
         run: |
           git fetch origin master
-          git add **/*.json
-          git commit -m "Auto-update manifest.json (active only) and QR routes" || echo "No changes to commit"
+          git add **/*.json **/style.css
+          git commit -m "Auto-update metadata CSS stubs, json manifests, and QR routes" || echo "No changes to commit"
           git push origin HEAD:master
 
   trigger-deploy:
-    needs: generate-manifests
+    needs: update-site-data
     runs-on: ubuntu-latest
     steps:
       - name: Trigger deploy-public workflow
@@ -117,5 +57,3 @@ jobs:
           token: ${{ secrets.WFE_AUTOPUSH_TOKEN }}
           repository: ${{ github.repository }}
           event-type: deploy-public
-
-
