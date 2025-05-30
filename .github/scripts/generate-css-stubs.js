@@ -1,39 +1,64 @@
 // generate-css-stubs.js
+// ======================
+// This script scans all folders containing a `($folder)_template.html`
+// Extracts all <meta name="doc-..."> definitions
+// Ensures that the corresponding CSS stubs (e.g., `.meta.date { }`) exist
+// If `style.css` is missing, it will create it
+// If a class is already defined, it is skipped
+// This script is designed for backend execution inside GitHub Actions
+// and must be paired with `template-metadata.js`
 
 const fs = require('fs');
 const path = require('path');
 const { getAllContentFolders, getTemplateMetaKeys } = require('./utils/template-metadata');
 
+// Get all folders that contain a `($folder)_template.html`
 const folders = getAllContentFolders('.');
 
 folders.forEach(folder => {
   const folderPath = path.join('.', folder);
   const cssPath = path.join(folderPath, 'style.css');
-  const docKeys = getTemplateMetaKeys(folderPath, folder); // e.g., ["doc-venue", "doc-summary"]
 
-  // Convert keys to class names
-  const classNames = new Set(docKeys.map(key => '.' + key.replace(/^doc-/, '')));
+  // Pull all doc-* metadata keys from template (e.g., 'doc-date', 'doc-summary')
+  const docKeys = getTemplateMetaKeys(folderPath, folder);
 
-  // Create empty CSS file if needed
-  if (!fs.existsSync(cssPath)) fs.writeFileSync(cssPath, '', 'utf-8');
+  // Convert each key to a selector like `.meta.summary`
+  const classNames = new Set(docKeys.map(key => {
+    const raw = key.replace(/^doc-/, '').toLowerCase();
+    return `.meta.${raw}`;
+  }));
 
-  // Load existing classes
-  const css = fs.readFileSync(cssPath, 'utf-8');
-  const existing = new Set();
-  const regex = /\.(\w[\w\-]*)\s*\{/g;
+  // Ensure the CSS file exists
+  if (!fs.existsSync(cssPath)) {
+    fs.writeFileSync(cssPath, '', 'utf-8');
+  }
+
+  // Read existing CSS classes already defined
+  const cssContent = fs.readFileSync(cssPath, 'utf-8');
+  const existingClasses = new Set();
+  const classRegex = /\.meta\.(\w[\w\-]*)\s*\{/g;
   let match;
-  while ((match = regex.exec(css))) {
-    existing.add('.' + match[1]);
+  while ((match = classRegex.exec(cssContent))) {
+    existingClasses.add(`.meta.${match[1]}`);
   }
 
-  // Generate missing stubs
-  const missing = [...classNames].filter(cls => !existing.has(cls));
-  if (missing.length > 0) {
-    const additions = `\n/* Auto-generated metadata stubs */\n` +
-      missing.map(cls => `${cls} { }\n`).join('');
-    fs.appendFileSync(cssPath, additions, 'utf-8');
-    console.log(`✅ ${folder}/style.css updated with ${missing.length} stubs.`);
-  } else {
-    console.log(`✔️ ${folder}/style.css already complete.`);
+  // Determine which classes are missing
+  const missing = [...classNames].filter(cls => !existingClasses.has(cls));
+  if (missing.length === 0) {
+    console.log(`✔️ ${folder}/style.css already contains all metadata stubs.`);
+    return;
   }
+
+  // Format missing entries for appending
+  const additions = [
+    '',
+    '/* =============================== */',
+    '/* Auto-generated metadata stubs  */',
+    '/* =============================== */',
+    ...missing.map(cls => `${cls} { }`)
+  ].join('\n') + '\n';
+
+  // Append to the CSS file
+  fs.appendFileSync(cssPath, additions, 'utf-8');
+  console.log(`✅ ${folder}/style.css updated with ${missing.length} stubs.`);
 });
