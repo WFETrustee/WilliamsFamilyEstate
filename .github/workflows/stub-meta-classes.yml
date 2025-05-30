@@ -2,6 +2,9 @@
 
 name: Generate Missing CSS Metadata Stubs
 
+permissions:
+  contents: write
+
 on:
   push:
     branches: [master]
