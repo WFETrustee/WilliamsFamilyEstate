@@ -1,5 +1,8 @@
 // =============================
-// File: publish.js
+// File: publish.js (refactored to use ($foldername).json)
+// Purpose: Dynamically render document content blocks on index.html by reading pre-built JSON
+// files generated from corresponding *_template.html meta definitions. This avoids live HTML parsing and
+// speeds up page loads while maintaining a dynamic, data-driven architecture.
 // =============================
 
 function parseTemplateMeta(templateHTML) {
@@ -25,59 +28,7 @@ function parseTemplateMeta(templateHTML) {
   return { metaElements, groupedMeta };
 }
 
-function loadManifestEntries(baseFolder) {
-  return fetch(`/${baseFolder}/manifest.json`)
-    .then(res => res.json())
-    .then(manifest =>
-      manifest.filter(entry =>
-        entry.filename !== "index.html" &&
-        entry.filename !== `${baseFolder}_template.html`
-      )
-    );
-}
-
-function loadNoticeMetadata(entry, baseFolder, metaElements) {
-  const { filename, lastModified } = entry;
-  const cacheKey = `${baseFolder}:${filename}`;
-  const cached = localStorage.getItem(cacheKey);
-
-  if (cached) {
-    try {
-      const cachedData = JSON.parse(cached);
-      if (cachedData.lastModified === lastModified) return Promise.resolve(cachedData);
-    } catch (e) {
-      console.warn(`Invalid cache for ${cacheKey}`, e);
-    }
-  }
-
-  return fetch(`/${baseFolder}/${filename}`)
-    .then(res => res.text())
-    .then(html => {
-      const temp = document.createElement("div");
-      temp.innerHTML = html;
-
-      const data = { filename, lastModified };
-      metaElements.forEach(meta => {
-        const name = meta.getAttribute("name");
-        const key = name.replace("doc-", "");
-        const el = temp.querySelector(`meta[name='${name}']`);
-        if (el) {
-          let content = el.getAttribute("content");
-          if (content?.trim()) data[key] = content;
-        }
-      });
-
-      if (data.status?.toLowerCase() !== "active") return null;
-      localStorage.setItem(cacheKey, JSON.stringify(data));
-      return data;
-    })
-    .catch(err => {
-      console.warn(`Failed to load ${filename}`, err);
-      return null;
-    });
-}
-
-function renderNotice(n, groupedMeta, baseFolder) {
+function renderContentEntry(n, groupedMeta, baseFolder) {
   const wrapper = document.createElement("div");
   wrapper.className = "notice";
   wrapper.style.position = "relative";
@@ -150,10 +101,12 @@ function startPublish() {
     .then(res => res.text())
     .then(templateHTML => {
       const { metaElements, groupedMeta } = parseTemplateMeta(templateHTML);
-      return loadManifestEntries(baseFolder).then(entries =>
-        Promise.all(entries.map(e => loadNoticeMetadata(e, baseFolder, metaElements)))
-          .then(notices => ({ groupedMeta, baseFolder, notices: notices.filter(n => n) }))
-      );
+      return fetch(`/${baseFolder}/${baseFolder}.json`)
+        .then(res => res.json())
+        .then(notices => {
+          const active = notices.filter(n => n['doc-status']?.toLowerCase() === 'active');
+          return { groupedMeta, baseFolder, notices: active };
+        });
     })
     .then(({ groupedMeta, baseFolder, notices }) => {
       const pinnedContainer = document.getElementById("pinned-notices");
@@ -164,8 +117,8 @@ function startPublish() {
       const unpinned = notices.filter(n => !(n.pinned === "true" || n.pinned === true))
         .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-      pinned.forEach(n => pinnedContainer.appendChild(renderNotice(n, groupedMeta, baseFolder)));
-      unpinned.forEach(n => regularContainer.appendChild(renderNotice(n, groupedMeta, baseFolder)));
+      pinned.forEach(n => pinnedContainer.appendChild(renderContentEntry(n, groupedMeta, baseFolder)));
+      unpinned.forEach(n => regularContainer.appendChild(renderContentEntry(n, groupedMeta, baseFolder)));
     })
     .catch(err => {
       live.textContent = "Failed to load notice data.";
