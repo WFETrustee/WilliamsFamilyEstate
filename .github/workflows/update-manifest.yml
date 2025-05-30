@@ -27,45 +27,56 @@ jobs:
       - name: Install dependencies
         run: npm install cheerio --no-save
 
-      - name: Generate manifests for active documents
+      - name: Generate JSON file manifests
         run: |
           node <<'EOF'
           const fs = require('fs');
           const path = require('path');
           const cheerio = require('cheerio');
-
+      
           function getAllTemplateFolders(startPath) {
             return fs.readdirSync(startPath, { withFileTypes: true })
               .filter(entry => entry.isDirectory())
               .map(entry => entry.name)
               .filter(folder => fs.existsSync(path.join(startPath, folder, `${folder}_template.html`)));
           }
-
+      
           const folders = getAllTemplateFolders('.');
-
+      
           folders.forEach(folder => {
             const folderPath = path.join('.', folder);
+            const templatePath = path.join(folderPath, `${folder}_template.html`);
             const files = fs.readdirSync(folderPath);
-            const templateFile = `${folder}_template.html`;
-            const manifest = [];
+            const templateHTML = fs.readFileSync(templatePath, 'utf8');
+            const $template = cheerio.load(templateHTML);
+            const expectedFields = $template('meta[name^="doc-"]').map((i, el) => $template(el).attr('name')).get();
 
+            const output = [];
+      
             files.forEach(file => {
-              if (!file.endsWith('.html') || file === 'index.html' || file === templateFile) return;
-
+              if (!file.endsWith('.html') || file === 'index.html' || file === `${folder}_template.html`) return;
+      
               const fullPath = path.join(folderPath, file);
               const html = fs.readFileSync(fullPath, 'utf8');
               const $ = cheerio.load(html);
+      
               const status = $('meta[name="doc-status"]').attr('content')?.toLowerCase();
-
-              if (status === 'active') {
-                const lastModified = fs.statSync(fullPath).mtime.toISOString();
-                manifest.push({ filename: file, lastModified });
-              }
+              if (status && status !== 'active') return;
+      
+              const entry = { filename: file };
+      
+              expectedFields.forEach(field => {
+                const val = $(`meta[name="${field}"]`).attr('content') || '';
+                entry[field] = val;
+              });
+      
+              entry.lastModified = fs.statSync(fullPath).mtime.toISOString();
+              output.push(entry);
             });
-
-            const manifestPath = path.join(folderPath, 'manifest.json');
-            fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
-            console.log(`Updated: ${manifestPath}`);
+      
+            const jsonPath = path.join(folderPath, `${folder}.json`);
+            fs.writeFileSync(jsonPath, JSON.stringify(output, null, 2), 'utf-8');
+            console.log(`✔ Created: ${jsonPath}`);
           });
           EOF
 
@@ -92,8 +103,7 @@ jobs:
       - name: Push updated manifests and QR routes
         run: |
           git fetch origin master
-          git add */manifest.json
-          git add qr-routes.json
+          git add **/*.json
           git commit -m "Auto-update manifest.json (active only) and QR routes" || echo "No changes to commit"
           git push origin HEAD:master
 
