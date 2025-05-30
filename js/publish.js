@@ -5,7 +5,7 @@
 // speeds up page loads while maintaining a dynamic, data-driven architecture.
 // =============================
 
-function parseTemplateMeta(templateHTML) {
+function parseTemplateMetadata(templateHTML) {
   const templateDoc = document.createElement("html");
   templateDoc.innerHTML = templateHTML;
 
@@ -100,7 +100,7 @@ function startPublish() {
   fetch(templatePath)
     .then(res => res.text())
     .then(templateHTML => {
-      const { metaElements, groupedMeta } = parseTemplateMeta(templateHTML);
+      const { metaElements, groupedMeta } = parseTemplateMetadata(templateHTML);
       return fetch(`/${baseFolder}/${baseFolder}.json`)
         .then(res => res.json())
         .then(notices => {
