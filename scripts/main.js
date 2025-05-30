@@ -12,14 +12,14 @@ function loadScript(url, callback) {
 
 document.addEventListener("DOMContentLoaded", () => {
   // Load core.js first
-  loadScript("/js/core.js", () => {
+  loadScript("/scripts/core.js", () => {
     // Then load header and footer
     loadHTML("site-header", "/header.html", highlightActiveMenuItem);
     loadHTML("site-footer", "/footer.html", insertFooterYear);
 
     // Conditionally load publish.js if needed
     if (document.getElementById("live-notices")) {
-      loadScript("/js/publish.js", () => {
+      loadScript("/scripts/publish.js", () => {
         if (typeof startPublish === "function") startPublish();
       });
     }
