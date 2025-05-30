@@ -128,6 +128,15 @@ main {
   background-color: #f9f9f9;
 }
 
+img.pinned {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 1.5rem;
+  height: auto;
+  z-index: 5;
+}
+
 /*Emergency entries*/
 .doc-header {
   display: flex;
@@ -238,9 +247,11 @@ main {
   display: none !important;
 }
 
+/*
 .pinned {
   display: none !important;
 }
+*/
 
 .date {
   font-style: italic;
