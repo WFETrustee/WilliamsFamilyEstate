@@ -247,11 +247,9 @@ img.pinned {
   display: none !important;
 }
 
-/*
-.pinned {
+p.meta.pinned {
   display: none !important;
 }
-*/
 
 .date {
   font-style: italic;
