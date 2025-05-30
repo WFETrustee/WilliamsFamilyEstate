@@ -31,20 +31,20 @@ function parseTemplateMetadata(templateHTML) {
 
 function renderContentEntry(entry, groupedMeta, baseFolder) {
   const wrapper = document.createElement("div");
-  wrapper.className = "content-entry";
+  wrapper.className = "notice";
   wrapper.style.position = "relative";
 
   if (entry["doc-pinned"] === "true" || entry["doc-pinned"] === true) {
     const pin = document.createElement("img");
     pin.src = "/images/pushpin.png";
     pin.alt = "Pinned";
-    pin.className = "content-pin";
+    pin.className = "pinned";
     wrapper.appendChild(pin);
   }
 
   const h2 = document.createElement("h2");
   h2.textContent = entry["doc-title"] || "Untitled";
-  h2.className = "content-title";
+  //h2.className = "title";
   wrapper.appendChild(h2);
 
   const filteredGroups = {};
@@ -82,7 +82,7 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
 
   const link = document.createElement("a");
   link.href = `/${baseFolder}/${entry.filename}`;
-  link.className = "content-link";
+  //link.className = "content-link";
   link.textContent = "View Full Document →";
   wrapper.appendChild(link);
 
