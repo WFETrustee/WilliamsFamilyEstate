@@ -106,8 +106,15 @@ function startPublish() {
       return fetch(jsonPath)
         .then(res => res.json())
         .then(entries => {
-          const active = entries.filter(e => e["doc-status"]?.toLowerCase() === "active");
-          return { groupedMeta, baseFolder, entries: active };
+          const mode = (window.siteConfig?.publishMode || "live").toLowerCase();
+          const filtered = entries.filter(e => {
+            const status = (e["doc-status"] || "").toLowerCase();
+            if (mode === "all") return true;
+            if (mode === "draft") return status === "draft";
+            return status === "active";
+          });
+
+          return { groupedMeta, baseFolder, entries: filtered };
         });
     })
     .then(({ groupedMeta, baseFolder, entries }) => {
@@ -129,4 +136,6 @@ function startPublish() {
       live.textContent = "Failed to load content.";
       console.error("startPublish error:", err);
     });
+}
+
 }
