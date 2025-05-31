@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
       loadHTML("site-header", "/header.html", highlightActiveMenuItem, config);
       loadHTML("site-footer", "/footer.html", insertFooterYear, config);
 
-      if (document.getElementById("live-notices") && typeof startPublish === "function") {
+      if (document.getElementById("live-content") && typeof startPublish === "function") {
         startPublish(config);
       }
     })
@@ -162,3 +162,4 @@ document.addEventListener("DOMContentLoaded", () => {
       window.siteConfig = {};
     });
 });
+

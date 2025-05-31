@@ -101,7 +101,7 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
  * Applies filters based on doc-status and siteConfig.mode.publish.
  */
 function startPublish(config = siteConfig) {
-  const live = document.getElementById("live-notices");
+  const live = document.getElementById("live-content");
   if (!live) return;
 
   const baseFolder = window.location.pathname.split("/").find(p => p && p !== "index.html") || "notice";
@@ -130,8 +130,8 @@ function startPublish(config = siteConfig) {
         });
     })
     .then(({ groupedMeta, baseFolder, entries }) => {
-      const pinnedContainer = document.getElementById("pinned-notices");
-      const regularContainer = document.getElementById("regular-notices");
+      const pinnedContainer = document.getElementById("pinned-content");
+      const regularContainer = document.getElementById("regular-content");
 
       const pinned = entries
         .filter(e => e["doc-pinned"] === "true" || e["doc-pinned"] === true)
@@ -149,3 +149,4 @@ function startPublish(config = siteConfig) {
       console.error("startPublish error:", err);
     });
 }
+

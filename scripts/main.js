@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // If this page is dynamic, load publish.js after core
-       if (document.getElementById("live-notices")) {
+       if (document.getElementById("live-content")) {
           loadScript("/scripts/publish.js", () => {
             if (typeof startPublish === "function") {
               startPublish(window.siteConfig);
@@ -42,3 +42,4 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("site-config.json failed to load. Aborting startup.", err);
     });
 });
+
