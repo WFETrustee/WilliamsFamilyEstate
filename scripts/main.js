@@ -9,7 +9,7 @@ function loadScript(url, callback) {
   const script = document.createElement("script");
   script.src = url;
   script.onload = () => callback?.();
-  script.onerror = () => console.error(`❌ Failed to load script: ${url}`);
+  script.onerror = () => console.error(`Failed to load script: ${url}`);
   document.head.appendChild(script);
 }
 
@@ -33,6 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     })
     .catch(err => {
-      console.error("❌ site-config.json failed to load. Aborting startup.", err);
+      console.error("site-config.json failed to load. Aborting startup.", err);
     });
 });
