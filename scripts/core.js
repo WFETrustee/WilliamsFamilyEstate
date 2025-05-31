@@ -1,12 +1,15 @@
-// =============================
+// ==========================================================
 // File: core.js
-// Purpose: Shared utility and rendering logic for Williams Family Estate frontend,
-// including safe HTML rendering, smart date formatting, Google Fonts injection,
-// header/footer loading, and menu highlighting.
-// =============================
+// Purpose: Provides foundational utility functions for rendering,
+// formatting, loading shared layouts, and injecting dynamic assets.
+// This script supports dynamic Google Fonts, HTML decoding,
+// date formatting, and shared layout includes.
+// It integrates with the global `siteConfig` object (from site-config.json)
+// to respect site-wide preferences and behaviors.
+// ==========================================================
+*/
 
 const TM_MARKER = '<span class="tm">&trade;</span>';
-const DEFAULT_FONTS = ["Spectral+SC", "Playfair+Display", "Scope+One"];
 
 const decodeHTML = str => {
   const txt = document.createElement("textarea");
@@ -14,6 +17,10 @@ const decodeHTML = str => {
   return txt.value;
 };
 
+/**
+ * Formats a date based on a raw value and optional hint.
+ * Supports ISO, custom formats (e.g. "MMMM d, yyyy"), or locale inference from example string.
+ */
 function processDate(rawValue, formatHint = "") {
   const inputDate = new Date(rawValue);
   if (isNaN(inputDate)) return rawValue;
@@ -22,7 +29,7 @@ function processDate(rawValue, formatHint = "") {
     return applyFormat(inputDate, formatHint);
   }
 
-  const locale = guessLocaleFromExample(formatHint) || (window.siteConfig?.defaultLocale ?? "en-US");
+  const locale = guessLocaleFromExample(formatHint) || siteConfig?.display?.defaultLocale || 'en-US';
   return inputDate.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'long',
@@ -30,6 +37,9 @@ function processDate(rawValue, formatHint = "") {
   });
 }
 
+/**
+ * Apply custom format string (e.g. "MMMM d, yyyy") to a Date object.
+ */
 function applyFormat(date, formatStr) {
   const map = {
     yyyy: date.getFullYear(),
@@ -41,20 +51,28 @@ function applyFormat(date, formatStr) {
     dd: String(date.getDate()).padStart(2, '0'),
     d: date.getDate()
   };
+
   return formatStr.replace(/yyyy|yy|MMMM|MMM|MM|M|dd|d/g, token => map[token] ?? token);
 }
 
+/**
+ * Attempts to infer locale formatting style from a sample string.
+ */
 function guessLocaleFromExample(example) {
-  if (/May\s+\d{1,2},\s+\d{4}/i.test(example)) return 'en-US';
-  if (/\d{1,2}\s+May\s+\d{4}/i.test(example)) return 'en-GB';
-  if (/\d{2}\/\d{2}\/\d{4}/.test(example)) return 'en-US';
+  if (/May\s+\d{1,2},\s+\d{4}/i.test(example)) return 'en-US';     // May 21, 2025
+  if (/\d{1,2}\s+May\s+\d{4}/i.test(example)) return 'en-GB';       // 21 May 2025
+  if (/\d{2}\/\d{2}\/\d{4}/.test(example)) return 'en-US';          // 05/21/2025
   return null;
 }
 
-function renderValue(label, value, solo = false, style = "", formatHint = "") {
+/**
+ * Renders a metadata value with optional formatting.
+ */
+function renderValue(label, value, solo = false, style = "", metaFormat = "") {
   let formattedValue = value;
+
   if (style === "date") {
-    formattedValue = processDate(value, formatHint || window.siteConfig?.defaultDateFormat);
+    formattedValue = processDate(value, metaFormat || siteConfig?.display?.defaultDateFormat);
   }
 
   const isHTMLSafe = formattedValue.includes(TM_MARKER);
@@ -65,9 +83,14 @@ function renderValue(label, value, solo = false, style = "", formatHint = "") {
     : `${label}: ${decoded}`;
 }
 
-function enableGoogleFonts(fonts) {
-  const fontList = Array.isArray(fonts) ? fonts : [fonts];
-  fontList.forEach(font_family => {
+/**
+ * Injects Google Fonts based on the config.fonts.googleFonts array.
+ */
+function enableGoogleFonts(config = siteConfig) {
+  if (!config?.fonts?.loadGoogleFonts) return;
+
+  const fonts = config.fonts.googleFonts || [];
+  fonts.forEach(font_family => {
     if (!document.querySelector(`link[href*='${font_family}']`)) {
       const link = document.createElement("link");
       link.href = `https://fonts.googleapis.com/css?family=${font_family}`;
@@ -77,7 +100,10 @@ function enableGoogleFonts(fonts) {
   });
 }
 
-function loadHTML(id, url, callback, fonts) {
+/**
+ * Dynamically loads an external HTML file into the given DOM element.
+ */
+function loadHTML(id, url, callback, config = siteConfig) {
   fetch(url)
     .then(response => {
       if (!response.ok) throw new Error(`Failed to load ${url}`);
@@ -87,15 +113,16 @@ function loadHTML(id, url, callback, fonts) {
       const container = document.getElementById(id);
       if (container) {
         container.innerHTML = html;
-        if (fonts?.length && window.siteConfig?.loadGoogleFonts !== false) {
-          enableGoogleFonts(fonts);
-        }
+        enableGoogleFonts(config);
         if (callback) callback();
       }
     })
     .catch(error => console.error(`Error loading ${url}:`, error));
 }
 
+/**
+ * Highlights current menu item in header navigation.
+ */
 function highlightActiveMenuItem() {
   const links = document.querySelectorAll("nav ul li a");
   const path = location.pathname.replace(/\/$/, "");
@@ -107,36 +134,32 @@ function highlightActiveMenuItem() {
   });
 }
 
+/**
+ * Auto-inserts current year into #footer-year span
+ */
 function insertFooterYear() {
   const yearSpan = document.getElementById("footer-year");
   if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 }
 
-// ⬇️ Load settings FIRST, then init DOM
-fetch("/site-config.json")
-  .then(res => res.json())
-  .then(config => {
-    window.siteConfig = config;
+// ===========================================
+// Main bootstrapping entry point
+// ===========================================
+document.addEventListener("DOMContentLoaded", () => {
+  fetch('/site-config.json')
+    .then(res => res.json())
+    .then(config => {
+      window.siteConfig = config;
 
-    document.addEventListener("DOMContentLoaded", () => {
-      loadHTML("site-header", "/header.html", highlightActiveMenuItem, config.googleFonts ?? DEFAULT_FONTS);
-      loadHTML("site-footer", "/footer.html", insertFooterYear);
-
-      if (document.getElementById("live-notices") && typeof startPublish === "function") {
-        startPublish();
-      }
-    });
-  })
-  .catch(err => {
-    console.warn("site-config.json not found or invalid. Using defaults.");
-    window.siteConfig = {}; // fallback
-
-    document.addEventListener("DOMContentLoaded", () => {
-      loadHTML("site-header", "/header.html", highlightActiveMenuItem, DEFAULT_FONTS);
-      loadHTML("site-footer", "/footer.html", insertFooterYear);
+      loadHTML("site-header", "/header.html", highlightActiveMenuItem, config);
+      loadHTML("site-footer", "/footer.html", insertFooterYear, config);
 
       if (document.getElementById("live-notices") && typeof startPublish === "function") {
-        startPublish();
+        startPublish(config);
       }
+    })
+    .catch(err => {
+      console.warn("site-config.json not found or invalid. Using defaults.");
+      window.siteConfig = {};
     });
-  });
+});
