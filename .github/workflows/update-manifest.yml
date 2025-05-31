@@ -9,6 +9,7 @@ on:
       - master
     paths:
       - '**/*.html'
+      - 'site-config.json'
       - '.github/scripts/**'
       - '.github/workflows/update-manifest.yml'
   workflow_dispatch:
@@ -26,13 +27,13 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies
+      - name: Install cheerio for DOM parsing
         run: npm install cheerio --no-save
 
-      - name: Generate CSS Metadata Stubs
+      - name: Generate CSS Metadata Stubs (if enabled)
         run: node .github/scripts/generate-css-stubs.js
 
-      - name: Distribute inherited root styles
+      - name: Distribute inherited root styles (if enabled)
         run: node .github/scripts/distribute-shared-styles.js
 
       - name: Generate Manifest Files and QR Routes
@@ -46,7 +47,7 @@ jobs:
       - name: Commit and push updated manifests and styles
         run: |
           git add **/*.json **/style.css
-          git commit -m "Auto-update metadata CSS stubs, json manifests, and QR routes" || echo "No changes to commit"
+          git commit -m "Auto-update metadata CSS stubs, JSON manifests, and QR routes" || echo "No changes to commit"
           git pull
           git push origin HEAD:master
 
