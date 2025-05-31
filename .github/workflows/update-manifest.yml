@@ -32,6 +32,9 @@ jobs:
       - name: Generate CSS Metadata Stubs
         run: node .github/scripts/generate-css-stubs.js
 
+      - name: Distribute inherited root styles
+        run: node .github/scripts/distribute-shared-styles.js
+
       - name: Generate Manifest Files and QR Routes
         run: node .github/scripts/generate-manifests.js
 
