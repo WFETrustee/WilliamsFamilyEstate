@@ -15,15 +15,15 @@ function parseTemplateMetadata(templateHTML) {
 
   metaElements.forEach(meta => {
     const name = meta.getAttribute("name"); // e.g. doc-title
-    const key = name; // keep "doc-title" as-is for direct match with JSON
+    const key = name; // Keep "doc-title" as-is for direct match with JSON
     const group = meta.getAttribute("data-group") || null;
     const style = meta.getAttribute("data-style") || null;
     const label = meta.getAttribute("data-label") || key.replace("doc-", "").replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
 
     const formatHint = meta.getAttribute("content") || "";
-    const metaDef = { key, name, group, style, label , formatHint };
-    const target = group || "__solo__";
+    const metaDef = { key, name, group, style, label, formatHint };
 
+    const target = group || "__solo__";
     if (!groupedMeta[target]) groupedMeta[target] = [];
     groupedMeta[target].push(metaDef);
   });
@@ -46,18 +46,19 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
 
   const h2 = document.createElement("h2");
   h2.textContent = entry["doc-title"] || "Untitled";
-  //h2.className = "title";
   wrapper.appendChild(h2);
 
+  // Exclude doc-title from the metadata display
   const filteredGroups = {};
   for (const [group, metas] of Object.entries(groupedMeta)) {
     const subset = metas.filter(({ key }) => key !== "doc-title");
     if (subset.length) filteredGroups[group] = subset;
   }
 
+  // Render each group of metadata
   Object.entries(filteredGroups).forEach(([groupKey, metas]) => {
     if (groupKey === "__solo__") {
-      metas.forEach(({ key, label, style }) => {
+      metas.forEach(({ key, label, style, formatHint }) => {
         if (entry[key]) {
           const p = document.createElement("p");
           p.className = "meta";
@@ -69,12 +70,12 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
     } else {
       const group = document.createElement("div");
       group.className = "meta-group";
-      metas.forEach(({ key, label, style }) => {
+      metas.forEach(({ key, label, style, formatHint }) => {
         if (entry[key]) {
           const span = document.createElement("span");
           span.className = "meta";
           if (style) span.classList.add(style);
-          span.innerHTML = renderValue(label, entry[key]);
+          span.innerHTML = renderValue(label, entry[key], false, style, formatHint);
           group.appendChild(span);
         }
       });
@@ -84,7 +85,6 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
 
   const link = document.createElement("a");
   link.href = `/${baseFolder}/${entry.filename}`;
-  //link.className = "content-link";
   link.textContent = "View Full Document →";
   wrapper.appendChild(link);
 
@@ -106,7 +106,7 @@ function startPublish() {
       return fetch(jsonPath)
         .then(res => res.json())
         .then(entries => {
-          const active = entries.filter(e => e["doc-status"]?.toLowerCase() === "active", false, style, formatHint);
+          const active = entries.filter(e => e["doc-status"]?.toLowerCase() === "active");
           return { groupedMeta, baseFolder, entries: active };
         });
     })
