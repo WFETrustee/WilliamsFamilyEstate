@@ -3,56 +3,95 @@
   "title": "Site Configuration Schema",
   "type": "object",
   "properties": {
-    "autoOrganizeCSS": {
-      "type": "boolean"
-    },
-    "debugMode": {
-      "type": "boolean"
-    },
-    "defaultDateFormat": {
-      "type": "string"
-    },
-    "allowInlineCSSOverrides": {
-      "type": "boolean"
-    },
-    "manifestCaching": {
-      "type": "boolean"
-    },
-    "defaultLocale": {
-      "type": "string"
-    },
-    "publishMode": {
-      "type": "string",
-      "enum": [
-        "live",
-        "draft",
-        "all"
+    "css": {
+      "type": "object",
+      "properties": {
+        "autoOrganize": {
+          "type": "boolean"
+        },
+        "allowInlineOverrides": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "autoOrganize",
+        "allowInlineOverrides"
       ]
     },
-    "enablePushpinIcon": {
-      "type": "boolean"
+    "display": {
+      "type": "object",
+      "properties": {
+        "defaultDateFormat": {
+          "type": "string"
+        },
+        "defaultLocale": {
+          "type": "string"
+        },
+        "enablePushpinIcon": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "defaultDateFormat",
+        "defaultLocale",
+        "enablePushpinIcon"
+      ]
     },
-    "loadGoogleFonts": {
-      "type": "boolean"
+    "fonts": {
+      "type": "object",
+      "properties": {
+        "loadGoogleFonts": {
+          "type": "boolean"
+        },
+        "googleFonts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "loadGoogleFonts",
+        "googleFonts"
+      ]
     },
-    "googleFonts": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
+    "performance": {
+      "type": "object",
+      "properties": {
+        "manifestCaching": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "manifestCaching"
+      ]
+    },
+    "mode": {
+      "type": "object",
+      "properties": {
+        "debug": {
+          "type": "boolean"
+        },
+        "publish": {
+          "type": "string",
+          "enum": [
+            "live",
+            "draft",
+            "all"
+          ]
+        }
+      },
+      "required": [
+        "debug",
+        "publish"
+      ]
     }
   },
   "required": [
-    "autoOrganizeCSS",
-    "debugMode",
-    "defaultDateFormat",
-    "allowInlineCSSOverrides",
-    "manifestCaching",
-    "defaultLocale",
-    "publishMode",
-    "enablePushpinIcon",
-    "loadGoogleFonts",
-    "googleFonts"
-  ],
-  "additionalProperties": false
+    "css",
+    "display",
+    "fonts",
+    "performance",
+    "mode"
+  ]
 }
