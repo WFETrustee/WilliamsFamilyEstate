@@ -16,13 +16,63 @@ const decodeHTML = str => {
   return txt.value;
 };
 
-function renderValue(label, value, solo) {
-  const isHTMLSafe = value.includes(TM_MARKER);
-  const decoded = isHTMLSafe ? value : decodeHTML(value);
+function processDate(rawValue, formatHint = "") {
+  // Try ISO parse first
+  const inputDate = new Date(rawValue);
+  if (isNaN(inputDate)) return rawValue;
+
+  // Try technical format string
+  if (/y{2,4}|M{1,4}|d{1,2}/i.test(formatHint)) {
+    return applyFormat(inputDate, formatHint); // see below
+  }
+
+  // Try sample-based format inference
+  const locale = guessLocaleFromExample(formatHint) || 'en-US';
+
+  return inputDate.toLocaleDateString(locale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+function applyFormat(date, formatStr) {
+  const map = {
+    yyyy: date.getFullYear(),
+    yy: String(date.getFullYear()).slice(-2),
+    MMMM: date.toLocaleString('default', { month: 'long' }),
+    MMM: date.toLocaleString('default', { month: 'short' }),
+    MM: String(date.getMonth() + 1).padStart(2, '0'),
+    M: date.getMonth() + 1,
+    dd: String(date.getDate()).padStart(2, '0'),
+    d: date.getDate()
+  };
+
+  return formatStr.replace(/yyyy|yy|MMMM|MMM|MM|M|dd|d/g, token => map[token] ?? token);
+}
+
+function guessLocaleFromExample(example) {
+  if (/May\s+\d{1,2},\s+\d{4}/i.test(example)) return 'en-US';     // May 21, 2025
+  if (/\d{1,2}\s+May\s+\d{4}/i.test(example)) return 'en-GB';       // 21 May 2025
+  if (/\d{2}\/\d{2}\/\d{4}/.test(example)) return 'en-US';          // 05/21/2025
+  return null;
+}
+
+function renderValue(label, value, solo = false, style = "", metaFormat = "") {
+  let formattedValue = value;
+
+  if (style === "date") {
+    formattedValue = processDate(value, metaFormat);
+  }
+
+  const isHTMLSafe = formattedValue.includes(TM_MARKER);
+  const decoded = isHTMLSafe ? formattedValue : decodeHTML(formattedValue);
+
   return solo
     ? `<strong>${label}:</strong> ${decoded}`
     : `${label}: ${decoded}`;
 }
+
 
 function enableGoogleFonts(fonts) {
   const fontList = Array.isArray(fonts) ? fonts : [fonts];
