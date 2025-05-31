@@ -1,47 +1,86 @@
-// .github/scripts/generate-manifests.js
-// ===============================================
-// This script scans each folder for documents with embedded
-// metadata inside <meta> tags, extracts key values based on
-// the folder's template, and outputs a JSON manifest file.
-// This enables dynamic loading without parsing HTML live.
-// ===============================================
+// ==========================================================
+// File: generate-manifests.js
+// Purpose: Generates per-folder ($folder).json manifest files
+// for each content folder that includes a ($folder)_template.html file.
+// These files contain only "active" entries with selected metadata
+// extracted from individual HTML files.
+// ==========================================================
 
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
-const { getAllContentFolders, extractMetadataFromDocument, parseTemplateMetadata } = require('./utils/template-metadata');
-const { loadSiteConfig } = require('./utils/load-config');
+const { getAllContentFolders, parseTemplateMetadata } = require('./utils/template-metadata');
 
-const config = loadSiteConfig();
 const folders = getAllContentFolders('.');
 
 folders.forEach(folder => {
-  const templatePath = path.join(folder, `${folder}_template.html`);
-  const manifestPath = path.join(folder, `${folder}.json`);
+  const folderPath = path.join('.', folder);
+  const templatePath = path.join(folderPath, `${folder}_template.html`);
+  const outputPath = path.join(folderPath, `${folder}.json`);
 
-  if (!fs.existsSync(templatePath)) return;
+  if (!fs.existsSync(templatePath)) {
+    console.warn(`⚠️  Template not found: ${templatePath}`);
+    return;
+  }
 
   const templateHTML = fs.readFileSync(templatePath, 'utf-8');
-  const { keys } = parseTemplateMetadata(templateHTML);
+  const { groupedMeta } = parseTemplateMetadata(templateHTML);
 
-  const files = fs.readdirSync(folder).filter(f => f.endsWith('.html') && !f.includes('_template'));
-  const manifest = [];
+  // Flatten meta keys from all groups into one array
+  const keys = Object.values(groupedMeta || {}).flat().map(m => m.key);
+
+  const entries = [];
+  const files = fs.readdirSync(folderPath);
 
   files.forEach(file => {
-    const fullPath = path.join(folder, file);
+    if (!file.endsWith('.html') || file === 'index.html' || file === `${folder}_template.html`) return;
+
+    const fullPath = path.join(folderPath, file);
     const html = fs.readFileSync(fullPath, 'utf-8');
     const $ = cheerio.load(html);
 
-    const entry = {};
+    const status = $('meta[name="doc-status"]').attr('content')?.toLowerCase();
+    if (status !== 'active') return;
+
+    const entry = { filename: file };
     keys.forEach(key => {
-      const tag = $(`meta[name="${key}"]`);
-      if (tag.length) entry[key] = tag.attr('content') || '';
+      const val = $(`meta[name="${key}"]`).attr('content');
+      if (val !== undefined) entry[key] = val;
     });
 
-    entry.filename = file;
-    manifest.push(entry);
+    // Get last modified timestamp
+    entry.lastModified = fs.statSync(fullPath).mtime.toISOString();
+
+    entries.push(entry);
   });
 
-  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf-8');
-  console.log(`✅ ${manifestPath} generated with ${manifest.length} entries`);
+  fs.writeFileSync(outputPath, JSON.stringify(entries, null, 2), 'utf-8');
+  console.log(`✅ ${folder}/${folder}.json written with ${entries.length} active entries`);
 });
+
+// Write global QR routes if content-certified
+const qrRoutes = {};
+folders.forEach(folder => {
+  const folderPath = path.join('.', folder);
+  const files = fs.readdirSync(folderPath);
+
+  files.forEach(file => {
+    if (!file.endsWith('.html')) return;
+
+    const fullPath = path.join(folderPath, file);
+    const html = fs.readFileSync(fullPath, 'utf-8');
+    const $ = cheerio.load(html);
+
+    const certified = $('meta[name="content-certified"]').attr('content')?.toLowerCase() === 'true';
+    if (!certified) return;
+
+    const id = $('meta[name="doc-id"]').attr('content');
+    if (!id) return;
+
+    const relative = `${folder}/${file}`;
+    qrRoutes[id] = relative;
+  });
+});
+
+fs.writeFileSync('qr-routes.json', JSON.stringify(qrRoutes, null, 2), 'utf-8');
+console.log(`📍 QR routes updated: ${Object.keys(qrRoutes).length} routes mapped`);
