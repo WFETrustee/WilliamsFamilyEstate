@@ -1,30 +1,44 @@
 // .github/scripts/distribute-shared-styles.js
-// ==========================================================
+// ============================================================================
+// Purpose:
 // This script scans the root-level style.css for all scoped (non-global)
-// selectors and distributes those into the appropriate folder-level
-// style.css files (e.g., /notices/style.css, /emergency/style.css, etc.)
-// if they are not already present. This allows each folder to override
-// design logic while maintaining root-level layout control.
-// The inserted blocks are alphabetically sorted by selector.
-// ==========================================================
+// selectors and distributes those into the appropriate folder-level style.css
+// files (e.g., /notices/style.css, /emergency/style.css, etc.) if not present.
+// This enables shared design logic while allowing overrides per folder.
+// Rules are appended in alphabetical order, and insertion is conditional
+// on the site-config.json setting: `"autoOrganizeCSS": true`.
+// ============================================================================
 
 const fs = require('fs');
 const path = require('path');
 const { getAllContentFolders } = require('./utils/template-metadata');
 
+// Load configuration (optional site-config.json)
+let config = { autoOrganizeCSS: true };
+try {
+  const raw = fs.readFileSync('site-config.json', 'utf-8');
+  config = JSON.parse(raw);
+} catch (err) {
+  console.warn('No site-config.json found, using defaults.');
+}
+
+if (!config.autoOrganizeCSS) {
+  console.log("CSS auto-organization disabled via site-config.json");
+  process.exit(0);
+}
+
 const rootStylePath = path.join('.', 'style.css');
 const rootCSS = fs.readFileSync(rootStylePath, 'utf-8');
 
-// Define selectors considered "global" and should NOT be copied
+// Define "global" selectors that should NOT be copied to folder stylesheets
 const globalSelectorPrefixes = [
   'body', 'html', 'main', 'header', 'footer',
-  'h1', 'h2', 'h3', 'p', 'nav',
-  '@media',
-  '.main-nav', '.site-header', '.site-footer', '.tm', 
+  'h1', 'h2', 'h3', 'p', 'nav', '@media',
+  '.main-nav', '.site-header', '.site-footer', '.tm',
   '.doc-shell', '.page-container'
 ];
 
-// Extract selectors and their full rule blocks
+// Extract all scoped CSS rules from root stylesheet
 const ruleRegex = /([^{]+)\{[^}]*\}/g;
 const scopedRules = new Map();
 
@@ -39,9 +53,8 @@ while ((match = ruleRegex.exec(rootCSS)) !== null) {
   scopedRules.set(selector, rule);
 }
 
-// Process each content folder
+// Loop through all content folders and distribute missing scoped styles
 const folders = getAllContentFolders('.');
-
 folders.forEach(folder => {
   const cssPath = path.join('.', folder, 'style.css');
   let existing = '';
@@ -53,7 +66,7 @@ folders.forEach(folder => {
     const defined = [...existing.matchAll(/([^{]+)\s*\{/g)].map(m => m[1].trim());
     defined.forEach(sel => foundSelectors.add(sel));
 
-    // Retain only non-inherited sections
+    // Retain user-defined CSS (everything before the inherited block)
     const lines = existing.split(/\r?\n/);
     let retain = true;
     for (const line of lines) {
@@ -88,8 +101,8 @@ folders.forEach(folder => {
     ].join('\n');
 
     fs.writeFileSync(cssPath, result, 'utf-8');
-    console.log(`✅ ${folder}/style.css updated with ${additions.length} inherited rules.`);
+    console.log(`${folder}/style.css updated with ${additions.length} inherited rules.`);
   } else {
-    console.log(`✔️ ${folder}/style.css already contains all scoped rules.`);
+    console.log(`${folder}/style.css already contains all scoped rules.`);
   }
 });
