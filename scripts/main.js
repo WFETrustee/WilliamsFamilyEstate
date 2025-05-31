@@ -27,8 +27,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // If this page is dynamic, load publish.js after core
-        if (document.getElementById("live-notices")) {
-          loadScript("/scripts/publish.js");
+       if (document.getElementById("live-notices")) {
+          loadScript("/scripts/publish.js", () => {
+            if (typeof startPublish === "function") {
+              startPublish(window.siteConfig);
+            } else {
+              console.error("startPublish is not defined in publish.js");
+            }
+          });
         }
       });
     })
