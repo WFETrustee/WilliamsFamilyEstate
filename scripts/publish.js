@@ -1,8 +1,9 @@
 // =============================
-// File: publish.js (refactored)
+// File: publish.js 
 // Purpose: Dynamically render document content blocks on index.html by reading pre-built JSON
 // files generated from corresponding *_template.html meta definitions. This avoids live HTML parsing and
-// speeds up page loads while maintaining a dynamic, data-driven architecture.
+// speeds up page loads while maintaining a dynamic, data-driven architecture. Allows meta-data to define
+// date formats for each content location.
 // =============================
 
 function parseTemplateMetadata(templateHTML) {
@@ -19,7 +20,8 @@ function parseTemplateMetadata(templateHTML) {
     const style = meta.getAttribute("data-style") || null;
     const label = meta.getAttribute("data-label") || key.replace("doc-", "").replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
 
-    const metaDef = { key, name, group, style, label };
+    const formatHint = meta.getAttribute("content") || "";
+    const metaDef = { key, name, group, style, label , formatHint };
     const target = group || "__solo__";
 
     if (!groupedMeta[target]) groupedMeta[target] = [];
@@ -60,7 +62,7 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
           const p = document.createElement("p");
           p.className = "meta";
           if (style) p.classList.add(style);
-          p.innerHTML = renderValue(label, entry[key], true);
+          p.innerHTML = renderValue(label, entry[key], true, style, formatHint);
           wrapper.appendChild(p);
         }
       });
@@ -104,7 +106,7 @@ function startPublish() {
       return fetch(jsonPath)
         .then(res => res.json())
         .then(entries => {
-          const active = entries.filter(e => e["doc-status"]?.toLowerCase() === "active");
+          const active = entries.filter(e => e["doc-status"]?.toLowerCase() === "active", false, style, formatHint);
           return { groupedMeta, baseFolder, entries: active };
         });
     })
