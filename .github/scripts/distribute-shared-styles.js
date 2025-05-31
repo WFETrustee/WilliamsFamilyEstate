@@ -15,10 +15,11 @@ const rootStylePath = path.join('.', 'style.css');
 const rootCSS = fs.readFileSync(rootStylePath, 'utf-8');
 
 // Define selectors considered "global" and should NOT be copied
-const globalPrefixes = [
-  'body', 'html', 'main', 'header', 'footer',
-  'h1', 'h2', 'h3', 'p', 'nav',
-  '@media', '.main-nav', '.site-header', '.site-footer'
+const globalSelectorPatterns = [
+  /^body\b/, /^html\b/, /^main\b/, /^header\b/, /^footer\b/, /^nav\b/, /^@media/,
+  /^h[1-6]\b/,
+  /^\.main-nav/, /^\.site-header/, /^\.site-footer/,
+  /^\.doc-shell/, /^\.page-container/
 ];
 
 // Extract selectors and their full rule blocks
@@ -27,11 +28,13 @@ const scopedRules = new Map();
 
 let match;
 while ((match = ruleRegex.exec(rootCSS)) !== null) {
-  const selector = match[1].trim();
+  let selector = match[1].trim();
+  // Remove any inline or block comments from the selector
+  selector = selector.replace(/\/\*.*?\*\//g, '').trim();
   const rule = match[0];
 
   // Skip global selectors
-  if (globalPrefixes.some(prefix => selector.startsWith(prefix))) continue;
+  if (globalSelectorPatterns.some(rx => rx.test(selector))) continue;
 
   scopedRules.set(selector, rule);
 }
@@ -56,7 +59,11 @@ folders.forEach(folder => {
   const additions = [];
   for (const [selector, rule] of scopedRules.entries()) {
     if (!foundSelectors.has(selector)) {
-      additions.push(`/* Inherited from root: ${selector} */\n${rule}\n`);
+      additions.push([
+        `/* Inherited from root: ${selector} */`,
+        rule,
+        ''
+      ].join('\n'));
     }
   }
 
