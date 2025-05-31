@@ -1,1 +1,230 @@
 
+
+/* =============================== */
+/* Auto-generated metadata stubs  */
+/* =============================== */
+.meta.title { }
+.meta.date { }
+.meta.category { }
+.meta.venue { }
+.meta.id { }
+.meta.summary { }
+.meta.status { }
+.meta.pinned { }
+
+
+/* ================================================= */
+/* Inherited scoped styles from root-level style.css */
+/* ================================================= */
+/* Inherited from root: .announce */
+
+
+.announce {
+    background-color: #e6f2ff;
+    color: #222;
+    padding: 1rem 2rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;    
+}
+/* Inherited from root: .date */
+
+
+.date {
+  font-style: italic;
+  color: #555;
+}
+/* Inherited from root: .doc-header */
+
+
+/*Emergency entries*/
+.doc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+/* Inherited from root: .doc-title-wrapper */
+
+
+.doc-title-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+/* Inherited from root: .instructions-section */
+
+
+.instructions-section {
+  border-top: 3px double #333;
+  margin-top: 3em;
+  padding-top: 1.5em;
+  background-color: #f9f9f9; /* subtle off-white for contrast */
+  padding-left: 1em;
+  padding-right: 1em;
+}
+/* Inherited from root: .instructions-section h2 */
+
+
+.instructions-section h2 {
+  font-size: 1.5em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #333;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 0.25em;
+  margin-bottom: 0.75em;
+}
+/* Inherited from root: .instructions-section ul */
+
+
+.instructions-section ul {
+  padding-bottom: 1.5em;
+}
+/* Inherited from root: .meta-group */
+
+
+.meta-group {
+  display: flex;
+  justify-content: space-between; /* Spread evenly */
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  border-bottom: 1px dotted #ccc;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: #444;
+}
+/* Inherited from root: .meta-group + .meta-group */
+
+
+/* Optional: visually separate grouped lines more cleanly */
+.meta-group + .meta-group {
+  border-bottom: 1px dotted #ccc;
+  padding-top: 0.5em;
+  margin-top: 0.5em;
+}
+/* Inherited from root: .meta-group span */
+
+
+.meta-group span {
+  flex: 1 1 auto;
+  min-width: 100px;
+}
+/* Inherited from root: .notice */
+
+
+/*Notice entries*/
+.notice {
+  position: relative;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border-left: 4px solid #888;
+  border-radius: 6px;
+  background: #f7f7f7;
+}
+/* Inherited from root: .notice h2 */
+
+
+.notice h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.35rem;
+}
+/* Inherited from root: .notice p */
+
+
+.notice p {
+  margin: 0.25rem 0;
+  line-height: 1.5;
+}
+/* Inherited from root: .notice.pinned */
+
+
+.notice.pinned {
+  border-left-color: #663399;
+  background-color: #f9f9f9;
+}
+/* Inherited from root: .pdf-float-icon */
+
+
+.pdf-float-icon {
+  height: 2em;
+  opacity: 1.00;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+/* Inherited from root: .pdf-float-icon:hover */
+
+
+.pdf-float-icon:hover {
+  transform: scale(1.3);
+  opacity: 1;
+}
+/* Inherited from root: .pdf-icon */
+
+
+.pdf-icon {
+  height: 2em;
+  margin-left: 1em;
+  transition: transform 0.2s ease;
+}
+/* Inherited from root: .pdf-icon:hover */
+
+
+.pdf-icon:hover {
+  transform: scale(1.3);
+  opacity: 1;
+}
+/* Inherited from root: .pdf-link */
+
+
+.pdf-link {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateY(2.00em); 
+}
+/* Inherited from root: .print-divider */
+
+
+/*Format the instructions of emergency documents*/
+.print-divider {
+  border: 0;
+  border-top: 2px dashed #999;
+  margin: 2em 0;
+}
+/* Inherited from root: .section-label */
+
+
+.section-label {
+  font-weight: bold;
+  font-size: 0.85em;
+  color: #c00;
+  margin-bottom: 0.5em;
+  text-align: center;
+  text-transform: uppercase;
+}
+/* Inherited from root: .status */
+
+
+.status {
+  display: none !important;
+}
+/* Inherited from root: .tm */
+
+
+.tm {
+  font-size: 66%;
+  vertical-align: super; /* optional: lifts it like a superscript */
+  /* opacity: 0.75;         /* optional: soften it visually */
+}
+/* Inherited from root: img.pinned */
+
+
+img.pinned {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 1.5rem;
+  height: auto;
+  z-index: 5;
+}
