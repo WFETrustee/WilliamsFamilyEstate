@@ -14,13 +14,6 @@ body {
   /* opacity: 0.75;         /* optional: soften it visually */
 }
 
-/* Content container */
-main {
-    max-width: 720px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-}
-
 /* Header */
 .site-header {
     background-color: #777;
@@ -94,6 +87,12 @@ main {
             z-index: 2;
         }
 
+main {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
 .announce {
     background-color: #e6f2ff;
     color: #222;
@@ -161,11 +160,11 @@ img.pinned {
   margin-top: 0.5em;
 }
 
-.status {
+.meta.status {
   display: none !important;
 }
 
-p.meta.pinned {
+.meta.pinned {
   display: none !important;
 }
 
