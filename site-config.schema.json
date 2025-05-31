@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Site Configuration Schema",
+  "type": "object",
+  "properties": {
+    "autoOrganizeCSS": {
+      "type": "boolean"
+    },
+    "debugMode": {
+      "type": "boolean"
+    },
+    "defaultDateFormat": {
+      "type": "string"
+    },
+    "allowInlineCSSOverrides": {
+      "type": "boolean"
+    },
+    "manifestCaching": {
+      "type": "boolean"
+    },
+    "defaultLocale": {
+      "type": "string"
+    },
+    "publishMode": {
+      "type": "string",
+      "enum": [
+        "live",
+        "draft",
+        "all"
+      ]
+    },
+    "enablePushpinIcon": {
+      "type": "boolean"
+    },
+    "loadGoogleFonts": {
+      "type": "boolean"
+    },
+    "googleFonts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "autoOrganizeCSS",
+    "debugMode",
+    "defaultDateFormat",
+    "allowInlineCSSOverrides",
+    "manifestCaching",
+    "defaultLocale",
+    "publishMode",
+    "enablePushpinIcon",
+    "loadGoogleFonts",
+    "googleFonts"
+  ],
+  "additionalProperties": false
+}
