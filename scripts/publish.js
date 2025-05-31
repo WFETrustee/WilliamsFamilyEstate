@@ -1,10 +1,13 @@
-// =============================
-// File: publish.js 
-// Purpose: Dynamically render document content blocks on index.html by reading pre-built JSON
-// files generated from corresponding *_template.html meta definitions. This avoids live HTML parsing and
-// speeds up page loads while maintaining a dynamic, data-driven architecture. Allows meta-data to define
-// date formats for each content location.
-// =============================
+// ==========================================================
+// File: publish.js
+// Purpose: Dynamically render document content blocks on index.html
+// by reading pre-built JSON files and corresponding meta templates.
+// - Respects site-wide configuration via `siteConfig`
+// - Supports folder-specific date formats and pinned documents
+// - Avoids runtime parsing of HTML content files
+// - Allows meta-data to define date formats for each content location.
+// ==========================================================
+*/
 
 function parseTemplateMetadata(templateHTML) {
   const templateDoc = document.createElement("html");
@@ -14,16 +17,16 @@ function parseTemplateMetadata(templateHTML) {
   const groupedMeta = {};
 
   metaElements.forEach(meta => {
-    const name = meta.getAttribute("name"); // e.g. doc-title
-    const key = name; // Keep "doc-title" as-is for direct match with JSON
+    const key = meta.getAttribute("name");
     const group = meta.getAttribute("data-group") || null;
     const style = meta.getAttribute("data-style") || null;
-    const label = meta.getAttribute("data-label") || key.replace("doc-", "").replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
-
+    const label = meta.getAttribute("data-label") ||
+      key.replace("doc-", "").replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
     const formatHint = meta.getAttribute("content") || "";
-    const metaDef = { key, name, group, style, label, formatHint };
 
+    const metaDef = { key, group, style, label, formatHint };
     const target = group || "__solo__";
+
     if (!groupedMeta[target]) groupedMeta[target] = [];
     groupedMeta[target].push(metaDef);
   });
@@ -31,12 +34,16 @@ function parseTemplateMetadata(templateHTML) {
   return { groupedMeta };
 }
 
+/**
+ * Renders a single entry block using template definitions and folder context.
+ */
 function renderContentEntry(entry, groupedMeta, baseFolder) {
   const wrapper = document.createElement("div");
   wrapper.className = "notice";
   wrapper.style.position = "relative";
 
-  if (entry["doc-pinned"] === "true" || entry["doc-pinned"] === true) {
+  const enablePin = siteConfig?.display?.enablePushpinIcon ?? true;
+  if (enablePin && (entry["doc-pinned"] === "true" || entry["doc-pinned"] === true)) {
     const pin = document.createElement("img");
     pin.src = "/images/pushpin.png";
     pin.alt = "Pinned";
@@ -48,14 +55,13 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
   h2.textContent = entry["doc-title"] || "Untitled";
   wrapper.appendChild(h2);
 
-  // Exclude doc-title from the metadata display
+  // Filter and organize groups
   const filteredGroups = {};
   for (const [group, metas] of Object.entries(groupedMeta)) {
     const subset = metas.filter(({ key }) => key !== "doc-title");
     if (subset.length) filteredGroups[group] = subset;
   }
 
-  // Render each group of metadata
   Object.entries(filteredGroups).forEach(([groupKey, metas]) => {
     if (groupKey === "__solo__") {
       metas.forEach(({ key, label, style, formatHint }) => {
@@ -91,7 +97,11 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
   return wrapper;
 }
 
-function startPublish() {
+/**
+ * Starts the content publishing process by loading the template and entries JSON.
+ * Applies filters based on doc-status and siteConfig.mode.publish.
+ */
+function startPublish(config = siteConfig) {
   const live = document.getElementById("live-notices");
   if (!live) return;
 
@@ -106,13 +116,16 @@ function startPublish() {
       return fetch(jsonPath)
         .then(res => res.json())
         .then(entries => {
-          const mode = (window.siteConfig?.publishMode || "live").toLowerCase();
-          const filtered = entries.filter(e => {
-            const status = (e["doc-status"] || "").toLowerCase();
-            if (mode === "all") return true;
-            if (mode === "draft") return status === "draft";
-            return status === "active";
-          });
+          const mode = config?.mode?.publish || "live";
+          let filtered;
+
+          if (mode === "live") {
+            filtered = entries.filter(e => e["doc-status"]?.toLowerCase() === "active");
+          } else if (mode === "draft") {
+            filtered = entries.filter(e => e["doc-status"]?.toLowerCase() === "draft");
+          } else {
+            filtered = entries; // publish: all
+          }
 
           return { groupedMeta, baseFolder, entries: filtered };
         });
@@ -136,6 +149,4 @@ function startPublish() {
       live.textContent = "Failed to load content.";
       console.error("startPublish error:", err);
     });
-}
-
 }
