@@ -1,0 +1,12 @@
+{
+  "autoOrganizeCSS": true,
+  "debugMode": false,
+  "defaultDateFormat": "MMMM d, yyyy",
+  "allowInlineCSSOverrides": true,
+  "manifestCaching": true,
+  "defaultLocale": "en-US",
+  "publishMode": "live",              // Options: "live", "draft", "all"
+  "enablePushpinIcon": true,
+  "loadGoogleFonts": true,
+  "googleFonts": ["Spectral+SC", "Playfair+Display", "Scope+One"]
+}
