@@ -7,7 +7,6 @@
 // - Avoids runtime parsing of HTML content files
 // - Allows meta-data to define date formats for each content location.
 // ==========================================================
-*/
 
 function parseTemplateMetadata(templateHTML) {
   const templateDoc = document.createElement("html");
