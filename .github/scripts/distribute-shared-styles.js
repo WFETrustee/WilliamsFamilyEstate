@@ -20,7 +20,7 @@ const globalSelectorPrefixes = [
   'body', 'html', 'main', 'header', 'footer',
   'h1', 'h2', 'h3', 'p', 'nav',
   '@media',
-  '.main-nav', '.site-header', '.site-footer', '.tm'
+  '.main-nav', '.site-header', '.site-footer', '.tm', 
   '.doc-shell', '.page-container'
 ];
 
