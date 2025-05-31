@@ -38,7 +38,7 @@ function parseTemplateMetadata(templateHTML) {
  */
 function renderContentEntry(entry, groupedMeta, baseFolder) {
   const wrapper = document.createElement("div");
-  wrapper.className = "notice";
+  wrapper.className = "content";
   wrapper.style.position = "relative";
 
   const enablePin = siteConfig?.display?.enablePushpinIcon ?? true;
@@ -104,7 +104,7 @@ function startPublish(config = siteConfig) {
   const live = document.getElementById("live-content");
   if (!live) return;
 
-  const baseFolder = window.location.pathname.split("/").find(p => p && p !== "index.html") || "notice";
+  const baseFolder = window.location.pathname.split("/").find(p => p && p !== "index.html") || "content";
   const templatePath = `/${baseFolder}/${baseFolder}_template.html`;
   const jsonPath = `/${baseFolder}/${baseFolder}.json`;
 

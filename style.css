@@ -103,7 +103,7 @@ main {
 }
 
 /*Notice entries*/
-.notice {
+.content {
   position: relative;
   margin-bottom: 2rem;
   padding: 1rem;
@@ -112,18 +112,18 @@ main {
   background: #f7f7f7;
 }
 
-.notice h2 {
+.content h2 {
   margin-top: 0;
   margin-bottom: 0.5rem;
   font-size: 1.35rem;
 }
 
-.notice p {
+.content p {
   margin: 0.25rem 0;
   line-height: 1.5;
 }
 
-.notice.pinned {
+.content.pinned {
   border-left-color: #663399;
   background-color: #f9f9f9;
 }
