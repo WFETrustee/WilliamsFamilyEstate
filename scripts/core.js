@@ -7,7 +7,6 @@
 // It integrates with the global `siteConfig` object (from site-config.json)
 // to respect site-wide preferences and behaviors.
 // ==========================================================
-*/
 
 const TM_MARKER = '<span class="tm">&trade;</span>';
 
