@@ -2,7 +2,7 @@
 // ==========================================================
 // This script scans the root-level style.css for all scoped (non-global)
 // selectors and distributes those into the appropriate folder-level
-// style.css files (e.g., /notices/style.css, /emergency/style.css, etc.)
+// style.css files (e.g., /notice/style.css, /emergency/style.css, etc.)
 // if they are not already present. This allows each folder to override
 // design logic while maintaining root-level layout control.
 // The inserted blocks are alphabetically sorted by selector.
