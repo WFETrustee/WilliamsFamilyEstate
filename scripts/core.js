@@ -17,6 +17,8 @@ const decodeHTML = str => {
   return txt.value;
 };
 
+console.log("✅ core.js loaded");
+
 /**
  * Formats a date based on a raw value and optional hint.
  * Supports ISO, custom formats (e.g. "MMMM d, yyyy"), or locale inference from example string.
