@@ -1,4 +1,4 @@
-#.github/scripts/clean-style-links.js
+//.github/scripts/clean-style-links.js
 
 const fs = require('fs');
 const path = require('path');
