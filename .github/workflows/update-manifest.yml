@@ -42,6 +42,9 @@ jobs:
       - name: Inject style.css references into content HTML
         run: node .github/scripts/inject-styles-into-html.js
 
+      - name: Clean duplicate style includes
+        run: node .github/scripts/clean-style-links.js
+
       - name: Configure Git identity
         run: |
           git config user.name "WFE Bot"
