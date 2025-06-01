@@ -50,6 +50,14 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
     wrapper.appendChild(pin);
   }
 
+  if (entry["doc-image"]) {
+    const img = document.createElement("img");
+    img.src = entry["doc-image"];
+    img.alt = entry["doc-title"] || "Document Image";
+    img.className = "entry-image"; // You can style this
+    wrapper.appendChild(img);
+  }
+
   const h2 = document.createElement("h2");
   h2.textContent = entry["doc-title"] || "Untitled";
   wrapper.appendChild(h2);
