@@ -54,7 +54,7 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
     const img = document.createElement("img");
     img.src = entry["doc-image"];
     img.alt = entry["doc-title"] || "Document Image";
-    img.className = "entry-image"; // You can style this
+    img.className = "content-image"; // You can style this
     wrapper.appendChild(img);
   }
 
