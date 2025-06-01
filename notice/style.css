@@ -42,6 +42,8 @@
 /* ================================================= */
 
 /* ================================================= */
+
+/* ================================================= */
 /* Inherited scoped styles from root-level style.css */
 /* ================================================= */
 /* Inherited from root: .announce */
@@ -125,10 +127,16 @@
   flex: 1 1 auto;
   min-width: 100px;
 }
-/* Inherited from root: .status */
+/* Inherited from root: .meta.pinned */
 
 
-.status {
+.meta.pinned {
+  display: none !important;
+}
+/* Inherited from root: .meta.status */
+
+
+.meta.status {
   display: none !important;
 }
 /* Inherited from root: img.pinned */
