@@ -30,6 +30,9 @@ jobs:
       - name: Install cheerio for DOM parsing
         run: npm install cheerio --no-save
 
+      - name: Install glob dependency
+        run: npm install glob --no-save
+
       - name: Generate CSS Metadata Stubs (if enabled)
         run: node .github/scripts/generate-css-stubs.js
 
