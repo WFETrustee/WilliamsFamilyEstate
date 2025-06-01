@@ -16,6 +16,87 @@
 .meta.pinned { }
 
 /* ================================================= */
+/*Emergency entries*/
+.doc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.doc-title-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.pdf-link {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateY(2.00em); 
+}
+
+.pdf-float-icon {
+  height: 2em;
+  opacity: 1.00;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.pdf-float-icon:hover {
+  transform: scale(1.3);
+  opacity: 1;
+}
+
+.pdf-icon {
+  height: 2em;
+  margin-left: 1em;
+  transition: transform 0.2s ease;
+}
+
+.pdf-icon:hover {
+  transform: scale(1.3);
+  opacity: 1;
+}
+
+/*Format the instructions of emergency documents*/
+.print-divider {
+  border: 0;
+  border-top: 2px dashed #999;
+  margin: 2em 0;
+}
+
+.section-label {
+  font-weight: bold;
+  font-size: 0.85em;
+  color: #c00;
+  margin-bottom: 0.5em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.instructions-section {
+  border-top: 3px double #333;
+  margin-top: 3em;
+  padding-top: 1.5em;
+  background-color: #f9f9f9; /* subtle off-white for contrast */
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+.instructions-section h2 {
+  font-size: 1.5em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #333;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 0.25em;
+  margin-bottom: 0.75em;
+}
+
+.instructions-section ul {
+  padding-bottom: 1.5em;
+}
 
 /* ================================================= */
 /* Inherited scoped styles from root-level style.css */
