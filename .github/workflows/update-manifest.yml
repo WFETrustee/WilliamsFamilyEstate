@@ -49,8 +49,8 @@ jobs:
 
       - name: Commit and push updated manifests and styles
         run: |
-          git add **/*.json **/style.css
-          git commit -m "Auto-update metadata CSS stubs, JSON manifests, and QR routes" || echo "No changes to commit"
+          git add **/*.json **/*.html **/style.css
+          git commit -m "Auto-update metadata CSS stubs, manifests, and injected style links" || echo "No changes to commit"
           git pull
           git push origin HEAD:master
 
