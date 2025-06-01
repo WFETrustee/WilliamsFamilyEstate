@@ -66,6 +66,8 @@
 /* ================================================= */
 
 /* ================================================= */
+
+/* ================================================= */
 /* Inherited scoped styles from root-level style.css */
 /* ================================================= */
 /* Inherited from root: .announce */
@@ -104,6 +106,16 @@
 .content p {
   margin: 0.25rem 0;
   line-height: 1.5;
+}
+/* Inherited from root: .content-image */
+
+
+.content-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 1rem;
 }
 /* Inherited from root: .content.pinned */
 
