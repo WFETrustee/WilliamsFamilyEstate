@@ -39,6 +39,9 @@ jobs:
       - name: Generate Manifest Files and QR Routes
         run: node .github/scripts/generate-manifests.js
 
+      - name: Inject style.css references into content HTML
+        run: node .github/scripts/inject-styles-into-html.js
+
       - name: Configure Git identity
         run: |
           git config user.name "WFE Bot"
