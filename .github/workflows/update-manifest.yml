@@ -1,5 +1,9 @@
 name: Auto-generate Manifests and Metadata Stubs
 
+defaults:
+  run:
+    shell: bash
+    
 permissions:
   contents: write
 
