@@ -54,7 +54,7 @@ folders.forEach(folder => {
     entries.push(entry);
   });
 
-  fs.writeFileSync(outputPath, JSON.stringify(entries, null, 2), 'utf-8');
+  fs.writeFileSync(outputPath, JSON.stringify(entries, null, 2), { encoding: 'utf8' });
   console.log(`✅ ${folder}/${folder}.json written with ${entries.length} active entries`);
 });
 
@@ -82,5 +82,5 @@ folders.forEach(folder => {
   });
 });
 
-fs.writeFileSync('qr-routes.json', JSON.stringify(qrRoutes, null, 2), 'utf-8');
+fs.writeFileSync('qr-routes.json', JSON.stringify(qrRoutes, null, 2), { encoding: 'utf8' });
 console.log(`📍 QR routes updated: ${Object.keys(qrRoutes).length} routes mapped`);
