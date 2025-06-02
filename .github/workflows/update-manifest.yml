@@ -46,6 +46,10 @@ jobs:
       - name: Clean duplicate style includes
         run: node .github/scripts/clean-style-links.js
 
+      - name: 🧹 Strip BOM from HTML files
+        run: |
+          find . -type f -name '*.html' -exec sed -i '1s/^\xEF\xBB\xBF//' {} \;
+
       - name: Configure Git identity
         run: |
           git config user.name "WFE Bot"
