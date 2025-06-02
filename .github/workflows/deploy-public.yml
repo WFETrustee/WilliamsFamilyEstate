@@ -1,5 +1,9 @@
 name: Deploy Active Content to Public Branch
 
+defaults:
+  run:
+    shell: bash
+    
 permissions:
   contents: write
 
