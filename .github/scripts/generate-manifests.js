@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
 const { getAllContentFolders, parseTemplateMetadata } = require('./utils/template-metadata');
-const { writeFile } = require('./utils/write-file'); // ✅ Shared write utility
+const { writeFile } = require('./utils/write-file'); //Shared write utility
 
 const folders = getAllContentFolders('.');
 
@@ -53,8 +53,8 @@ folders.forEach(folder => {
     entries.push(entry);
   });
 
-  writeFile(outputPath, JSON.stringify(entries, null, 2)); // ✅ replaced fs.writeFileSync
-  console.log(`✅ ${folder}/${folder}.json written with ${entries.length} active entries`);
+  writeFile(outputPath, JSON.stringify(entries, null, 2)); //replaced fs.writeFileSync
+  console.log(`${folder}/${folder}.json written with ${entries.length} active entries`);
 });
 
 // Write global QR routes if content-certified
@@ -81,5 +81,5 @@ folders.forEach(folder => {
   });
 });
 
-writeFile('qr-routes.json', JSON.stringify(qrRoutes, null, 2)); // ✅ replaced fs.writeFileSync
-console.log(`📍 QR routes updated: ${Object.keys(qrRoutes).length} routes mapped`);
+writeFile('qr-routes.json', JSON.stringify(qrRoutes, null, 2)); //replaced fs.writeFileSync
+console.log(`QR routes updated: ${Object.keys(qrRoutes).length} routes mapped`);
