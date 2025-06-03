@@ -1,30 +1,22 @@
 // .github/scripts/distribute-shared-styles.js
 // ==========================================================
 // This script scans the root-level style.css for all scoped (non-global)
-// selectors and distributes those into the appropriate folder-level
-// style.css files (e.g., /notice/style.css, /emergency/style.css, etc.)
-// if they are not already present. This allows each folder to override
-// design logic while maintaining root-level layout control.
-// The inserted blocks are alphabetically sorted by selector.
+// selectors and distributes those into each content folder's style.css
+// (e.g., /notice/style.css, /emergency/style.css).
+// It avoids inserting global styles and appends missing inherited blocks
+// without duplicating the metadata header or bloat.
 // ==========================================================
 
 const fs = require('fs');
 const path = require('path');
 const { getAllContentFolders } = require('./utils/template-metadata');
-const { loadSiteConfig } = require('./utils/load-config');
-const { writeFile } = require('./utils/write-file'); //use shared writer
-
-const config = loadSiteConfig();
-if (!config.css?.autoOrganize) {
-  console.log("CSS auto-organization disabled via site-config.json");
-  process.exit(0);
-}
+const { writeFile } = require('./utils/write-file'); // shared writer
 
 const rootStylePath = path.join('.', 'style.css');
 const rootCSS = fs.readFileSync(rootStylePath, 'utf-8');
 
-// Define selectors considered "global" and should NOT be copied
-const globalSelectorPrefixes = [
+// Define global selectors that should not be copied to child folders
+const globalPrefixes = [
   'body', 'html', 'main', 'header', 'footer',
   'h1', 'h2', 'h3', 'p', 'nav',
   '@media',
@@ -32,47 +24,30 @@ const globalSelectorPrefixes = [
   '.doc-shell', '.page-container'
 ];
 
-// Extract selectors and their full rule blocks
+// Extract non-global selectors and their blocks
 const ruleRegex = /([^{]+)\{[^}]*\}/g;
 const scopedRules = new Map();
-
 let match;
+
 while ((match = ruleRegex.exec(rootCSS)) !== null) {
-  let selector = match[1].trim();
-  selector = selector.replace(/\/\*.*?\*\//g, '').trim();
-  const rule = match[0];
-
-  if (globalSelectorPrefixes.some(prefix => selector.startsWith(prefix))) continue;
-
-  scopedRules.set(selector, rule);
+  const selector = match[1].trim();
+  const cleaned = selector.replace(/\/\*.*?\*\//g, '').trim();
+  if (globalPrefixes.some(prefix => cleaned.startsWith(prefix))) continue;
+  scopedRules.set(cleaned, match[0]); // full rule
 }
 
-// Process each content folder
 const folders = getAllContentFolders('.');
 
 folders.forEach(folder => {
   const cssPath = path.join('.', folder, 'style.css');
-  let existing = '';
+  let existing = fs.existsSync(cssPath) ? fs.readFileSync(cssPath, 'utf-8') : '';
+
   const foundSelectors = new Set();
-  const retainedLines = [];
-
-  if (fs.existsSync(cssPath)) {
-    existing = fs.readFileSync(cssPath, 'utf-8');
-    const defined = [...existing.matchAll(/([^{]+)\s*\{/g)].map(m => m[1].trim());
-    defined.forEach(sel => foundSelectors.add(sel));
-
-    // Retain only non-inherited sections
-    const lines = existing.split(/\r?\n/);
-    let retain = true;
-    for (const line of lines) {
-      if (line.includes('/* Inherited scoped styles from root-level style.css */')) retain = false;
-      if (retain) retainedLines.push(line);
-    }
-  } else {
-    writeFile(cssPath, ''); // initialize blank file if missing
-  }
+  const definedMatches = [...existing.matchAll(/([^{]+)\s*\{/g)];
+  definedMatches.forEach(m => foundSelectors.add(m[1].trim()));
 
   const additions = [];
+
   for (const [selector, rule] of scopedRules.entries()) {
     if (!foundSelectors.has(selector)) {
       additions.push({
@@ -85,19 +60,23 @@ folders.forEach(folder => {
   if (additions.length > 0) {
     additions.sort((a, b) => a.selector.localeCompare(b.selector));
 
-    const result = [
-      ...retainedLines,
+    const header = [
       '',
       '/* ================================================= */',
       '/* Inherited scoped styles from root-level style.css */',
       '/* ================================================= */',
+    ];
+
+    const finalOutput = [
+      existing.trimEnd(),
+      ...header,
       ...additions.map(a => a.block.trim()),
       ''
     ].join('\n');
 
-    writeFile(cssPath, result); //safe writer
-    console.log(`${folder}/style.css updated with ${additions.length} inherited rules.`);
+    writeFile(cssPath, finalOutput);
+    console.log(`✅ ${folder}/style.css updated with ${additions.length} inherited rules.`);
   } else {
-    console.log(`${folder}/style.css already contains all scoped rules.`);
+    console.log(`⏭  ${folder}/style.css already contains all scoped rules.`);
   }
 });
