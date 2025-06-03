@@ -20,7 +20,7 @@ folders.forEach(folder => {
   const outputPath = path.join(folderPath, `${folder}.json`);
 
   if (!fs.existsSync(templatePath)) {
-    console.warn(`⚠️  Template not found: ${templatePath}`);
+    console.warn(`Template not found: ${templatePath}`);
     return;
   }
 
