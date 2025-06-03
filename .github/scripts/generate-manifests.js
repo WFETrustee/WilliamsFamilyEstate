@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
 const { getAllContentFolders, parseTemplateMetadata } = require('./utils/template-metadata');
+const { writeFile } = require('./utils/write-file'); // ✅ Shared write utility
 
 const folders = getAllContentFolders('.');
 
@@ -48,13 +49,11 @@ folders.forEach(folder => {
       if (val !== undefined) entry[key] = val;
     });
 
-    // Get last modified timestamp
     entry.lastModified = fs.statSync(fullPath).mtime.toISOString();
-
     entries.push(entry);
   });
 
-  fs.writeFileSync(outputPath, JSON.stringify(entries, null, 2), { encoding: 'utf8' });
+  writeFile(outputPath, JSON.stringify(entries, null, 2)); // ✅ replaced fs.writeFileSync
   console.log(`✅ ${folder}/${folder}.json written with ${entries.length} active entries`);
 });
 
@@ -82,5 +81,5 @@ folders.forEach(folder => {
   });
 });
 
-fs.writeFileSync('qr-routes.json', JSON.stringify(qrRoutes, null, 2), { encoding: 'utf8' });
+writeFile('qr-routes.json', JSON.stringify(qrRoutes, null, 2)); // ✅ replaced fs.writeFileSync
 console.log(`📍 QR routes updated: ${Object.keys(qrRoutes).length} routes mapped`);
