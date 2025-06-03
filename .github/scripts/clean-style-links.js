@@ -7,7 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
-const { writeFile } = require('./utils/write-file'); // ✅ shared writer
+const { writeFile } = require('./utils/write-file'); // shared writer
 
 const ROOT_STYLE = '/style.css';
 
@@ -31,8 +31,8 @@ function cleanStyleLinks(filePath, folderName) {
     return ''; // Remove all others
   });
 
-  writeFile(filePath, html); // ✅ safe encoding
-  console.log(`🧼 Cleaned: ${filePath}`);
+  writeFile(filePath, html); //ensures safe encoding
+  console.log(`Cleaned: ${filePath}`);
 }
 
 /**
