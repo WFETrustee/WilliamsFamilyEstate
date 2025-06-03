@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const { getAllContentFolders, extractStyleClassesFromTemplate } = require('./utils/template-metadata');
 const { loadSiteConfig } = require('./utils/load-config');
-const { writeFile } = require('./utils/write-file'); // ✅ shared safe writer
+const { writeFile } = require('./utils/write-file'); //shared safe writer
 
 const config = loadSiteConfig();
 if (!config.css?.autoOrganize) {
@@ -40,9 +40,9 @@ folders.forEach(folder => {
 
   if (additions.length) {
     const result = existing + '\n\n/* Auto-generated style stubs */\n' + additions.join('\n');
-    writeFile(cssPath, result); // ✅ use wrapper
-    console.log(`✅ ${folder}/style.css updated with ${additions.length} stubs`);
+    writeFile(cssPath, result); //use wrapper
+    console.log(`${folder}/style.css updated with ${additions.length} stubs`);
   } else {
-    console.log(`✔️ ${folder}/style.css already contains all stubs`);
+    console.log(`${folder}/style.css already contains all stubs`);
   }
 });
