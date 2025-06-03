@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
 const { getAllContentFolders } = require('./utils/template-metadata');
+const { writeFile } = require('./utils/write-file'); // NEW: shared writer
 
 const ROOT_STYLE_HREF = '/style.css';
 
@@ -22,18 +23,23 @@ function injectStylesIntoFile(filePath, folder) {
   const folderHref = `/${folder}/style.css`;
   const folderExists = $(`link[href="${folderHref}"]`).length > 0;
 
+  let changed = false;
+
   if (!rootExists) {
     head.append(`\n<link rel="stylesheet" href="${ROOT_STYLE_HREF}">`);
     console.log(`✅ Added root CSS to ${filePath}`);
+    changed = true;
   }
 
   if (!folderExists) {
     head.append(`\n<link rel="stylesheet" href="${folderHref}">`);
     console.log(`✅ Added folder CSS to ${filePath}`);
+    changed = true;
   }
 
-  if (!rootExists || !folderExists) {
-    fs.writeFileSync(filePath, $.html(), 'utf-8');
+  if (changed) {
+    const newHTML = $.html();
+    writeFile(filePath, newHTML); // ✅ Use shared utility
   } else {
     console.log(`✔️  ${filePath} already includes both styles`);
   }
