@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const { getAllContentFolders } = require('./utils/template-metadata');
 const { loadSiteConfig } = require('./utils/load-config');
-const { writeFile } = require('./utils/write-file'); // ✅ use shared writer
+const { writeFile } = require('./utils/write-file'); //use shared writer
 
 const config = loadSiteConfig();
 if (!config.css?.autoOrganize) {
@@ -69,7 +69,7 @@ folders.forEach(folder => {
       if (retain) retainedLines.push(line);
     }
   } else {
-    writeFile(cssPath, ''); // ✅ initialize blank file if missing
+    writeFile(cssPath, ''); // initialize blank file if missing
   }
 
   const additions = [];
@@ -95,9 +95,9 @@ folders.forEach(folder => {
       ''
     ].join('\n');
 
-    writeFile(cssPath, result); // ✅ use safe writer
-    console.log(`✅ ${folder}/style.css updated with ${additions.length} inherited rules.`);
+    writeFile(cssPath, result); //safe writer
+    console.log(`${folder}/style.css updated with ${additions.length} inherited rules.`);
   } else {
-    console.log(`✔️ ${folder}/style.css already contains all scoped rules.`);
+    console.log(`${folder}/style.css already contains all scoped rules.`);
   }
 });
