@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const { getAllContentFolders, extractStyleClassesFromTemplate } = require('./utils/template-metadata');
 const { loadSiteConfig } = require('./utils/load-config');
+const { writeFile } = require('./utils/write-file'); // ✅ shared safe writer
 
 const config = loadSiteConfig();
 if (!config.css?.autoOrganize) {
@@ -39,7 +40,7 @@ folders.forEach(folder => {
 
   if (additions.length) {
     const result = existing + '\n\n/* Auto-generated style stubs */\n' + additions.join('\n');
-    fs.writeFileSync(cssPath, result, 'utf-8');
+    writeFile(cssPath, result); // ✅ use wrapper
     console.log(`✅ ${folder}/style.css updated with ${additions.length} stubs`);
   } else {
     console.log(`✔️ ${folder}/style.css already contains all stubs`);
