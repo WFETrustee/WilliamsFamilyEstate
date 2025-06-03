@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const { getAllContentFolders } = require('./utils/template-metadata');
 const { loadSiteConfig } = require('./utils/load-config');
+const { writeFile } = require('./utils/write-file'); // ✅ use shared writer
 
 const config = loadSiteConfig();
 if (!config.css?.autoOrganize) {
@@ -27,7 +28,7 @@ const globalSelectorPrefixes = [
   'body', 'html', 'main', 'header', 'footer',
   'h1', 'h2', 'h3', 'p', 'nav',
   '@media',
-  '.main-nav', '.site-header', '.site-footer', '.tm', 
+  '.main-nav', '.site-header', '.site-footer', '.tm',
   '.doc-shell', '.page-container'
 ];
 
@@ -68,7 +69,7 @@ folders.forEach(folder => {
       if (retain) retainedLines.push(line);
     }
   } else {
-    fs.writeFileSync(cssPath, '', 'utf-8');
+    writeFile(cssPath, ''); // ✅ initialize blank file if missing
   }
 
   const additions = [];
@@ -94,7 +95,7 @@ folders.forEach(folder => {
       ''
     ].join('\n');
 
-    fs.writeFileSync(cssPath, result, 'utf-8');
+    writeFile(cssPath, result); // ✅ use safe writer
     console.log(`✅ ${folder}/style.css updated with ${additions.length} inherited rules.`);
   } else {
     console.log(`✔️ ${folder}/style.css already contains all scoped rules.`);
