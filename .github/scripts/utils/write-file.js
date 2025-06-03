@@ -6,11 +6,11 @@ const path = require('path');
  * @param {string} filePath - Destination file path.
  * @param {string|Buffer} content - Content to write.
  */
-function writeUTF8(filePath, content) {
+function writeFile(filePath, content) {
   fs.writeFileSync(filePath, content, {
     encoding: 'utf8',
     flag: 'w' // Always overwrite (safe default)
   });
 }
 
-module.exports = { writeUTF8 };
+module.exports = { writeFile };
