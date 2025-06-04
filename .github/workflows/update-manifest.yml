@@ -31,9 +31,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install script dependencies (cheerio + glob)
+      - name: Install script dependencies (cheerio + glob + node-fetch)
         working-directory: .github/scripts
-        run: npm install cheerio glob --no-save
+        run: npm install cheerio glob node-fetch@2 --no-save
 
       - name: Generate CSS Metadata Stubs (if enabled)
         run: node .github/scripts/generate-css-stubs.js
@@ -53,9 +53,12 @@ jobs:
       - name: Generate sitemap.xml
         run: node .github/scripts/generate-sitemap.js
 
-      - name: 🧹 Strip BOM from HTML files
+      - name: Strip BOM from HTML files
         run: |
           find . -type f -name '*.html' -exec sed -i '1s/^\xEF\xBB\xBF//' {} \;
+
+      - name: Archive active documents to Archive.org
+        run: node .github/scripts/archive-flagged-pages.js
 
       - name: Configure Git identity
         run: |
