@@ -35,20 +35,11 @@ jobs:
         working-directory: .github/scripts
         run: npm install cheerio glob node-fetch@2 --no-save
 
-      - name: Generate CSS Metadata Stubs (if enabled)
-        run: node .github/scripts/generate-css-stubs.js
-
-      - name: Distribute inherited root styles (if enabled)
-        run: node .github/scripts/distribute-shared-styles.js
-
       - name: Generate Manifest Files and QR Routes
         run: node .github/scripts/generate-manifests.js
 
-      - name: Inject style.css references into content HTML
-        run: node .github/scripts/inject-styles-into-html.js
-
-      - name: Clean duplicate style includes
-        run: node .github/scripts/clean-style-links.js
+      - name: Maintain Styles (stubs, distribute, clean)
+        run: node .github/scripts/maintain-styles.js
 
       - name: Generate sitemap.xml
         run: node .github/scripts/generate-sitemap.js
@@ -68,7 +59,7 @@ jobs:
       - name: Commit and push updated manifests and styles
         run: |
           git add **/*.json **/*.html **/style.css sitemap.xml
-          git commit -m "Auto-update metadata CSS stubs, manifests, and injected style links" || echo "No changes to commit"
+          git commit -m "Auto-update site metadata, manifests, and style maintenance"
           git pull
           git push origin HEAD:master
 
