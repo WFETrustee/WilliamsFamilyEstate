@@ -1,0 +1,9 @@
+User-agent: *
+Disallow:
+
+# Encourage Archive.org to crawl
+User-agent: archive.org_bot
+Disallow:
+
+# Optional: link to your sitemap for better indexing
+Sitemap: https://williamsfamilyestate.org/sitemap.xml
