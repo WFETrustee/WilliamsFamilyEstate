@@ -2,6 +2,13 @@ const fs = require("fs");
 const path = require("path");
 const fetch = require("node-fetch");
 const { getAllContentFolders } = require("./utils/template-metadata");
+const { loadSiteConfig } = require("./utils/load-config");
+
+const config = loadSiteConfig();
+if (!config.automation?.archiveToInternetArchive) {
+  console.log("Archive.org publishing disabled via site-config.json");
+  process.exit(0);
+}
 
 const BASE_URL = "https://williamsfamilyestate.org";
 const ARCHIVE_ENDPOINT = "https://web.archive.org/save/";
