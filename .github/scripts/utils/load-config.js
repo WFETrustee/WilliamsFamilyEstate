@@ -1,6 +1,21 @@
 // utils/load-config.js
 const fs = require('fs');
 
+function deepMerge(target, source) {
+  for (const key of Object.keys(source)) {
+    if (
+      typeof source[key] === 'object' &&
+      source[key] !== null &&
+      !Array.isArray(source[key])
+    ) {
+      target[key] = deepMerge(target[key] || {}, source[key]);
+    } else {
+      target[key] = source[key];
+    }
+  }
+  return target;
+}
+
 function loadSiteConfig() {
   const defaultConfig = {
     css: {
@@ -22,12 +37,17 @@ function loadSiteConfig() {
     mode: {
       debug: false,
       publish: "live"
+    },
+    automation: {
+      generateSitemap: true,
+      archiveToInternetArchive: true
     }
   };
 
   try {
     const raw = fs.readFileSync('site-config.json', 'utf-8');
-    return { ...defaultConfig, ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    return deepMerge(defaultConfig, parsed);
   } catch (err) {
     console.warn('[CONFIG] site-config.json not found or invalid. Using defaults.');
     return defaultConfig;
