@@ -1,9 +1,9 @@
 // ==========================================================
 // File: template-metadata.js
 // Purpose: Utility module for parsing content folders and extracting
-// template metadata including style class names.
+// template metadata including style class names and document metadata.
 // Used across build tools such as manifest generation, CSS stub creation,
-// and shared style distribution.
+// shared style distribution, and sitemap building.
 // ==========================================================
 
 const fs = require('fs');
@@ -79,8 +79,35 @@ function humanizeLabel(raw) {
     .replace(/\b\w/g, l => l.toUpperCase());
 }
 
+/**
+ * Loads an HTML file and extracts all <meta name="..."> content values.
+ * Used to build manifest entries by scanning real document files.
+ */
+function extractHtmlMetadata(filePath, keys = []) {
+  if (!fs.existsSync(filePath)) return null;
+
+  const html = fs.readFileSync(filePath, 'utf-8');
+  const meta = {};
+  const matches = [...html.matchAll(/<meta\s+name=["']([^"']+)["']\s+content=["']([^"']*)["']/g)];
+
+  matches.forEach(match => {
+    const name = match[1];
+    const content = match[2];
+    if (!keys.length || keys.includes(name)) {
+      meta[name] = content;
+    }
+  });
+
+  if (meta['doc-status']) {
+    meta['doc-status'] = meta['doc-status'].toLowerCase();
+  }
+
+  return meta;
+}
+
 module.exports = {
   getAllContentFolders,
   parseTemplateMetadata,
-  extractStyleClassesFromTemplate
+  extractStyleClassesFromTemplate,
+  extractHtmlMetadata
 };
