@@ -1,6 +1,7 @@
 [
   {
     "filename": "EMG-HC01_Writ_of_Habeas_Corpus.html",
+    "lastModified": "2025-06-04T23:41:17.561Z",
     "doc-date": "2025-05-22",
     "doc-id": "EMG-HC01",
     "doc-version": "1.0",
@@ -9,10 +10,24 @@
     "doc-title": "Writ of Habeas Corpus for Gregory-Alan: Williams",
     "doc-certified": "true",
     "doc-use-trigger": "Trustee is arrested, detained, or obstructed from acting in his private or trust capacity under color of law.",
-    "doc-instructions": "Print 2 copies. File with Clerk of Court and Sheriff's Office. Obtain stamped receipt.",
+    "doc-instructions": "Print 2 copies. File with Clerk of Court and Sheriff",
     "doc-filer": "Partner Sonia, any next friend, or Successor Trustee",
-    "doc-status": "Active",
-    "doc-pinned": "false",
-    "lastModified": "2025-06-04T22:40:03.636Z"
+    "doc-status": "active",
+    "doc-pinned": "false"
+  },
+  {
+    "filename": "EMG-REM01_Demand_ER_Unlawful_Conversion.html",
+    "lastModified": "2025-06-04T23:41:17.561Z",
+    "doc-date": "2025-05-27",
+    "doc-id": "EMG-REMEDY01",
+    "doc-version": "1.0",
+    "doc-category": "Emergency – Property Defense",
+    "doc-author": "Gregory-Alan: Williams, Trustee",
+    "doc-title": "Demand for Emergency Relief – Unlawful Conversion of Trust Property",
+    "doc-use-trigger": "If any party attempts to convert, foreclose, repossess, or encumber trust property without verified authority or rebuttal of perfected claim.",
+    "doc-instructions": "Deliver to Clerk of Court, Sheriff, creditor, or enforcement agent attempting to take trust property.",
+    "doc-filer": "Gregory-Alan: Williams, Trustee",
+    "doc-status": "draft",
+    "doc-pinned": "true"
   }
 ]
