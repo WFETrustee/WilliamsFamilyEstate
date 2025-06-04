@@ -1,11 +1,17 @@
 // ============================================================
 // File: maintain-styles.js
-// Purpose: Manages all CSS-related tasks in one place, including:
-//          - Generating CSS stubs from templates
-//          - Distributing shared root styles
-//          - Cleaning duplicate <link> tags
-//          - Injecting missing style links into HTML
-//          Usage: node maintain-styles.js [all|stubs|distribute|clean|inject]
+// Purpose: Manages all CSS-related tasks in one place.
+//          Use this script to auto-generate class stubs based on template metadata,
+//          distribute shared root-level styles to content folders,
+//          inject missing style references into HTML headers,
+//          and clean up redundant <link> tags for style.css.
+//
+// Usage:
+//   node maintain-styles.js all         // runs everything
+//   node maintain-styles.js stubs       // generate only stubs
+//   node maintain-styles.js distribute  // copy shared scoped styles
+//   node maintain-styles.js inject      // insert link tags into HTML
+//   node maintain-styles.js clean       // remove duplicate <link> tags
 // ============================================================
 
 const fs = require('fs');
@@ -20,15 +26,16 @@ const mode = process.argv[2] || 'all';
 const folders = getAllContentFolders('.');
 let modesToRun = (mode === 'all') ? ['stubs', 'distribute', 'clean', 'inject'] : [mode];
 
+// If auto-organize is off, we won't distribute shared styles
 if (!config.css?.autoOrganize) {
   modesToRun = modesToRun.filter(m => m !== 'distribute');
 }
 
+// Task: Generate CSS stub classes based on template metadata
 function generateCssStubs() {
   folders.forEach(folder => {
     const templatePath = path.join(folder, `${folder}_template.html`);
     const stylePath = path.join(folder, 'style.css');
-
     if (!fs.existsSync(templatePath)) return;
 
     const html = fs.readFileSync(templatePath, 'utf-8');
@@ -54,6 +61,7 @@ function generateCssStubs() {
   });
 }
 
+// Task: Distribute root-level scoped styles into each folder's style.css
 function distributeSharedStyles() {
   const rootCssPath = path.join('.', 'style.css');
   if (!fs.existsSync(rootCssPath)) return;
@@ -84,6 +92,7 @@ function distributeSharedStyles() {
   });
 }
 
+// Task: Remove duplicate style.css <link> tags in HTML files
 function cleanStyleLinks() {
   folders.forEach(folder => {
     const folderPath = path.join('.', folder);
@@ -104,6 +113,7 @@ function cleanStyleLinks() {
   });
 }
 
+// Task: Ensure each HTML file includes both root and folder-level style.css links
 function injectStyleLinks() {
   folders.forEach(folder => {
     const folderPath = path.join('.', folder);
@@ -132,6 +142,7 @@ function injectStyleLinks() {
   });
 }
 
+// Execute selected tasks
 if (modesToRun.includes('stubs')) generateCssStubs();
 if (modesToRun.includes('distribute')) distributeSharedStyles();
 if (modesToRun.includes('clean')) cleanStyleLinks();
