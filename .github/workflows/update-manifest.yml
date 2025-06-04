@@ -58,7 +58,7 @@ jobs:
           find . -type f -name '*.html' -exec sed -i '1s/^\xEF\xBB\xBF//' {} \;
 
       - name: Archive active documents to Archive.org
-        run: node .github/scripts/archive-flagged-pages.js
+        run: node .github/scripts/webarchive-active-pages.js
 
       - name: Configure Git identity
         run: |
