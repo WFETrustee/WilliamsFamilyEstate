@@ -3,32 +3,34 @@ const path = require("path");
 const { getAllContentFolders } = require("./utils/template-metadata");
 
 const BASE_URL = "https://williamsfamilyestate.org";
-const REPO_ROOT = path.join(__dirname, "../../");
-const OUTPUT_FILE = path.join(REPO_ROOT, "sitemap.xml");
+const OUTPUT_FILE = "sitemap.xml"; // relative to repo root
 
-// 1. Discover folders
-const folders = getAllContentFolders(REPO_ROOT);
+// Discover folders with valid templates
+const folders = getAllContentFolders('.');
 
-// 2. Collect URLs from each folder’s manifest
+// Aggregate URLs from each folder’s manifest
 const urls = folders.flatMap(folder => {
-  const manifestPath = path.join(REPO_ROOT, folder, `${folder}.json`);
+  const manifestPath = path.join(folder, `${folder}.json`);
   if (!fs.existsSync(manifestPath)) {
-    console.warn(`Skipping missing manifest: ${manifestPath}`);
+    console.warn(`⚠️ Missing manifest in folder: ${folder}`);
     return [];
   }
 
-  const entries = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
-  return entries.map(entry => `${BASE_URL}/${folder}/${entry.filename}`);
+  const entries = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+  return entries.map(entry => ({
+    loc: `${BASE_URL}/${folder}/${entry.filename}`,
+    lastmod: entry.lastModified
+  }));
 });
 
-// 3. Build sitemap XML
+// Generate XML
 const xml = [
   '<?xml version="1.0" encoding="UTF-8"?>',
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-  ...urls.map(url => `  <url><loc>${url}</loc></url>`),
+  ...urls.map(u => `  <url><loc>${u.loc}</loc><lastmod>${u.lastmod}</lastmod></url>`),
   '</urlset>'
 ].join("\n");
 
-// 4. Write to file
-fs.writeFileSync(OUTPUT_FILE, xml, "utf-8");
-console.log(`Sitemap generated with ${urls.length} entries from ${folders.length} folders.`);
+// Write to root
+fs.writeFileSync(OUTPUT_FILE, xml, 'utf-8');
+console.log(`✅ sitemap.xml written with ${urls.length} entries.`);
