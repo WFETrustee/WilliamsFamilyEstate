@@ -4,40 +4,45 @@ const fetch = require("node-fetch");
 const { getAllContentFolders } = require("./utils/template-metadata");
 
 const BASE_URL = "https://williamsfamilyestate.org";
-const ARCHIVE_URL = "https://web.archive.org/save/";
+const ARCHIVE_ENDPOINT = "https://web.archive.org/save/";
+const MAX_CONCURRENT = 5; // adjustable batch size
 
 const folders = getAllContentFolders('.');
+let allUrls = [];
 
-(async () => {
-  let count = 0;
+folders.forEach(folder => {
+  const manifestPath = path.join(folder, `${folder}.json`);
+  if (!fs.existsSync(manifestPath)) return;
 
-  for (const folder of folders) {
-    const manifestPath = path.join(folder, `${folder}.json`);
-    if (!fs.existsSync(manifestPath)) {
-      console.warn(`Missing manifest for ${folder}`);
-      continue;
+  const entries = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
+  const urls = entries.map(e => `${BASE_URL}/${folder}/${e.filename}`);
+  allUrls.push(...urls);
+});
+
+console.log(`Preparing to archive ${allUrls.length} URLs...`);
+
+async function archiveUrl(url) {
+  console.log('Archiving:', url);
+  try {
+    const res = await fetch(ARCHIVE_ENDPOINT + encodeURIComponent(url));
+    if (!res.ok) {
+      console.warn('Failed:', url, res.statusText);
+    } else {
+      console.log('Archived:', url);
     }
-
-    const entries = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
-
-    for (const entry of entries) {
-      const fullUrl = `${BASE_URL}/${folder}/${entry.filename}`;
-      console.log(`📡 Archiving: ${fullUrl}`);
-
-      try {
-        const res = await fetch(`${ARCHIVE_URL}${fullUrl}`, { method: "GET" });
-        if (res.ok) {
-          console.log(`Archived: ${fullUrl}`);
-          count++;
-        } else {
-          console.warn(`Failed to archive ${fullUrl}: ${res.statusText}`);
-        }
-        // Respect polite usage: Wait 1 sec between calls
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      } catch (err) {
-        console.error(`Error archiving ${fullUrl}: ${err.message}`);
-      }
-    }
+  } catch (err) {
+    console.error('Error:', url, err.message);
   }
+}
 
-})();
+// Batched concurrency helper
+async function archiveInBatches(urls, batchSize) {
+  for (let i = 0; i < urls.length; i += batchSize) {
+    const batch = urls.slice(i, i + batchSize);
+    await Promise.allSettled(batch.map(archiveUrl));
+    await new Promise(resolve => setTimeout(resolve, 1500)); // short delay between batches
+  }
+}
+
+archiveInBatches(allUrls, MAX_CONCURRENT)
+  .then(() => console.log(`Archive complete. ${allUrls.length} attempted.`));
