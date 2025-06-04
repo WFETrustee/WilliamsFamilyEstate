@@ -331,3 +331,121 @@ img.pinned {
   height: auto;
   z-index: 5;
 }
+
+/* ================================================= */
+/* Inherited scoped styles from root-level style.css */
+/* ================================================= */
+/* Inherited from root: .announce */
+
+
+.announce {
+    background-color: #e6f2ff;
+    color: #222;
+    padding: 1rem 2rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;    
+}
+/* Inherited from root: .content */
+
+
+/*Content entries*/
+.content {
+  position: relative;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border-left: 4px solid #888;
+  border-radius: 6px;
+  background: #f7f7f7;
+}
+/* Inherited from root: .content h2 */
+
+
+.content h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.35rem;
+}
+/* Inherited from root: .content p */
+
+
+.content p {
+  margin: 0.25rem 0;
+  line-height: 1.5;
+}
+/* Inherited from root: .content-image */
+
+
+.content-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+/* Inherited from root: .content.pinned */
+
+
+.content.pinned {
+  border-left-color: #663399;
+  background-color: #f9f9f9;
+}
+/* Inherited from root: .date */
+
+
+.date {
+  font-style: italic;
+  color: #555;
+}
+/* Inherited from root: .meta-group */
+
+
+.meta-group {
+  display: flex;
+  justify-content: space-between; /* Spread evenly */
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  border-bottom: 1px dotted #ccc;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: #444;
+}
+/* Inherited from root: .meta-group + .meta-group */
+
+
+/* Optional: visually separate grouped lines more cleanly */
+.meta-group + .meta-group {
+  border-bottom: 1px dotted #ccc;
+  padding-top: 0.5em;
+  margin-top: 0.5em;
+}
+/* Inherited from root: .meta-group span */
+
+
+.meta-group span {
+  flex: 1 1 auto;
+  min-width: 100px;
+}
+/* Inherited from root: .meta.pinned */
+
+
+.meta.pinned {
+  display: none !important;
+}
+/* Inherited from root: .meta.status */
+
+
+.meta.status {
+  display: none !important;
+}
+/* Inherited from root: img.pinned */
+
+
+img.pinned {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 1.5rem;
+  height: auto;
+  z-index: 5;
+}
