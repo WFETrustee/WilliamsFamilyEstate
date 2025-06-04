@@ -6,22 +6,22 @@ const BASE_URL = "https://williamsfamilyestate.org";
 const REPO_ROOT = path.join(__dirname, "../../");
 const OUTPUT_FILE = path.join(REPO_ROOT, "sitemap.xml");
 
-// 1. Dynamically discover content folders
-const contentFolders = getAllContentFolders(REPO_ROOT);
+// 1. Discover folders
+const folders = getAllContentFolders(REPO_ROOT);
 
-// 2. Walk each folder and collect .html files
-function walkFolder(folder) {
-  const folderPath = path.join(REPO_ROOT, folder);
-  if (!fs.existsSync(folderPath)) return [];
+// 2. Collect URLs from each folder’s manifest
+const urls = folders.flatMap(folder => {
+  const manifestPath = path.join(REPO_ROOT, folder, `${folder}.json`);
+  if (!fs.existsSync(manifestPath)) {
+    console.warn(`Skipping missing manifest: ${manifestPath}`);
+    return [];
+  }
 
-  return fs.readdirSync(folderPath)
-    .filter(f => f.endsWith(".html"))
-    .map(f => `${BASE_URL}/${folder}/${f}`);
-}
+  const entries = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
+  return entries.map(entry => `${BASE_URL}/${folder}/${entry.filename}`);
+});
 
-const urls = contentFolders.flatMap(walkFolder);
-
-// 3. Generate sitemap
+// 3. Build sitemap XML
 const xml = [
   '<?xml version="1.0" encoding="UTF-8"?>',
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
@@ -29,7 +29,6 @@ const xml = [
   '</urlset>'
 ].join("\n");
 
-// 4. Write file
+// 4. Write to file
 fs.writeFileSync(OUTPUT_FILE, xml, "utf-8");
-
-console.log(`✅ Sitemap generated with ${urls.length} URLs from ${contentFolders.length} folders.`);
+console.log(`Sitemap generated with ${urls.length} entries from ${folders.length} folders.`);
