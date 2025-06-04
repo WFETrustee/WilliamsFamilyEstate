@@ -38,8 +38,8 @@ jobs:
       - name: Generate Manifest Files and QR Routes
         run: node .github/scripts/generate-manifests.js
 
-      - name: Maintain Styles (stubs, distribute, clean)
-        run: node .github/scripts/maintain-styles.js
+      - name: Maintain Styles (stubs, distribute, inject, clean)
+        run: node .github/scripts/maintain-styles.js all
 
       - name: Generate sitemap.xml
         run: node .github/scripts/generate-sitemap.js
