@@ -1,3 +1,6 @@
+// File: generate-sitemap.js
+// Purpose: Generates sitemap.xml using only documents with doc-status "active".
+
 const fs = require("fs");
 const path = require("path");
 const { getAllContentFolders } = require("./utils/template-metadata");
@@ -10,12 +13,12 @@ if (!config.automation?.generateSitemap) {
 }
 
 const BASE_URL = "https://williamsfamilyestate.org";
-const OUTPUT_FILE = "sitemap.xml"; // relative to repo root
+const OUTPUT_FILE = "sitemap.xml";
 
-// Discover folders with valid templates
+// Discover folders that contain template files
 const folders = getAllContentFolders('.');
 
-// Aggregate URLs from each folder’s manifest
+// Collect only active document URLs from each manifest
 const urls = folders.flatMap(folder => {
   const manifestPath = path.join(folder, `${folder}.json`);
   if (!fs.existsSync(manifestPath)) {
@@ -24,13 +27,16 @@ const urls = folders.flatMap(folder => {
   }
 
   const entries = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
-  return entries.map(entry => ({
-    loc: `${BASE_URL}/${folder}/${entry.filename}`,
-    lastmod: entry.lastModified
-  }));
+
+  return entries
+    .filter(entry => entry['doc-status']?.toLowerCase() === 'active')
+    .map(entry => ({
+      loc: `${BASE_URL}/${folder}/${entry.filename}`,
+      lastmod: entry.lastModified
+    }));
 });
 
-// Generate XML
+// Create XML structure for sitemap
 const xml = [
   '<?xml version="1.0" encoding="UTF-8"?>',
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
@@ -38,5 +44,6 @@ const xml = [
   '</urlset>'
 ].join("\n");
 
-// Write to root
-fs.writeFileSync(OUTPUT_FILE, xml, 'utf-8');
+// Write sitemap.xml to the root of the repository
+fs.writeFileSync(OUTPUT_FILE, 'utf-8');
+console.log('sitemap.xml written with ' + urls.length + ' active entries.');
