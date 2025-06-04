@@ -1,6 +1,13 @@
 const fs = require("fs");
 const path = require("path");
 const { getAllContentFolders } = require("./utils/template-metadata");
+const { loadSiteConfig } = require("./utils/load-config");
+
+const config = loadSiteConfig();
+if (!config.automation?.generateSitemap) {
+  console.log("Sitemap generation disabled via site-config.json");
+  process.exit(0);
+}
 
 const BASE_URL = "https://williamsfamilyestate.org";
 const OUTPUT_FILE = "sitemap.xml"; // relative to repo root
