@@ -12,7 +12,7 @@ const folders = getAllContentFolders('.');
 const urls = folders.flatMap(folder => {
   const manifestPath = path.join(folder, `${folder}.json`);
   if (!fs.existsSync(manifestPath)) {
-    console.warn(`⚠️ Missing manifest in folder: ${folder}`);
+    console.warn(`Missing manifest in folder: ${folder}`);
     return [];
   }
 
@@ -33,4 +33,4 @@ const xml = [
 
 // Write to root
 fs.writeFileSync(OUTPUT_FILE, xml, 'utf-8');
-console.log(`✅ sitemap.xml written with ${urls.length} entries.`);
+console.log('sitemap.xml written with ${urls.length} entries.`);
