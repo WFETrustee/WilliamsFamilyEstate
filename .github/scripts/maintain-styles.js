@@ -1,151 +1,109 @@
+// ============================================================
 // File: maintain-styles.js
-// Purpose: Unified utility to manage CSS stubs, distribute shared styles,
-// and clean style link tags across all valid content folders.
+// Purpose: Combines style tasks (stubs, distribution, cleanup) into a single
+//          utility script. Controlled by 'mode' CLI argument and site-config.json.
+//          Usage: node maintain-styles.js [all|stubs|distribute|clean]
+// ============================================================
 
 const fs = require('fs');
 const path = require('path');
-const glob = require('glob');
-const { getAllContentFolders, extractStyleClassesFromTemplate } = require('./utils/template-metadata');
-const { writeFile } = require('./utils/write-file');
+const cheerio = require('cheerio');
 const { loadSiteConfig } = require('./utils/load-config');
+const { getAllContentFolders, parseTemplateMetadata } = require('./utils/template-metadata');
+const { writeFile } = require('./utils/write-file');
 
-const ROOT_STYLE = '/style.css';
 const config = loadSiteConfig();
+const mode = process.argv[2] || 'all';
 const folders = getAllContentFolders('.');
+let modesToRun = (mode === 'all') ? ['stubs', 'distribute', 'clean'] : [mode];
 
-function generateCSSStubs() {
-  if (!config.css?.autoOrganize) {
-    console.log("CSS stub generation skipped via site-config.json");
-    return;
-  }
+if (!config.css?.autoOrganize) {
+  modesToRun = modesToRun.filter(m => m !== 'distribute');
+}
 
+// Generate CSS stub entries for each template
+function generateCssStubs() {
   folders.forEach(folder => {
     const templatePath = path.join(folder, `${folder}_template.html`);
-    const cssPath = path.join(folder, 'style.css');
+    const stylePath = path.join(folder, 'style.css');
+
     if (!fs.existsSync(templatePath)) return;
 
-    const templateHTML = fs.readFileSync(templatePath, 'utf-8');
-    const styles = extractStyleClassesFromTemplate(templateHTML);
-    if (!styles.length) return;
+    const html = fs.readFileSync(templatePath, 'utf-8');
+    const $ = cheerio.load(html);
+    const classNames = new Set();
 
-    let existing = fs.existsSync(cssPath) ? fs.readFileSync(cssPath, 'utf-8') : '';
-    const existingSelectors = new Set([...existing.matchAll(/\.(\w[\w-]*)\s*\{/g)].map(m => m[1]));
+    // Pull all class names from meta[name] that have data-style
+    $('meta[data-style]').each((_, el) => {
+      const key = $(el).attr('data-style') || $(el).attr('name');
+      if (key) classNames.add(key);
+    });
 
-    const additions = styles
-      .filter(s => !existingSelectors.has(s))
-      .sort()
-      .map(s => `/* Style for .${s} */\n.${s} {\n  /* TODO: define style */\n}\n`);
+    if (classNames.size === 0) return;
 
-    if (additions.length) {
-      const result = existing + '\n\n/* Auto-generated style stubs */\n' + additions.join('\n');
-      writeFile(cssPath, result);
-      console.log(`${folder}/style.css updated with ${additions.length} stubs`);
-    } else {
-      console.log(`${folder}/style.css already contains all stubs`);
+    const stubCss = Array.from(classNames).sort().map(c => `.${c} {\n  /* style for ${c} */\n}\n`).join('\n');
+
+    if (!fs.existsSync(stylePath)) {
+      writeFile(stylePath, stubCss);
+      console.log(`${folder}/style.css created with ${classNames.size} stubs.`);
     }
   });
 }
 
+// Copy shared root styles to folder-level CSS files if they don't already include them
 function distributeSharedStyles() {
-  const rootStylePath = path.join('.', 'style.css');
-  if (!fs.existsSync(rootStylePath)) {
-    console.log("No root-level style.css found.");
-    return;
-  }
-  const rootCSS = fs.readFileSync(rootStylePath, 'utf-8');
+  const rootCssPath = path.join('.', 'style.css');
+  if (!fs.existsSync(rootCssPath)) return;
+
+  const rootCSS = fs.readFileSync(rootCssPath, 'utf-8');
+  const selectorBlocks = rootCSS.split(/(?=^\s*\.)/m).map(b => b.trim()).filter(Boolean);
 
   const globalPrefixes = [
     'body', 'html', 'main', 'header', 'footer',
-    'h1', 'h2', 'h3', 'p', 'nav', '@media',
-    '.main-nav', '.site-header', '.site-footer', '.tm',
-    '.doc-shell', '.page-container'
+    'h1', 'h2', 'h3', 'p', 'nav',
+    '@media', '.main-nav'
   ];
 
-  const ruleRegex = /([^{}]+)\{[^}]*\}/g;
-  const scopedRules = new Map();
-  let match;
-  while ((match = ruleRegex.exec(rootCSS)) !== null) {
-    const selector = match[1].trim().replace(/\/\*.*?\*\//g, '').trim();
-    if (globalPrefixes.some(prefix => selector.startsWith(prefix))) continue;
-    scopedRules.set(selector, match[0]);
-  }
+  const isScoped = block => !globalPrefixes.some(p => block.startsWith(p));
+
+  const scopedBlocks = selectorBlocks.filter(isScoped).sort();
 
   folders.forEach(folder => {
-    const cssPath = path.join('.', folder, 'style.css');
-    let existing = fs.existsSync(cssPath) ? fs.readFileSync(cssPath, 'utf-8') : '';
+    const folderCssPath = path.join(folder, 'style.css');
+    if (!fs.existsSync(folderCssPath)) return;
 
-    const foundSelectors = new Set();
-    const definedMatches = [...existing.matchAll(/([^{}]+)\s*\{/g)];
-    definedMatches.forEach(m => foundSelectors.add(m[1].trim()));
+    let localCss = fs.readFileSync(folderCssPath, 'utf-8');
+    const missing = scopedBlocks.filter(block => !localCss.includes(block));
 
-    const additions = [];
-
-    for (const [selector, rule] of scopedRules.entries()) {
-      if (!foundSelectors.has(selector)) {
-        additions.push(`/* Inherited from root: ${selector} */\n${rule}`);
-      }
-    }
-
-    if (additions.length > 0) {
-      additions.sort();
-      const finalOutput = [
-        existing.trimEnd(),
-        '',
-        '/* ================================================= */',
-        '/* Inherited scoped styles from root-level style.css */',
-        '/* ================================================= */',
-        ...additions,
-        ''
-      ].join('\n');
-
-      writeFile(cssPath, finalOutput);
-      console.log(`${folder}/style.css updated with ${additions.length} inherited rules.`);
-    } else {
-      console.log(`${folder}/style.css already contains all scoped rules.`);
+    if (missing.length > 0) {
+      const final = localCss.trim() + '\n\n' + missing.join('\n\n');
+      writeFile(folderCssPath, final);
+      console.log(`${folder}/style.css updated with ${missing.length} inherited blocks.`);
     }
   });
 }
 
+// Remove duplicate <link> to style.css in each HTML file
 function cleanStyleLinks() {
   folders.forEach(folder => {
-    const htmlFiles = glob.sync(`${folder}/**/*.html`);
-    htmlFiles.forEach(file => {
-      let html = fs.readFileSync(file, 'utf-8');
+    const folderPath = path.join('.', folder);
+    const files = fs.readdirSync(folderPath).filter(f => f.endsWith('.html'));
 
-      html = html.replace(/<link\s+rel="stylesheet"\s+href="\.{1,2}\/style\.css"\s*\/?>\s*/gi, '');
+    files.forEach(file => {
+      const fullPath = path.join(folderPath, file);
+      const html = fs.readFileSync(fullPath, 'utf-8');
+      const $ = cheerio.load(html);
 
-      const seen = new Set();
-      html = html.replace(/<link\s+rel="stylesheet"\s+href="([^"]+)"[^>]*>\s*/gi, (match, href) => {
-        if (href === ROOT_STYLE || href === `/${folder}/style.css`) {
-          if (seen.has(href)) return '';
-          seen.add(href);
-          return match;
-        }
-        return '';
-      });
-
-      writeFile(file, html);
-      console.log(`Cleaned: ${file}`);
+      const links = $('link[href$="style.css"]');
+      if (links.length > 1) {
+        links.slice(1).remove();
+        writeFile(fullPath, $.html());
+        console.log(`${folder}/${file}: Removed ${links.length - 1} duplicate style link(s).`);
+      }
     });
   });
 }
 
-const task = process.argv[2];
-
-switch (task) {
-  case 'stubs':
-    generateCSSStubs();
-    break;
-  case 'distribute':
-    distributeSharedStyles();
-    break;
-  case 'clean':
-    cleanStyleLinks();
-    break;
-  case 'all':
-  default:
-    generateCSSStubs();
-    distributeSharedStyles();
-    cleanStyleLinks();
-    break;
-}
+if (modesToRun.includes('stubs')) generateCssStubs();
+if (modesToRun.includes('distribute')) distributeSharedStyles();
+if (modesToRun.includes('clean')) cleanStyleLinks();
