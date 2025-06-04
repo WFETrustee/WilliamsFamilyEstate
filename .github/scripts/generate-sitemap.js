@@ -33,4 +33,3 @@ const xml = [
 
 // Write to root
 fs.writeFileSync(OUTPUT_FILE, xml, 'utf-8');
-console.log(`Hello, ${name}, you have ${count} notices.`);
