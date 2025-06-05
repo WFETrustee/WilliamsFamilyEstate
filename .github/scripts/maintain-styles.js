@@ -61,19 +61,18 @@ function distributeSharedStyles() {
 
   const rootCSS = fs.readFileSync(rootCssPath, 'utf-8');
 
-  // Break out all CSS blocks that start with a class selector (i.e. .something { ... })
-  // We’re intentionally skipping global tags like body, html, h1, etc.
+  // Grab all blocks that start with a class selector like `.example { ... }`
   const selectorBlocks = rootCSS
     .split(/(?=^\s*\.)/m)
     .map(b => b.trim())
     .filter(Boolean);
 
+  // Skip anything that's clearly global layout — body, html, etc.
   const globalPrefixes = [
     'body', 'html', 'main', 'header', 'footer',
     'h1', 'h2', 'h3', 'p', 'nav', '@media', '.main-nav'
   ];
 
-  // We only want scoped styles (e.g., .announce), not structural HTML tags
   const isScoped = block => !globalPrefixes.some(p => block.startsWith(p));
   const scopedBlocks = selectorBlocks.filter(isScoped).sort();
 
@@ -83,32 +82,37 @@ function distributeSharedStyles() {
 
     const localCss = fs.readFileSync(folderCssPath, 'utf-8');
 
-    // Extract all selector names already defined in this file (e.g. .announce, .content p)
-    // We're only interested in the selector string — not its rules, formatting, or comments.
-    const localSelectors = new Set(
-      Array.from(localCss.matchAll(/^\s*([^{]+?)\s*\{/gm)).map(m => m[1].trim())
-    );
+    // Extract all defined selectors from local CSS — including comma-separated ones
+    const extractSelectors = cssText => {
+      return Array.from(cssText.matchAll(/([^{]+)\s*\{/g))
+        .flatMap(match => match[1].split(','))
+        .map(sel => sel.trim());
+    };
 
-    // Now we filter out any root-level blocks whose selectors already exist locally.
-    // If a local style uses `.announce`, we leave it alone — even if it differs from root.
+    const localSelectors = new Set(extractSelectors(localCss));
+
     const missingBlocks = scopedBlocks.filter(block => {
-      const match = block.match(/^\s*([^{]+?)\s*\{/);
+      const match = block.match(/^([^{]+)\s*\{/);
       if (!match) return false;
-      const selector = match[1].trim();
-      return !localSelectors.has(selector);
+
+      // Split out any comma-delimited selectors like `.foo, .bar`
+      const selectors = match[1].split(',').map(s => s.trim());
+
+      // If even one selector is already locally defined, we skip this block entirely
+      // Designers might want to override `.content` or `.announce` — that's the point.
+      return selectors.every(sel => !localSelectors.has(sel));
     });
 
     if (missingBlocks.length > 0) {
-      // Append only the missing root-level blocks to the local file
       const final = localCss.trim() + '\n\n' + missingBlocks.join('\n\n') + '\n';
       writeFile(folderCssPath, final);
       console.log(`${folder}/style.css updated with ${missingBlocks.length} inherited block(s).`);
     }
 
-    // 🔒 Why this matters:
-    // Designers are allowed to override root styles. That’s the point of local style.css.
-    // So we do NOT overwrite, replace, or reformat anything that already exists.
-    // We only add what’s missing — as safe defaults — and nothing else.
+    // 🔐 Final guardrails:
+    // We do NOT overwrite or inject styles if the selector exists — regardless of content.
+    // This ensures local files remain the authority and can override root defaults freely.
+    // Our job here is just to gently backfill what’s missing — no more, no less.
   });
 }
 
