@@ -61,13 +61,12 @@ function distributeSharedStyles() {
 
   const rootCSS = fs.readFileSync(rootCssPath, 'utf-8');
 
-  // Grab all blocks that start with a class selector like `.example { ... }`
+  // Extract all blocks that begin with a class selector
   const selectorBlocks = rootCSS
     .split(/(?=^\s*\.)/m)
     .map(b => b.trim())
     .filter(Boolean);
 
-  // Skip anything that's clearly global layout — body, html, etc.
   const globalPrefixes = [
     'body', 'html', 'main', 'header', 'footer',
     'h1', 'h2', 'h3', 'p', 'nav', '@media', '.main-nav'
@@ -82,11 +81,11 @@ function distributeSharedStyles() {
 
     const localCss = fs.readFileSync(folderCssPath, 'utf-8');
 
-    // Extract all defined selectors from local CSS — including comma-separated ones
+    // Normalize selector extraction to avoid false positives due to formatting
     const extractSelectors = cssText => {
       return Array.from(cssText.matchAll(/([^{]+)\s*\{/g))
         .flatMap(match => match[1].split(','))
-        .map(sel => sel.trim());
+        .map(sel => sel.trim().replace(/\s+/g, ' ')); // collapse excess spaces
     };
 
     const localSelectors = new Set(extractSelectors(localCss));
@@ -95,12 +94,11 @@ function distributeSharedStyles() {
       const match = block.match(/^([^{]+)\s*\{/);
       if (!match) return false;
 
-      // Split out any comma-delimited selectors like `.foo, .bar`
-      const selectors = match[1].split(',').map(s => s.trim());
+      const selectors = match[1].split(',').map(s =>
+        s.trim().replace(/\s+/g, ' ')
+      );
 
-      // DESIGN SAFETY:
-      // If even one selector is defined locally, skip the whole block.
-      // This ensures designers can override root styles without fear.
+      // If even one selector is already present, we assume it's intentional and skip it.
       return selectors.every(sel => !localSelectors.has(sel));
     });
 
@@ -110,11 +108,12 @@ function distributeSharedStyles() {
       console.log(`${folder}/style.css updated with ${missingBlocks.length} inherited block(s).`);
     }
 
-    // Guardrails:
-    // We do NOT overwrite or modify any existing selector blocks.
-    // This avoids stomping on custom overrides — local files win.
+    // Designer Protection Mode:
+    // We will NOT inject any block whose selector appears to already exist — even partially.
+    // This ensures full override safety, even with formatting differences.
   });
 }
+
 
 // -------------------------------------
 // Remove duplicate <link href="style.css"> entries
