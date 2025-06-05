@@ -59,61 +59,52 @@ function distributeSharedStyles() {
   const rootCssPath = path.join('.', 'style.css');
   if (!fs.existsSync(rootCssPath)) return;
 
-  const rootCSS = fs.readFileSync(rootCssPath, 'utf-8');
+  const rootCss = fs.readFileSync(rootCssPath, 'utf-8');
 
-  // Extract all blocks that begin with a class selector
-  const selectorBlocks = rootCSS
-    .split(/(?=^\s*\.)/m)
-    .map(b => b.trim())
-    .filter(Boolean);
+  // STEP 1 — Extract root-level styles as a map of selector => fullBlock
+  const rootBlocks = Array.from(rootCss.matchAll(/([^{]+)\s*\{[^}]*\}/g))
+    .map(match => {
+      const selector = match[1].trim().replace(/\s+/g, ' ');
+      const fullBlock = match[0].trim();
+      return [selector, fullBlock];
+    });
 
-  const globalPrefixes = [
-    'body', 'html', 'main', 'header', 'footer',
-    'h1', 'h2', 'h3', 'p', 'nav', '@media', '.main-nav'
-  ];
+  const rootSelectorMap = new Map(rootBlocks); // selector => block
 
-  const isScoped = block => !globalPrefixes.some(p => block.startsWith(p));
-  const scopedBlocks = selectorBlocks.filter(isScoped).sort();
-
+  // STEP 2 — Iterate over each content folder
   folders.forEach(folder => {
     const folderCssPath = path.join(folder, 'style.css');
     if (!fs.existsSync(folderCssPath)) return;
 
-    const localCss = fs.readFileSync(folderCssPath, 'utf-8');
+    const folderCss = fs.readFileSync(folderCssPath, 'utf-8');
 
-    // Normalize selector extraction to avoid false positives due to formatting
-    const extractSelectors = cssText => {
-      return Array.from(cssText.matchAll(/([^{]+)\s*\{/g))
-        .flatMap(match => match[1].split(','))
-        .map(sel => sel.trim().replace(/\s+/g, ' ')); // collapse excess spaces
-    };
+    // STEP 3 — Extract normalized selectors from B (folder CSS)
+    const existingSelectors = new Set(
+      Array.from(folderCss.matchAll(/([^{]+)\s*\{/g))
+        .map(match => match[1].trim().replace(/\s+/g, ' '))
+    );
 
-    const localSelectors = new Set(extractSelectors(localCss));
-
-    const missingBlocks = scopedBlocks.filter(block => {
-      const match = block.match(/^([^{]+)\s*\{/);
-      if (!match) return false;
-
-      const selectors = match[1].split(',').map(s =>
-        s.trim().replace(/\s+/g, ' ')
-      );
-
-      // If even one selector is already present, we assume it's intentional and skip it.
-      return selectors.every(sel => !localSelectors.has(sel));
-    });
-
-    if (missingBlocks.length > 0) {
-      const final = localCss.trim() + '\n\n' + missingBlocks.join('\n\n') + '\n';
-      writeFile(folderCssPath, final);
-      console.log(`${folder}/style.css updated with ${missingBlocks.length} inherited block(s).`);
+    // STEP 4 — Identify styles in A that are NOT in B
+    const missingBlocks = [];
+    for (const [selector, block] of rootSelectorMap.entries()) {
+      if (!existingSelectors.has(selector)) {
+        missingBlocks.push(block);
+      }
     }
 
-    // Designer Protection Mode:
-    // We will NOT inject any block whose selector appears to already exist — even partially.
-    // This ensures full override safety, even with formatting differences.
+    // STEP 5 — Append the missing styles to the end of B
+    if (missingBlocks.length > 0) {
+      const updated = folderCss.trim() + '\n\n' + missingBlocks.join('\n\n') + '\n';
+      writeFile(folderCssPath, updated);
+      console.log(`${folder}/style.css updated with ${missingBlocks.length} inherited selector(s).`);
+    }
+
+    // 🔐 Final safeguard:
+    // We NEVER overwrite or reformat existing styles in folder-level CSS.
+    // Designers can fully override root selectors, and we will NOT interfere.
+    // Only truly missing selectors are gently appended once.
   });
 }
-
 
 // -------------------------------------
 // Remove duplicate <link href="style.css"> entries
