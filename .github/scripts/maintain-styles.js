@@ -131,10 +131,17 @@ function injectStyleLinks() {
         const head = $('head');
         if (!head.length) return;
 
-        if (needsRoot) head.append(`\n${expectedRoot}`);
-        if (needsFolder) head.append(`\n${expectedFolder}`);
+        if (needsRoot) head.append(`
+${expectedRoot}`);
+        if (needsFolder) head.append(`
+${expectedFolder}`);
 
-        writeFile(fullPath, $.html());
+        const updated = $.html();
+        if (updated !== html) {
+          writeFile(fullPath, updated);
+          console.log(`${folder}/${file}: Injected missing style link(s).`);
+        }
+      }
         console.log(`${folder}/${file}: Injected missing style link(s).`);
       }
     });
