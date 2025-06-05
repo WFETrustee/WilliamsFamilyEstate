@@ -98,8 +98,9 @@ function distributeSharedStyles() {
       // Split out any comma-delimited selectors like `.foo, .bar`
       const selectors = match[1].split(',').map(s => s.trim());
 
-      // If even one selector is already locally defined, we skip this block entirely
-      // Designers might want to override `.content` or `.announce` — that's the point.
+      // DESIGN SAFETY:
+      // If even one selector is defined locally, skip the whole block.
+      // This ensures designers can override root styles without fear.
       return selectors.every(sel => !localSelectors.has(sel));
     });
 
@@ -109,13 +110,11 @@ function distributeSharedStyles() {
       console.log(`${folder}/style.css updated with ${missingBlocks.length} inherited block(s).`);
     }
 
-    // 🔐 Final guardrails:
-    // We do NOT overwrite or inject styles if the selector exists — regardless of content.
-    // This ensures local files remain the authority and can override root defaults freely.
-    // Our job here is just to gently backfill what’s missing — no more, no less.
+    // Guardrails:
+    // We do NOT overwrite or modify any existing selector blocks.
+    // This avoids stomping on custom overrides — local files win.
   });
 }
-
 
 // -------------------------------------
 // Remove duplicate <link href="style.css"> entries
@@ -132,16 +131,11 @@ function cleanStyleLinks() {
       const originalHtml = fs.readFileSync(fullPath, 'utf-8');
       const $ = cheerio.load(originalHtml);
 
-      // Track which hrefs we’ve seen to prevent removing valid, first-included links
       const seenHrefs = new Set();
       let removedCount = 0;
 
-      // Scan all <link> tags that end in style.css — could be root or folder scoped
       $('link[href$="style.css"]').each((i, el) => {
         const href = $(el).attr('href');
-
-        // First instance of each href is considered valid — leave it alone.
-        // Anything after that is considered redundant and will be removed.
         if (seenHrefs.has(href)) {
           $(el).remove();
           removedCount++;
@@ -152,26 +146,17 @@ function cleanStyleLinks() {
 
       const updatedHtml = $.html();
 
-      // Only write the file if actual <link> tags were removed
       if (removedCount > 0 && updatedHtml !== originalHtml) {
         writeFile(fullPath, updatedHtml);
-
-        // Log what we cleaned up
         console.log(`${folder}/${file}: Removed ${removedCount} duplicate style link(s).`);
       }
 
-      // Why this matters:
-      // Without this de-duplication pass, the inject step can stack links over time.
-      // Especially when you re-run "all" modes in one go, cheerio will gladly append
-      // the same <link> tags repeatedly unless we guard against it.
-      //
-      // This is NOT just cosmetic — it affects page load, validator noise, and Git churn.
-      // The goal is to ensure a single clean instance of each required stylesheet,
-      // while leaving valid inclusions untouched.
+      // Clean-up rationale:
+      // Without this, the "inject" step can accumulate duplicate tags over time.
+      // This reduces bloat, avoids validator noise, and keeps diffs clean.
     });
   });
 }
-
 
 // -------------------------------------
 // Inject missing root/folder <link> tags into <head>
@@ -184,18 +169,15 @@ function injectStyleLinks() {
     files.forEach(file => {
       const fullPath = path.join(folderPath, file);
       const originalHtml = fs.readFileSync(fullPath, 'utf-8');
-
       const $ = cheerio.load(originalHtml);
       const head = $('head');
-      if (!head.length) return; // No <head> tag? Skip it.
+      if (!head.length) return;
 
-      // Check via DOM parsing to avoid false matches on formatting variations.
       const hasRootLink = $('link[href="/style.css"]').length > 0;
       const hasFolderLink = $(`link[href="/${folder}/style.css"]`).length > 0;
 
       let changed = false;
 
-      // Only inject what’s missing. Do not assume anything.
       if (!hasRootLink) {
         head.append('<link rel="stylesheet" href="/style.css">');
         console.log(`${folder}/${file}: Injecting root style link`);
@@ -210,10 +192,6 @@ function injectStyleLinks() {
 
       if (changed) {
         const updatedHtml = $.html();
-
-        // Normalize whitespace for comparison. HTML doesn't care about formatting,
-        // and Cheerio often rewrites line breaks, indentation, etc., for no good reason.
-        // So we collapse all whitespace when checking for real changes.
         const normalize = str => str.replace(/\s+/g, ' ').trim();
 
         if (normalize(updatedHtml) !== normalize(originalHtml)) {
@@ -226,7 +204,6 @@ function injectStyleLinks() {
     });
   });
 }
-
 
 // -------------------------------------
 // Execute the selected operations
