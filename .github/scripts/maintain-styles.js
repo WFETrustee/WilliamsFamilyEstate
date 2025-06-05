@@ -142,7 +142,6 @@ ${expectedFolder}`);
           console.log(`${folder}/${file}: Injected missing style link(s).`);
         }
       }
-        console.log(`${folder}/${file}: Injected missing style link(s).`);
       }
     });
   });
