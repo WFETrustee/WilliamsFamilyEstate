@@ -121,7 +121,7 @@ function injectStyleLinks() {
       const html = fs.readFileSync(fullPath, 'utf-8');
 
       const expectedRoot = '<link rel="stylesheet" href="/style.css">';
-      const expectedFolder = `<link rel=\"stylesheet\" href=\"/${folder}/style.css\">`;
+      const expectedFolder = `<link rel="stylesheet" href="/${folder}/style.css">`;
 
       const needsRoot = !html.includes(expectedRoot);
       const needsFolder = !html.includes(expectedFolder);
