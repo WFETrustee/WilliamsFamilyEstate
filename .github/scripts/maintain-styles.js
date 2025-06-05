@@ -26,7 +26,6 @@ const mode = process.argv[2] || 'all';
 const folders = getAllContentFolders('.');
 let modesToRun = (mode === 'all') ? ['stubs', 'distribute', 'clean', 'inject'] : [mode];
 
-// If auto-organize is off, we won't distribute shared styles
 if (!config.css?.autoOrganize) {
   modesToRun = modesToRun.filter(m => m !== 'distribute');
 }
@@ -97,14 +96,17 @@ function cleanStyleLinks() {
 
     files.forEach(file => {
       const fullPath = path.join(folderPath, file);
-      const html = fs.readFileSync(fullPath, 'utf-8');
-      const $ = cheerio.load(html);
+      const original = fs.readFileSync(fullPath, 'utf-8');
+      const $ = cheerio.load(original);
 
       const links = $('link[href$="style.css"]');
       if (links.length > 1) {
         links.slice(1).remove();
-        writeFile(fullPath, $.html());
-        console.log(`${folder}/${file}: Removed ${links.length - 1} duplicate style link(s).`);
+        const updated = $.html();
+        if (updated !== original) {
+          writeFile(fullPath, updated);
+          console.log(`${folder}/${file}: Removed ${links.length - 1} duplicate style link(s).`);
+        }
       }
     });
   });
@@ -129,13 +131,23 @@ function injectStyleLinks() {
       const rootExists = $(`link[href="${rootHref}"]`).length > 0;
       const folderExists = $(`link[href="${folderHref}"]`).length > 0;
 
-      if (!rootExists) head.append(`\n<link rel="stylesheet" href="${rootHref}">`);
-      if (!folderExists) head.append(`\n<link rel="stylesheet" href="${folderHref}">`);
+      let changed = false;
+      if (!rootExists) {
+        head.append(`\n<link rel="stylesheet" href="${rootHref}">`);
+        changed = true;
+      }
 
-      const updated = $.html();
-      if (original !== updated) {
-        writeFile(fullPath, updated);
-        console.log(`${folder}/${file}: Injected missing style link(s).`);
+      if (!folderExists) {
+        head.append(`\n<link rel="stylesheet" href="${folderHref}">`);
+        changed = true;
+      }
+
+      if (changed) {
+        const updated = $.html();
+        if (updated !== original) {
+          writeFile(fullPath, updated);
+          console.log(`${folder}/${file}: Injected missing style link(s).`);
+        }
       }
     });
   });
