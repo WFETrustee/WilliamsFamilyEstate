@@ -97,21 +97,49 @@ function cleanStyleLinks() {
 
     files.forEach(file => {
       const fullPath = path.join(folderPath, file);
-      const html = fs.readFileSync(fullPath, 'utf-8');
-      const $ = cheerio.load(html);
+      const originalHtml = fs.readFileSync(fullPath, 'utf-8');
+      const $ = cheerio.load(originalHtml);
 
-      const links = $('link[href$="style.css"]');
-      if (links.length > 1) {
-        links.slice(1).remove(); // Keep first
-        const updated = $.html();
-        if (updated !== html) {
-          writeFile(fullPath, updated);
-          console.log(`${folder}/${file}: Removed ${links.length - 1} duplicate style link(s).`);
+      // Track which hrefs we’ve seen to prevent removing valid, first-included links
+      const seenHrefs = new Set();
+      let removedCount = 0;
+
+      // Scan all <link> tags that end in style.css — could be root or folder scoped
+      $('link[href$="style.css"]').each((i, el) => {
+        const href = $(el).attr('href');
+
+        // First instance of each href is considered valid — leave it alone.
+        // Anything after that is considered redundant and will be removed.
+        if (seenHrefs.has(href)) {
+          $(el).remove();
+          removedCount++;
+        } else {
+          seenHrefs.add(href);
         }
+      });
+
+      const updatedHtml = $.html();
+
+      // Only write the file if actual <link> tags were removed
+      if (removedCount > 0 && updatedHtml !== originalHtml) {
+        writeFile(fullPath, updatedHtml);
+
+        // Log what we cleaned up
+        console.log(`${folder}/${file}: Removed ${removedCount} duplicate style link(s).`);
       }
+
+      // Why this matters:
+      // Without this de-duplication pass, the inject step can stack links over time.
+      // Especially when you re-run "all" modes in one go, cheerio will gladly append
+      // the same <link> tags repeatedly unless we guard against it.
+      //
+      // This is NOT just cosmetic — it affects page load, validator noise, and Git churn.
+      // The goal is to ensure a single clean instance of each required stylesheet,
+      // while leaving valid inclusions untouched.
     });
   });
 }
+
 
 // -------------------------------------
 // Inject missing root/folder <link> tags into <head>
