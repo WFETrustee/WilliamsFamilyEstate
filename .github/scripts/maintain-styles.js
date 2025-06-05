@@ -49,8 +49,7 @@ function generateCssStubs() {
 
     const stubCss = Array.from(classNames).sort().map(c => `.${c} {
   /* style for ${c} */
-}
-`).join('\n');
+}`).join('\n\n');
 
     if (!fs.existsSync(stylePath)) {
       writeFile(stylePath, stubCss);
@@ -119,23 +118,26 @@ function injectStyleLinks() {
 
     files.forEach(file => {
       const fullPath = path.join(folderPath, file);
-      const original = fs.readFileSync(fullPath, 'utf-8');
-      const $ = cheerio.load(original);
+      const html = fs.readFileSync(fullPath, 'utf-8');
 
-      const head = $('head');
-      if (!head.length) return;
+      // Only check the file if it is missing either root or folder style links
+      if (!html.includes('/style.css') || !html.includes(`/${folder}/style.css`)) {
+        const $ = cheerio.load(html);
+        const head = $('head');
+        if (!head.length) return;
 
-      const rootHref = '/style.css';
-      const folderHref = `/${folder}/style.css`;
+        const rootHref = '/style.css';
+        const folderHref = `/${folder}/style.css`;
 
-      const rootExists = $(`link[href="${rootHref}"]`).length > 0;
-      const folderExists = $(`link[href="${folderHref}"]`).length > 0;
+        const rootExists = $(`link[href="${rootHref}"]`).length > 0;
+        const folderExists = $(`link[href="${folderHref}"]`).length > 0;
 
-      if (!rootExists || !folderExists) {
-        if (!rootExists) head.append(`\n<link rel="stylesheet" href="${rootHref}">`);
-        if (!folderExists) head.append(`\n<link rel="stylesheet" href="${folderHref}">`);
-        writeFile(fullPath, $.html());
-        console.log(`${folder}/${file}: Injected missing style link(s).`);
+        if (!rootExists || !folderExists) {
+          if (!rootExists) head.append(`\n<link rel="stylesheet" href="${rootHref}">`);
+          if (!folderExists) head.append(`\n<link rel="stylesheet" href="${folderHref}">`);
+          writeFile(fullPath, $.html());
+          console.log(`${folder}/${file}: Injected missing style link(s).`);
+        }
       }
     });
   });
