@@ -119,37 +119,54 @@ function cleanStyleLinks() {
 function injectStyleLinks() {
   folders.forEach(folder => {
     const folderPath = path.join('.', folder);
-    if (!fs.existsSync(folderPath)) return;
-
     const files = fs.readdirSync(folderPath).filter(f => f.endsWith('.html'));
 
     files.forEach(file => {
       const fullPath = path.join(folderPath, file);
-      const html = fs.readFileSync(fullPath, 'utf-8');
+      const originalHtml = fs.readFileSync(fullPath, 'utf-8');
 
-      const expectedRoot = '<link rel="stylesheet" href="/style.css">';
-      const expectedFolder = `<link rel="stylesheet" href="/${folder}/style.css">`;
+      const $ = cheerio.load(originalHtml);
+      const head = $('head');
+      if (!head.length) return; // No <head> tag? Skip it.
 
-      const needsRoot = !html.includes(expectedRoot);
-      const needsFolder = !html.includes(expectedFolder);
+      // Check via DOM parsing to avoid false matches on formatting variations.
+      const hasRootLink = $('link[href="/style.css"]').length > 0;
+      const hasFolderLink = $(`link[href="/${folder}/style.css"]`).length > 0;
 
-      if (needsRoot || needsFolder) {
-        const $ = cheerio.load(html);
-        const head = $('head');
-        if (!head.length) return;
+      let changed = false;
 
-        if (needsRoot) head.append('\n' + expectedRoot);
-        if (needsFolder) head.append('\n' + expectedFolder);
+      // Only inject what’s missing. Do not assume anything.
+      if (!hasRootLink) {
+        head.append('<link rel="stylesheet" href="/style.css">');
+        console.log(`${folder}/${file}: Injecting root style link`);
+        changed = true;
+      }
 
-        const updated = $.html();
-        if (updated !== html) {
-          writeFile(fullPath, updated);
+      if (!hasFolderLink) {
+        head.append(`<link rel="stylesheet" href="/${folder}/style.css">`);
+        console.log(`${folder}/${file}: Injecting folder style link`);
+        changed = true;
+      }
+
+      if (changed) {
+        const updatedHtml = $.html();
+
+        // Normalize whitespace for comparison. HTML doesn't care about formatting,
+        // and Cheerio often rewrites line breaks, indentation, etc., for no good reason.
+        // So we collapse all whitespace when checking for real changes.
+        const normalize = str => str.replace(/\s+/g, ' ').trim();
+
+        if (normalize(updatedHtml) !== normalize(originalHtml)) {
+          writeFile(fullPath, updatedHtml);
           console.log(`${folder}/${file}: Injected missing style link(s).`);
+        } else {
+          console.log(`${folder}/${file}: Skipped write – only cosmetic changes detected.`);
         }
       }
     });
   });
 }
+
 
 // -------------------------------------
 // Execute the selected operations
