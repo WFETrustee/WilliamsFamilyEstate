@@ -1,10 +1,11 @@
-// File: archive-active-documents.js
-// Purpose: Archive only active documents (doc-status = "active")
-// listed in folder-level manifest files using the Internet Archive's save endpoint.
+// File: webarchive-active-pages.js
+// Purpose: Archive only active documents to Archive.org using manifest data.
+// Optimized to skip previously archived files and run in parallel.
 
 const fs = require("fs");
 const path = require("path");
 const fetch = require("node-fetch");
+const crypto = require("crypto");
 const { getAllContentFolders } = require("./utils/template-metadata");
 const { loadSiteConfig } = require("./utils/load-config");
 
@@ -17,9 +18,17 @@ if (!config.automation?.archiveToInternetArchive) {
 const BASE_URL = "https://williamsfamilyestate.org";
 const ARCHIVE_ENDPOINT = "https://web.archive.org/save/";
 const MAX_CONCURRENT = 5;
+const STATE_FILE = ".archive-log.json";
 
-const folders = getAllContentFolders('.');
-let allUrls = [];
+let previousHashes = {};
+if (fs.existsSync(STATE_FILE)) {
+  try {
+    previousHashes = JSON.parse(fs.readFileSync(STATE_FILE, "utf-8"));
+  } catch {}
+}
+
+const folders = getAllContentFolders(".");
+const urlsToArchive = [];
 
 folders.forEach(folder => {
   const manifestPath = path.join(folder, `${folder}.json`);
@@ -27,38 +36,47 @@ folders.forEach(folder => {
 
   const entries = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
 
-  // Only include entries where doc-status is explicitly "active"
-  const activeUrls = entries
-    .filter(entry => entry['doc-status']?.toLowerCase() === 'active')
-    .map(entry => `${BASE_URL}/${folder}/${entry.filename}`);
+  entries.forEach(entry => {
+    if (entry["doc-status"]?.toLowerCase() !== "active") return;
+    const filePath = path.join(folder, entry.filename);
+    if (!fs.existsSync(filePath)) return;
 
-  allUrls.push(...activeUrls);
+    const content = fs.readFileSync(filePath);
+    const hash = crypto.createHash("sha256").update(content).digest("hex");
+    const url = `${BASE_URL}/${folder}/${entry.filename}`;
+
+    if (previousHashes[url] !== hash) {
+      urlsToArchive.push({ url, filePath, hash });
+    }
+  });
 });
 
-console.log(`Preparing to archive ${allUrls.length} active URLs...`);
+console.log(`Preparing to archive ${urlsToArchive.length} changed or new active URLs...`);
 
-async function archiveUrl(url) {
-  console.log('Archiving:', url);
+async function archiveUrl({ url, hash }) {
+  console.log("Archiving:", url);
   try {
     const res = await fetch(ARCHIVE_ENDPOINT + encodeURIComponent(url));
     if (!res.ok) {
-      console.warn('Failed:', url, res.statusText);
+      console.warn("Failed:", url, res.statusText);
     } else {
-      console.log('Archived:', url);
+      console.log("Archived:", url);
+      previousHashes[url] = hash;
     }
   } catch (err) {
-    console.error('Error:', url, err.message);
+    console.error("Error:", url, err.message);
   }
 }
 
-// Submit URLs in batches to avoid hitting rate limits
-async function archiveInBatches(urls, batchSize) {
-  for (let i = 0; i < urls.length; i += batchSize) {
-    const batch = urls.slice(i, i + batchSize);
+async function archiveInBatches(items, batchSize) {
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
     await Promise.allSettled(batch.map(archiveUrl));
     await new Promise(resolve => setTimeout(resolve, 1500));
   }
 }
 
-archiveInBatches(allUrls, MAX_CONCURRENT)
-  .then(() => console.log(`Archive complete. ${allUrls.length} active documents submitted.`));
+archiveInBatches(urlsToArchive, MAX_CONCURRENT).then(() => {
+  fs.writeFileSync(STATE_FILE, JSON.stringify(previousHashes, null, 2));
+  console.log(`Archive complete. ${urlsToArchive.length} submitted.`);
+});
