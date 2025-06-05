@@ -120,24 +120,22 @@ function injectStyleLinks() {
       const fullPath = path.join(folderPath, file);
       const html = fs.readFileSync(fullPath, 'utf-8');
 
-      // Only check the file if it is missing either root or folder style links
-      if (!html.includes('/style.css') || !html.includes(`/${folder}/style.css`)) {
+      const expectedRoot = '<link rel="stylesheet" href="/style.css">';
+      const expectedFolder = `<link rel=\"stylesheet\" href=\"/${folder}/style.css\">`;
+
+      const needsRoot = !html.includes(expectedRoot);
+      const needsFolder = !html.includes(expectedFolder);
+
+      if (needsRoot || needsFolder) {
         const $ = cheerio.load(html);
         const head = $('head');
         if (!head.length) return;
 
-        const rootHref = '/style.css';
-        const folderHref = `/${folder}/style.css`;
+        if (needsRoot) head.append(`\n${expectedRoot}`);
+        if (needsFolder) head.append(`\n${expectedFolder}`);
 
-        const rootExists = $(`link[href="${rootHref}"]`).length > 0;
-        const folderExists = $(`link[href="${folderHref}"]`).length > 0;
-
-        if (!rootExists || !folderExists) {
-          if (!rootExists) head.append(`\n<link rel="stylesheet" href="${rootHref}">`);
-          if (!folderExists) head.append(`\n<link rel="stylesheet" href="${folderHref}">`);
-          writeFile(fullPath, $.html());
-          console.log(`${folder}/${file}: Injected missing style link(s).`);
-        }
+        writeFile(fullPath, $.html());
+        console.log(`${folder}/${file}: Injected missing style link(s).`);
       }
     });
   });
