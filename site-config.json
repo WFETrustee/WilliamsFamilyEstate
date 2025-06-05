@@ -25,6 +25,6 @@
   },
   "automation": {
     "generateSitemap": true,
-    "archiveToInternetArchive": false
+    "archiveToInternetArchive": true
   }
 }
