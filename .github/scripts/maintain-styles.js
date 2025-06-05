@@ -131,10 +131,8 @@ function injectStyleLinks() {
         const head = $('head');
         if (!head.length) return;
 
-        if (needsRoot) head.append(`
-${expectedRoot}`);
-        if (needsFolder) head.append(`
-${expectedFolder}`);
+        if (needsRoot) head.append(`\n${expectedRoot}`);
+        if (needsFolder) head.append(`\n${expectedFolder}`);
 
         const updated = $.html();
         if (updated !== html) {
@@ -142,10 +140,10 @@ ${expectedFolder}`);
           console.log(`${folder}/${file}: Injected missing style link(s).`);
         }
       }
-      }
     });
   });
 }
+
 
 if (modesToRun.includes('stubs')) generateCssStubs();
 if (modesToRun.includes('distribute')) distributeSharedStyles();
