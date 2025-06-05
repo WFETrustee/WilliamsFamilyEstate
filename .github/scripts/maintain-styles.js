@@ -131,23 +131,11 @@ function injectStyleLinks() {
       const rootExists = $(`link[href="${rootHref}"]`).length > 0;
       const folderExists = $(`link[href="${folderHref}"]`).length > 0;
 
-      let changed = false;
-      if (!rootExists) {
-        head.append(`\n<link rel="stylesheet" href="${rootHref}">`);
-        changed = true;
-      }
-
-      if (!folderExists) {
-        head.append(`\n<link rel="stylesheet" href="${folderHref}">`);
-        changed = true;
-      }
-
-      if (changed) {
-        const updated = $.html();
-        if (updated !== original) {
-          writeFile(fullPath, updated);
-          console.log(`${folder}/${file}: Injected missing style link(s).`);
-        }
+      if (!rootExists || !folderExists) {
+        if (!rootExists) head.append(`\n<link rel="stylesheet" href="${rootHref}">`);
+        if (!folderExists) head.append(`\n<link rel="stylesheet" href="${folderHref}">`);
+        writeFile(fullPath, $.html());
+        console.log(`${folder}/${file}: Injected missing style link(s).`);
       }
     });
   });
