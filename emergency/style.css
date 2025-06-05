@@ -2280,3 +2280,160 @@ body {
     color: #222;
     line-height: 1.6;
 }
+
+.announce {
+    background-color: #e6f2ff;
+    color: #222;
+    padding: 1rem 2rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;    
+}
+
+/*Content entries*/
+
+.content h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.35rem;
+}
+
+.content p {
+  margin: 0.25rem 0;
+  line-height: 1.5;
+}
+
+.content {
+  position: relative;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border-left: 4px solid #888;
+  border-radius: 6px;
+  background: #f7f7f7;
+}
+
+.content-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.content.pinned {
+  border-left-color: #663399;
+  background-color: #f9f9f9;
+}
+
+img.pinned {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 1.5rem;
+  height: auto;
+  z-index: 5;
+}
+
+.date {
+  font-style: italic;
+  color: #555;
+}
+
+/* Footer */
+
+.meta-group + .meta-group {
+  border-bottom: 1px dotted #ccc;
+  padding-top: 0.5em;
+  margin-top: 0.5em;
+}
+
+.meta-group span {
+  flex: 1 1 auto;
+  min-width: 100px;
+}
+
+/* Optional: visually separate grouped lines more cleanly */
+
+.meta-group {
+  display: flex;
+  justify-content: space-between; /* Spread evenly */
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  border-bottom: 1px dotted #ccc;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.meta.pinned {
+  display: none !important;
+}
+
+.meta.status {
+  display: none !important;
+}
+
+.site-footer {
+        font-size: 0.85rem;
+        padding: 2rem 1rem;
+    }
+
+    main {
+        padding: 0 1.25rem;
+    }
+}
+
+.site-footer {
+    background: radial-gradient(ellipse at center, #888, #777);
+    color: #f1f1f1;
+    text-align: center;
+    font-size: 0.9rem;
+    padding: 0.50rem 1rem 1rem;
+    line-height: 1.6;
+    #background-color: #777;
+    /* Top shadow line */
+    box-shadow: inset 0 8px 10px -8px rgba(0, 0, 0, 0.75);    
+}
+
+/* Responsive Enhancements */
+@media (max-width: 600px) {
+    body {
+        font-size: 1.05rem;
+        line-height: 1.7;
+    }
+
+.site-header h1 {
+        font-family: "Scope One", serif;
+        margin: 0 auto;
+        font-size: 1.9rem;
+        line-height: 1.2;
+        max-width: 720px;
+        font-weight: 400; /* Add this line */
+    }
+
+/* Navigation */
+
+.site-header {
+    background-color: #777;
+    color: #f1f1f1;
+    padding: 1rem 1rem; 
+    text-align: center;
+}
+
+.tm {
+  font-size: 66%;
+  vertical-align: super; /* optional: lifts it like a superscript */
+  /* opacity: 0.75;         /* optional: soften it visually */
+}
+
+/* Header */
+
+/* Global Layout */
+body {
+    font-family: Georgia, serif;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    color: #222;
+    line-height: 1.6;
+}
