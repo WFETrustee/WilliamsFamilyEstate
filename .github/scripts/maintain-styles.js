@@ -3,7 +3,7 @@
 // Purpose: Manages all CSS-related tasks in one place.
 //          Use this script to auto-generate class stubs based on template metadata,
 //          distribute shared root-level styles to content folders,
-//          inject missing style references into HTML headers,
+//          inject missing style references into HTML headers (only if absent),
 //          and clean up redundant <link> tags for style.css.
 //
 // Usage:
@@ -31,7 +31,6 @@ if (!config.css?.autoOrganize) {
   modesToRun = modesToRun.filter(m => m !== 'distribute');
 }
 
-// Task: Generate CSS stub classes based on template metadata
 function generateCssStubs() {
   folders.forEach(folder => {
     const templatePath = path.join(folder, `${folder}_template.html`);
@@ -61,7 +60,6 @@ function generateCssStubs() {
   });
 }
 
-// Task: Distribute root-level scoped styles into each folder's style.css
 function distributeSharedStyles() {
   const rootCssPath = path.join('.', 'style.css');
   if (!fs.existsSync(rootCssPath)) return;
@@ -92,7 +90,6 @@ function distributeSharedStyles() {
   });
 }
 
-// Task: Remove duplicate style.css <link> tags in HTML files
 function cleanStyleLinks() {
   folders.forEach(folder => {
     const folderPath = path.join('.', folder);
@@ -113,7 +110,6 @@ function cleanStyleLinks() {
   });
 }
 
-// Task: Ensure each HTML file includes both root and folder-level style.css links
 function injectStyleLinks() {
   folders.forEach(folder => {
     const folderPath = path.join('.', folder);
@@ -121,8 +117,8 @@ function injectStyleLinks() {
 
     files.forEach(file => {
       const fullPath = path.join(folderPath, file);
-      const html = fs.readFileSync(fullPath, 'utf-8');
-      const $ = cheerio.load(html);
+      const original = fs.readFileSync(fullPath, 'utf-8');
+      const $ = cheerio.load(original);
 
       const head = $('head');
       if (!head.length) return;
@@ -136,13 +132,15 @@ function injectStyleLinks() {
       if (!rootExists) head.append(`\n<link rel="stylesheet" href="${rootHref}">`);
       if (!folderExists) head.append(`\n<link rel="stylesheet" href="${folderHref}">`);
 
-      writeFile(fullPath, $.html());
-      console.log(`${folder}/${file}: Injected missing style link(s).`);
+      const updated = $.html();
+      if (original !== updated) {
+        writeFile(fullPath, updated);
+        console.log(`${folder}/${file}: Injected missing style link(s).`);
+      }
     });
   });
 }
 
-// Execute selected tasks
 if (modesToRun.includes('stubs')) generateCssStubs();
 if (modesToRun.includes('distribute')) distributeSharedStyles();
 if (modesToRun.includes('clean')) cleanStyleLinks();
