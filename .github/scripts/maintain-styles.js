@@ -1,17 +1,6 @@
 // ============================================================
 // File: maintain-styles.js
-// Purpose: Manages all CSS-related tasks in one place.
-//          Use this script to auto-generate class stubs based on template metadata,
-//          distribute shared root-level styles to content folders,
-//          inject missing style references into HTML headers (only if absent),
-//          and clean up redundant <link> tags for style.css.
-//
-// Usage:
-//   node maintain-styles.js all         // runs everything
-//   node maintain-styles.js stubs       // generate only stubs
-//   node maintain-styles.js distribute  // copy shared scoped styles
-//   node maintain-styles.js inject      // insert link tags into HTML
-//   node maintain-styles.js clean       // remove duplicate <link> tags
+// Purpose: Central CSS maintenance: class stubs, style distribution, <link> injection, deduplication
 // ============================================================
 
 const fs = require('fs');
@@ -24,16 +13,20 @@ const { writeFile } = require('./utils/write-file');
 const config = loadSiteConfig();
 const mode = process.argv[2] || 'all';
 const folders = getAllContentFolders('.');
-let modesToRun = (mode === 'all') ? ['stubs', 'distribute', 'clean', 'inject'] : [mode];
 
+let modesToRun = (mode === 'all') ? ['stubs', 'distribute', 'clean', 'inject'] : [mode];
 if (!config.css?.autoOrganize) {
   modesToRun = modesToRun.filter(m => m !== 'distribute');
 }
 
+// -------------------------------------
+// Generate CSS stubs from <meta data-style="">
+// -------------------------------------
 function generateCssStubs() {
   folders.forEach(folder => {
     const templatePath = path.join(folder, `${folder}_template.html`);
     const stylePath = path.join(folder, 'style.css');
+
     if (!fs.existsSync(templatePath)) return;
 
     const html = fs.readFileSync(templatePath, 'utf-8');
@@ -47,17 +40,21 @@ function generateCssStubs() {
 
     if (classNames.size === 0) return;
 
-    const stubCss = Array.from(classNames).sort().map(c => `.${c} {
-  /* style for ${c} */
-}`).join('\n\n');
+    const stubCss = Array.from(classNames)
+      .sort()
+      .map(c => `.${c} {\n  /* style for ${c} */\n}`)
+      .join('\n\n');
 
     if (!fs.existsSync(stylePath)) {
-      writeFile(stylePath, stubCss);
+      writeFile(stylePath, stubCss.trim() + '\n');
       console.log(`${folder}/style.css created with ${classNames.size} stubs.`);
     }
   });
 }
 
+// -------------------------------------
+// Copy shared scoped styles into folder stylesheets
+// -------------------------------------
 function distributeSharedStyles() {
   const rootCssPath = path.join('.', 'style.css');
   if (!fs.existsSync(rootCssPath)) return;
@@ -81,28 +78,33 @@ function distributeSharedStyles() {
     const missing = scopedBlocks.filter(block => !localCss.includes(block));
 
     if (missing.length > 0) {
-      const final = localCss.trim() + '\n\n' + missing.join('\n\n');
+      const final = localCss.trim() + '\n\n' + missing.join('\n\n') + '\n';
       writeFile(folderCssPath, final);
       console.log(`${folder}/style.css updated with ${missing.length} inherited blocks.`);
     }
   });
 }
 
+// -------------------------------------
+// Remove duplicate <link href="style.css"> entries
+// -------------------------------------
 function cleanStyleLinks() {
   folders.forEach(folder => {
     const folderPath = path.join('.', folder);
+    if (!fs.existsSync(folderPath)) return;
+
     const files = fs.readdirSync(folderPath).filter(f => f.endsWith('.html'));
 
     files.forEach(file => {
       const fullPath = path.join(folderPath, file);
-      const original = fs.readFileSync(fullPath, 'utf-8');
-      const $ = cheerio.load(original);
+      const html = fs.readFileSync(fullPath, 'utf-8');
+      const $ = cheerio.load(html);
 
       const links = $('link[href$="style.css"]');
       if (links.length > 1) {
-        links.slice(1).remove();
+        links.slice(1).remove(); // Keep first
         const updated = $.html();
-        if (updated !== original) {
+        if (updated !== html) {
           writeFile(fullPath, updated);
           console.log(`${folder}/${file}: Removed ${links.length - 1} duplicate style link(s).`);
         }
@@ -111,9 +113,14 @@ function cleanStyleLinks() {
   });
 }
 
+// -------------------------------------
+// Inject missing root/folder <link> tags into <head>
+// -------------------------------------
 function injectStyleLinks() {
   folders.forEach(folder => {
     const folderPath = path.join('.', folder);
+    if (!fs.existsSync(folderPath)) return;
+
     const files = fs.readdirSync(folderPath).filter(f => f.endsWith('.html'));
 
     files.forEach(file => {
@@ -131,8 +138,8 @@ function injectStyleLinks() {
         const head = $('head');
         if (!head.length) return;
 
-        if (needsRoot) head.append(`\n${expectedRoot}`);
-        if (needsFolder) head.append(`\n${expectedFolder}`);
+        if (needsRoot) head.append('\n' + expectedRoot);
+        if (needsFolder) head.append('\n' + expectedFolder);
 
         const updated = $.html();
         if (updated !== html) {
@@ -144,7 +151,9 @@ function injectStyleLinks() {
   });
 }
 
-
+// -------------------------------------
+// Execute the selected operations
+// -------------------------------------
 if (modesToRun.includes('stubs')) generateCssStubs();
 if (modesToRun.includes('distribute')) distributeSharedStyles();
 if (modesToRun.includes('clean')) cleanStyleLinks();
