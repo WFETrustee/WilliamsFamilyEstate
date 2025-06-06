@@ -1,7 +1,7 @@
 [
   {
     "filename": "EMG-HC01_Writ_of_Habeas_Corpus.html",
-    "lastModified": "2025-06-06T16:20:27.224Z",
+    "lastModified": "2025-06-06T16:25:23.388Z",
     "doc-date": "2025-05-22",
     "doc-id": "EMG-HC01",
     "doc-version": "1.0",
@@ -14,5 +14,31 @@
     "doc-filer": "Partner Sonia, any next friend, or Successor Trustee",
     "doc-status": "active",
     "doc-pinned": "false"
+  },
+  {
+    "filename": "EMG-REM001_Demand_ER_Unlawful_Conversion.html",
+    "lastModified": "2025-06-06T16:25:23.388Z",
+    "doc-date": "2025-05-27",
+    "doc-id": "EMG-REM001",
+    "doc-version": "1.0",
+    "doc-category": "Emergency – Property Defense",
+    "doc-author": "Gregory-Alan: Williams, Trustee",
+    "doc-title": "Demand for Emergency Relief – Unlawful Conversion of Trust Property",
+    "doc-use-trigger": "If any party attempts to convert, foreclose, repossess, or encumber trust property without verified authority or rebuttal of perfected claim.",
+    "doc-instructions": "Deliver to Clerk of Court, Sheriff, creditor, or enforcement agent attempting to take trust property.",
+    "doc-filer": "Gregory-Alan: Williams, Trustee",
+    "doc-status": "draft",
+    "doc-pinned": "true"
+  },
+  {
+    "filename": "EMG-REM002_Demand_ER_Unlawful_Seizure.html",
+    "lastModified": "2025-06-06T16:25:23.389Z",
+    "doc-date": "2025-05-28",
+    "doc-id": "EMG-REM002",
+    "doc-version": "1.0",
+    "doc-category": "Emergency Document",
+    "doc-author": "Gregory-Alan: Williams, Trustee",
+    "doc-title": "Demand for Emergency Relief – Unlawful Seizure of Trust Vehicle",
+    "doc-status": "draft"
   }
 ]
