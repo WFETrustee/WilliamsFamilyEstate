@@ -2,6 +2,14 @@
   "css": {
   "autoOrganize": true,
   "allowInlineOverrides": true,
+  "displayPriority": {
+    ".main-nav": 1,
+    ".site-header": 2,
+    ".announce": 3,
+    ".content": 4,
+    ".meta*": 5,
+    ".site-footer": 99
+  },
   "excludeFromRootDistribute": [
     ".main-nav",
     ".site-header",
