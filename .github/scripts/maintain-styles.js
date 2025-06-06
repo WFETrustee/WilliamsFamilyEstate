@@ -205,7 +205,7 @@ function injectStyleLinks() {
     files.forEach(file => {
       const fullPath = path.join(folderPath, file);
       const originalHtml = fs.readFileSync(fullPath, 'utf-8');
-      const $ = cheerio.load(originalHtml);
+      const $ = cheerio.load(originalHtml, { decodeEntities: false });
       const head = $('head');
       if (!head.length) return;
 
@@ -214,21 +214,26 @@ function injectStyleLinks() {
       let changed = false;
 
       if (!hasRootLink) {
-        head.append('<link rel="stylesheet" href="/style.css">');
+        head.append($('<link>').attr({
+          rel: 'stylesheet',
+          href: '/style.css'
+        }));
         console.log(`${folder}/${file}: Injecting root style link`);
         changed = true;
       }
 
       if (!hasFolderLink) {
-        head.append(`<link rel="stylesheet" href="/${folder}/style.css">`);
+        head.append($('<link>').attr({
+          rel: 'stylesheet',
+          href: `/${folder}/style.css`
+        }));
         console.log(`${folder}/${file}: Injecting folder style link`);
         changed = true;
       }
 
       if (changed) {
-        const updatedHtml = $.html();
-        const normalize = str => str.replace(/\s+/g, ' ').trim();
-        if (normalize(updatedHtml) !== normalize(originalHtml)) {
+        const updatedHtml = $.html().replace(/(\r?\n){3,}/g, '\n\n').trim();
+        if (updatedHtml !== originalHtml.trim()) {
           writeFile(fullPath, updatedHtml);
           console.log(`${folder}/${file}: Injected missing style link(s).`);
         }
