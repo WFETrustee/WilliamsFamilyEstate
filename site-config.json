@@ -15,7 +15,8 @@
     ".site-header",
     ".site-footer",
     "#site-header",
-    "#site-footer"
+    "#site-footer",
+    ".tm"
   ],
   "alwaysDistribute": [
     ".announce",
