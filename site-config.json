@@ -1,7 +1,22 @@
 {
   "css": {
-    "autoOrganize": true,
-    "allowInlineOverrides": true
+  "autoOrganize": true,
+  "allowInlineOverrides": true,
+  "excludeFromRootDistribute": [
+    ".main-nav",
+    ".site-header",
+    ".site-footer",
+    "#site-header",
+    "#site-footer"
+  ],
+  "alwaysDistribute": [
+    ".announce",
+    ".content",
+    ".date",
+    ".meta-group",
+    ".meta.title",
+    ".meta.date"
+  ]
   },
   "display": {
     "defaultDateFormat": "MMMM d, yyyy",
