@@ -141,3 +141,12 @@ img.pinned {
         line-height: 1.7;
     }
 }
+
+/* Injected shared styles from root style.css */
+.meta.status {
+  display: none !important;
+}
+
+.meta.pinned {
+  display: none !important;
+}
