@@ -78,6 +78,10 @@ function generateCssStubs() {
 // ------------------------------------------------------------
 // 2. Distribute root styles into folder-level style.css files
 // ------------------------------------------------------------
+// ------------------------------------------------------------
+// 2. Distribute root styles into folder-level style.css files
+//    Supports exclusions, always-includes, and displayPriority
+// ------------------------------------------------------------
 async function distributeSharedStyles() {
   const rootCssPath = path.join('.', 'style.css');
   if (!fs.existsSync(rootCssPath)) return;
@@ -85,16 +89,35 @@ async function distributeSharedStyles() {
   const rootCSS = fs.readFileSync(rootCssPath, 'utf-8');
   const rootAST = await postcss([]).process(rootCSS, { from: rootCssPath, parser: postcssSafeParser });
 
-  const rootMap = new Map();
+  // Build maps and lists from config
+  const excludePatterns = (config.css?.excludeFromRootDistribute || []).map(p => new RegExp(p));
+  const alwaysIncludePatterns = (config.css?.alwaysDistribute || []).map(p => new RegExp(p));
+  const priorityMap = config.css?.displayPriority || {};
+
+  // Extract all root rules
+  const rootRules = [];
   for (const node of rootAST.root.nodes) {
     if (node.type === 'rule' && node.selector?.trim()) {
       const selector = node.selector.trim();
-      if (!matchesAny(selector, excludeRegexes)) {
-        rootMap.set(selector, node.toString().trim());
-      }
+
+      const isExcluded = excludePatterns.some(re => re.test(selector));
+      const isAlwaysIncluded = alwaysIncludePatterns.some(re => re.test(selector));
+
+      // Skip if excluded and not always included
+      if (isExcluded && !isAlwaysIncluded) continue;
+
+      rootRules.push({
+        selector,
+        cssText: node.toString().trim(),
+        priority: getPriority(selector, priorityMap)
+      });
     }
   }
 
+  // Sort by display priority (if specified)
+  rootRules.sort((a, b) => a.priority - b.priority);
+
+  // Inject missing styles into each content folder
   for (const folder of folders) {
     const targetPath = path.join(folder, 'style.css');
     if (!fs.existsSync(targetPath)) continue;
@@ -110,23 +133,30 @@ async function distributeSharedStyles() {
     }
 
     const additions = [];
-    for (const [selector, cssText] of rootMap.entries()) {
-      const isMissing = !existingSelectors.has(selector);
-      const isAlways = matchesAny(selector, alwaysDistributeRegexes);
-      if (isMissing || isAlways) {
-        additions.push(cssText);
+    for (const rule of rootRules) {
+      if (!existingSelectors.has(rule.selector)) {
+        additions.push(rule.cssText);
       }
     }
 
     if (additions.length > 0) {
       const finalCSS = `${folderCSS.trim()}\n\n/* Injected shared styles from root style.css */\n${additions.join('\n\n')}`;
       writeFile(targetPath, finalCSS);
-      console.log(`✔ Injected ${additions.length} missing styles into ${targetPath}`);
+      console.log(`✔ Injected ${additions.length} styles into ${targetPath}`);
     } else {
-      console.log(`✓ ${targetPath} already contains all necessary selectors. No changes.`);
+      console.log(`✓ ${targetPath} already contains all required selectors. No changes.`);
     }
   }
+
+  // Local helper to resolve numeric priority
+  function getPriority(selector, map) {
+    for (const pattern in map) {
+      if (new RegExp(pattern).test(selector)) return map[pattern];
+    }
+    return 9999; // Lowest priority if not listed
+  }
 }
+
 
 // ------------------------------------------------------------
 // 3. Remove duplicate <link href="style.css"> tags
