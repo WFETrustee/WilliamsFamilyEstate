@@ -62,8 +62,8 @@ jobs:
 
       - name: Commit and push updated manifests and styles
         run: |
-          git add **/*.json **/*.html **/style.css sitemap.xml
-          git commit -m "Auto-update site metadata, manifests, and style maintenance"
+          git add -A
+          git commit -m "Auto-update site metadata, page routes, manifests, and style maintenance"
           git pull
           git push origin HEAD:master
 
