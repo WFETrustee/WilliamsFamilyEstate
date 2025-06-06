@@ -3,32 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <title>Redirecting...</title>
-  <script>
-    async function redirectToDoc() {
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get("id");
-
-      if (!id) {
-        document.body.innerText = "Missing ID.";
-        return;
-      }
-
-      try {
-        const res = await fetch('/qr-routes.json');
-        const routes = await res.json();
-
-        if (routes[id]) {
-          window.location.href = "/" + routes[id];
-        } else {
-          document.body.innerText = "Document not found or not certified.";
-        }
-      } catch (e) {
-        console.error(e);
-        document.body.innerText = "Error loading routing table.";
-      }
-    }
-    redirectToDoc();
-  </script>
+<script src="/scripts/page-router.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", handleQrRedirect);
+</script>
 </head>
 <body>
   Redirecting to certified document...
