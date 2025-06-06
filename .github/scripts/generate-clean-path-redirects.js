@@ -1,8 +1,7 @@
 // ============================================================
 // File: .github/scripts/generate-clean-path-redirects.js
-// Purpose: Auto-create /[folder]/[doc-id]/index.html redirect files
-//          based on page-routes.json so that clean URLs like
-//          /emergency/EMG-HC01/ will resolve to the correct document.
+// Purpose: Auto-create and clean /[folder]/[doc-id]/index.html redirect shims
+//          Based on page-routes.json mappings. 100% data driven.
 // ============================================================
 
 const fs = require('fs');
@@ -10,37 +9,27 @@ const path = require('path');
 
 const ROUTE_FILE = 'page-routes.json';
 if (!fs.existsSync(ROUTE_FILE)) {
-  console.error(`page-routes.json is missing. This must be generated before this script runs.`);
+  console.error(`Missing route file: ${ROUTE_FILE}`);
   process.exit(1);
 }
 
 const routes = JSON.parse(fs.readFileSync(ROUTE_FILE, 'utf-8'));
-let created = 0;
-let skipped = 0;
-let missingFolder = 0;
+const expectedPaths = new Set();
+let created = 0, skipped = 0, removed = 0;
 
 for (const [docId, relativePath] of Object.entries(routes)) {
   const parts = relativePath.split('/');
   if (parts.length !== 2) {
-    console.warn(`Skipping invalid path format: ${relativePath}`);
+    console.warn(`Skipping invalid path: ${relativePath}`);
     continue;
   }
 
   const [folder, filename] = parts;
   const targetUrl = `/${folder}/${filename}`;
-
-  // If the target content folder (e.g., /emergency) doesn't exist, skip it.
-  // We don't create these folders — they should be part of the normal site structure.
-  const baseFolderPath = path.join('.', folder);
-  if (!fs.existsSync(baseFolderPath)) {
-    console.warn(`Folder not found: ${baseFolderPath}. Skipping this entry.`);
-    missingFolder++;
-    continue;
-  }
-
-  // This is where the redirect index.html will be written
-  const redirectDir = path.join(baseFolderPath, docId);
+  const redirectDir = path.join(folder, docId);
   const redirectPath = path.join(redirectDir, 'index.html');
+
+  expectedPaths.add(redirectPath);
 
   const redirectHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -55,7 +44,6 @@ for (const [docId, relativePath] of Object.entries(routes)) {
 </body>
 </html>`;
 
-  // Avoid unnecessary writes if the file already exists and matches
   let needsWrite = true;
   if (fs.existsSync(redirectPath)) {
     const current = fs.readFileSync(redirectPath, 'utf-8');
@@ -73,4 +61,30 @@ for (const [docId, relativePath] of Object.entries(routes)) {
   }
 }
 
-console.log(`Redirect generation complete. Created: ${created}, Skipped: ${skipped}, Missing folder: ${missingFolder}`);
+// === Cleanup Phase ===
+// Remove any previously generated doc-id folders no longer mapped
+const folders = fs.readdirSync('.', { withFileTypes: true })
+  .filter(dirent => dirent.isDirectory())
+  .map(dirent => dirent.name);
+
+// For each folder that has doc-id subfolders
+for (const folder of folders) {
+  const folderPath = path.join('.', folder);
+  const subdirs = fs.readdirSync(folderPath, { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .map(d => d.name);
+
+  for (const subdir of subdirs) {
+    const indexPath = path.join(folder, subdir, 'index.html');
+    if (
+      fs.existsSync(indexPath) &&
+      !expectedPaths.has(indexPath)
+    ) {
+      // Folder exists but is no longer routed to — delete it
+      fs.rmSync(path.join(folder, subdir), { recursive: true, force: true });
+      removed++;
+    }
+  }
+}
+
+console.log(`Redirects created: ${created}, skipped (already correct): ${skipped}, removed (stale): ${removed}`);
