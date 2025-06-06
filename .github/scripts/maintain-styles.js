@@ -1,6 +1,7 @@
 // ============================================================
 // File: maintain-styles.js
 // Purpose: Central CSS maintenance: class stubs, style distribution, <link> injection, deduplication
+// Supports: alwaysDistribute and excludeFromRootDistribute via site-config.json
 // ============================================================
 
 const fs = require('fs');
@@ -9,17 +10,37 @@ const cheerio = require('cheerio');
 const postcss = require('postcss');
 const postcssSafeParser = require('postcss-safe-parser');
 const { loadSiteConfig } = require('./utils/load-config');
-const { getAllContentFolders, parseTemplateMetadata } = require('./utils/template-metadata');
+const { getAllContentFolders } = require('./utils/template-metadata');
 const { writeFile } = require('./utils/write-file');
 
 const config = loadSiteConfig();
 const mode = process.argv[2] || 'all';
 const folders = getAllContentFolders('.');
-let modesToRun = (mode === 'all') ? ['stubs', 'distribute', 'clean', 'inject'] : [mode];
 
-// Disable distribution logic unless it's permitted in the config
-if (!config.css?.autoOrganize) {
-  modesToRun = modesToRun.filter(m => m !== 'distribute');
+let modesToRun = (mode === 'all') ? ['stubs', 'distribute', 'clean', 'inject'] : [mode];
+if (!config.css?.autoOrganize) modesToRun = modesToRun.filter(m => m !== 'distribute');
+
+// ------------------------------------------------------------
+// Helper: Convert string patterns into regex
+// ------------------------------------------------------------
+function getRegexList(array = []) {
+  return array.map(pattern => {
+    // Escape if needed and convert wildcards (*) to regex
+    if (pattern.includes('*')) {
+      return new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+    } else {
+      return new RegExp('^' + pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$');
+    }
+  });
+}
+
+// Preprocess config regex rules
+const excludeRegexes = getRegexList(config.css?.excludeFromRootDistribute || []);
+const alwaysDistributeRegexes = getRegexList(config.css?.alwaysDistribute || []);
+
+// Check if a selector matches any regex in a given list
+function matchesAny(selector, regexList) {
+  return regexList.some(rx => rx.test(selector));
 }
 
 // ------------------------------------------------------------
@@ -56,8 +77,6 @@ function generateCssStubs() {
 
 // ------------------------------------------------------------
 // 2. Distribute root styles into folder-level style.css files
-//    using PostCSS for AST-level accuracy.
-//    Safe: only missing selectors are injected.
 // ------------------------------------------------------------
 async function distributeSharedStyles() {
   const rootCssPath = path.join('.', 'style.css');
@@ -66,11 +85,13 @@ async function distributeSharedStyles() {
   const rootCSS = fs.readFileSync(rootCssPath, 'utf-8');
   const rootAST = await postcss([]).process(rootCSS, { from: rootCssPath, parser: postcssSafeParser });
 
-  // Build a map of all selectors in the root sheet
   const rootMap = new Map();
   for (const node of rootAST.root.nodes) {
     if (node.type === 'rule' && node.selector?.trim()) {
-      rootMap.set(node.selector.trim(), node.toString().trim());
+      const selector = node.selector.trim();
+      if (!matchesAny(selector, excludeRegexes)) {
+        rootMap.set(selector, node.toString().trim());
+      }
     }
   }
 
@@ -90,8 +111,9 @@ async function distributeSharedStyles() {
 
     const additions = [];
     for (const [selector, cssText] of rootMap.entries()) {
-      if (!existingSelectors.has(selector)) {
-        // This style is truly missing and safe to append
+      const isMissing = !existingSelectors.has(selector);
+      const isAlways = matchesAny(selector, alwaysDistributeRegexes);
+      if (isMissing || isAlways) {
         additions.push(cssText);
       }
     }
@@ -101,7 +123,7 @@ async function distributeSharedStyles() {
       writeFile(targetPath, finalCSS);
       console.log(`✔ Injected ${additions.length} missing styles into ${targetPath}`);
     } else {
-      console.log(`✓ ${targetPath} already contains all root selectors. No changes.`);
+      console.log(`✓ ${targetPath} already contains all necessary selectors. No changes.`);
     }
   }
 }
@@ -190,7 +212,7 @@ function injectStyleLinks() {
 // ------------------------------------------------------------
 (async () => {
   if (modesToRun.includes('stubs')) generateCssStubs();
-  if (modesToRun.includes('distribute')) await distributeSharedStyles(); // note: now async
+  if (modesToRun.includes('distribute')) await distributeSharedStyles(); // async
   if (modesToRun.includes('clean')) cleanStyleLinks();
   if (modesToRun.includes('inject')) injectStyleLinks();
 })();
