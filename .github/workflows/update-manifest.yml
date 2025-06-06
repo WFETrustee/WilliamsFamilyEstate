@@ -33,8 +33,8 @@ jobs:
 
       - name: Install script dependencies (postcss cheerio + glob + node-fetch)
         working-directory: .github/scripts
-        #run: npm install postcss postcss-safe-parser cheerio glob node-fetch@2 --no-save
-        run: npm install cheerio glob node-fetch@2 --no-save
+        run: npm install postcss postcss-safe-parser cheerio glob node-fetch@2 --no-save
+        #run: npm install cheerio glob node-fetch@2 --no-save
 
       - name: Generate Manifest Files and QR Routes
         run: node .github/scripts/generate-manifests.js
