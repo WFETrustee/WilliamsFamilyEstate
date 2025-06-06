@@ -493,3 +493,83 @@ body {
             position: relative;
             z-index: 2;
         }
+
+/* Injected shared styles from root style.css */
+.main-nav img {
+      height: 1.25em;
+      vertical-align: middle;
+      transition: transform 0.2s ease;
+    }
+
+.main-nav a:hover img {
+      transform: scale(1.5); /* Grows 50% larger on hover */
+    }
+
+.main-nav > ul {
+        max-width: 720px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0;
+        display: flex;
+        gap: 1.25rem;
+        list-style: none;
+    }
+
+.main-nav ul li a {
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+
+.main-nav ul li a:hover {
+            #background-color: #777;
+        }
+
+.main-nav ul li a.active {
+            background-color: #777;
+            color: #f1f1f1;
+            font-weight: bold;
+            padding: 0.4rem 0.75rem;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            margin-top: -4px; /* Merge into header */
+            position: relative;
+            z-index: 2;
+        }
+
+.announce {
+    background-color: #e6f2ff;
+    color: #222;
+    padding: 1rem 2rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;    
+}
+
+.content {
+  position: relative;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border-left: 4px solid #888;
+  border-radius: 6px;
+  background: #f7f7f7;
+}
+
+.meta-group {
+  display: flex;
+  justify-content: space-between; /* Spread evenly */
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  border-bottom: 1px dotted #ccc;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.date {
+  font-style: italic;
+  color: #555;
+}
