@@ -1,10 +1,8 @@
 // ==========================================================
-// File: generate-manifests.js (Refactored)
-// Purpose: Generates per-folder ($folder).json manifest files
-//          and a global qr-routes.json using shared metadata logic.
-//          This file depends on:
-//          - extractHtmlMetadata(): parses <meta> tags from HTML files
-//          - parseTemplateMetadata(): determines expected meta keys from templates
+// File: generate-manifests.js
+// Purpose: Build each folder's manifest AND a universal router for QR and clean path access.
+// Note: All docs with a doc-id (draft or active) go into page-routes.json,
+//       but only "active" docs are listed in their folder-level manifests.
 // ==========================================================
 
 const fs = require('fs');
@@ -12,59 +10,59 @@ const path = require('path');
 const { getAllContentFolders, parseTemplateMetadata, extractHtmlMetadata } = require('./utils/template-metadata');
 const { writeFile } = require('./utils/write-file');
 
-// Get all valid content folders based on presence of a template
+// Grab all folders that have a template file
 const folders = getAllContentFolders('.');
-const qrRoutes = {}; // Holds doc-id to relative path mapping for QR routing
+const pageRoutes = {}; // This is the universal router { doc-id: "folder/filename.html" }
 
 folders.forEach(folder => {
   const folderPath = path.join('.', folder);
   const templatePath = path.join(folderPath, `${folder}_template.html`);
   const outputPath = path.join(folderPath, `${folder}.json`);
 
-  // Skip folders without template
+  // Skip folders without a template
   if (!fs.existsSync(templatePath)) {
     console.warn(`Template not found: ${templatePath}`);
     return;
   }
 
-  // Determine which metadata fields to extract based on the template
+  // Figure out which <meta> keys we care about by parsing the template
   const templateHTML = fs.readFileSync(templatePath, 'utf-8');
   const { groupedMeta } = parseTemplateMetadata(templateHTML);
   const keys = Object.values(groupedMeta || {}).flat().map(m => m.key);
 
-  const entries = [];
+  const entries = []; // folder manifest entries (only for ACTIVE docs)
   const files = fs.readdirSync(folderPath);
 
   files.forEach(file => {
-    // Ignore non-HTML, index, or template files
+    // Skip index.html, templates, and non-HTML files
     if (!file.endsWith('.html') || file === 'index.html' || file === `${folder}_template.html`) return;
 
     const fullPath = path.join(folderPath, file);
     const meta = extractHtmlMetadata(fullPath, keys);
 
-    // Only include active or draft documents
-    if (!meta || !['active', 'draft'].includes(meta['doc-status'])) return;
+    // Skip if no doc-id or no recognized status
+    if (!meta || !['active', 'draft'].includes(meta['doc-status']) || !meta['doc-id']) return;
+
+    // Add to global route table no matter the status
+    pageRoutes[meta['doc-id']] = `${folder}/${file}`;
+
+    // Only add ACTIVE docs to public manifest
+    if (meta['doc-status'] !== 'active') return;
 
     const entry = { filename: file, lastModified: fs.statSync(fullPath).mtime.toISOString() };
 
-    // Pull only requested metadata keys
     keys.forEach(key => {
       if (meta[key] !== undefined) entry[key] = meta[key];
     });
 
     entries.push(entry);
-
-    // If this document is content-certified and has a doc-id, add to QR routing
-    if (meta['content-certified'] === 'true' && meta['doc-id']) {
-      qrRoutes[meta['doc-id']] = `${folder}/${file}`;
-    }
   });
 
-  // Write manifest for this folder
+  // Write the public manifest for this folder (active docs only)
   writeFile(outputPath, JSON.stringify(entries, null, 2));
   console.log(`${folder}/${folder}.json written with ${entries.length} active entries`);
 });
 
-// Write global QR routing file
-writeFile('qr-routes.json', JSON.stringify(qrRoutes, null, 2));
-console.log(`QR routes updated: ${Object.keys(qrRoutes).length} routes mapped`);
+// Write the universal page routing map (includes ALL doc-id entries: active + draft)
+writeFile('page-routes.json', JSON.stringify(pageRoutes, null, 2));
+console.log(`✔ page-routes.json updated with ${Object.keys(pageRoutes).length} entries`);
