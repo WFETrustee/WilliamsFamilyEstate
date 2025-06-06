@@ -137,3 +137,18 @@ img.pinned {
         line-height: 1.7;
     }
 }
+
+/* Injected shared styles from root style.css */
+.meta.status {
+  display: none !important;
+}
+
+.meta.pinned {
+  display: none !important;
+}
+
+.tm {
+  font-size: 66%;
+  vertical-align: super; /* optional: lifts it like a superscript */
+  /* opacity: 0.75;         /* optional: soften it visually */
+}
