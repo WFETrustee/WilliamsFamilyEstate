@@ -1,6 +1,6 @@
 /**
  * ROUTER MODULE: QR-based redirection via ?id=XYZ
- * Uses: /qr-routes.json
+ * Uses: /page-routes.json
  */
 async function handleQrRedirect() {
   const params = new URLSearchParams(window.location.search);
@@ -12,7 +12,7 @@ async function handleQrRedirect() {
   }
 
   try {
-    const res = await fetch('/qr-routes.json');
+    const res = await fetch('/page-routes.json');
     const routes = await res.json();
 
     if (routes[id]) {
