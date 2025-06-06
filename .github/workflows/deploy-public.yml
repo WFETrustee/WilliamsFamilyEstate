@@ -3,7 +3,7 @@ name: Deploy Active Content to Public Branch
 defaults:
   run:
     shell: bash
-    
+
 permissions:
   contents: write
 
@@ -24,9 +24,15 @@ jobs:
           rm -rf public
           mkdir public
 
-      - name: Copy all non-HTML assets to public/
+      - name: Copy all non-HTML public assets
         run: |
-          find . -type f ! -name '*.html' | while read filepath; do
+          find . -type f \( \
+            -name '*.css' -o \
+            -name '*.js' -o \
+            -name '*.json' -o \
+            -name '*.txt' -o \
+            -name 'CNAME' \
+          \) ! -path './.git/*' | while read filepath; do
             dir=$(dirname "$filepath")
             mkdir -p "public/$dir"
             cp "$filepath" "public/$filepath"
@@ -34,32 +40,25 @@ jobs:
 
       - name: Copy only active HTML files
         run: |
-          for file in $(find . -type f -name '*.html'); do
-            base=$(basename "$file")
-            dir=$(dirname "$file")
-
-            # Match meta tags with content="inactive"
-            pattern="(content)\\s*=\\s*[\"']inactive[\"']"
-            if grep -Pi "$pattern" "$file"; then
-              echo "Skipping inactive file: $file"
+          for file in $(find . -type f -name '*.html' ! -path './.git/*'); do
+            if grep -Pi 'content\s*=\s*["'\'']inactive["'\'']' "$file"; then
+              echo "Skipping inactive: $file"
               continue
             fi
-
+            dir=$(dirname "$file")
             mkdir -p "public/$dir"
             cp "$file" "public/$file"
             echo "Included: $file"
           done
 
-      - name: Switch to public branch and clean all old files
+      - name: Switch to public branch and clean old content
         run: |
           git fetch origin public || true
           git checkout public || git checkout -b public
-
-          # Wipe all tracked and untracked files
           git rm -rf . || true
           git clean -fdx
 
-      - name: Copy new public content to branch root
+      - name: Copy new content to root of public branch
         run: |
           cp -r public/* ./
           rm -rf public
@@ -69,7 +68,7 @@ jobs:
           git config user.name "WFE Bot"
           git config user.email "trustee@williamsfamilyestate.org"
 
-      - name: Commit and push to public
+      - name: Commit and push public content
         run: |
           git add .
           git commit -m "Deploy active content to public branch" || echo "No changes to commit"
