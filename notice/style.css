@@ -438,3 +438,58 @@ body {
             position: relative;
             z-index: 2;
         }
+
+/* Injected shared styles from root style.css */
+.main-nav {
+    background-color: #fff;
+    padding: 0 1rem; 
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.main-nav img {
+      height: 1.25em;
+      vertical-align: middle;
+      transition: transform 0.2s ease;
+    }
+
+.main-nav a:hover img {
+      transform: scale(1.5); /* Grows 50% larger on hover */
+    }
+
+.main-nav > ul {
+        max-width: 720px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0;
+        display: flex;
+        gap: 1.25rem;
+        list-style: none;
+    }
+
+.main-nav ul li a {
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+
+.main-nav ul li a:hover {
+            #background-color: #777;
+        }
+
+.main-nav ul li a.active {
+            background-color: #777;
+            color: #f1f1f1;
+            font-weight: bold;
+            padding: 0.4rem 0.75rem;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            margin-top: -4px; /* Merge into header */
+            position: relative;
+            z-index: 2;
+        }
