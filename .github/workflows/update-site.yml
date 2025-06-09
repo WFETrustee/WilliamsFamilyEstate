@@ -13,6 +13,8 @@ on:
       - master
     paths:
       - '**/*.html'
+      - '**/*.css'
+      - '**/*.js'
       - 'site-config.json'
       - '.github/scripts/**'
       - '.github/workflows/update-manifest.yml'
