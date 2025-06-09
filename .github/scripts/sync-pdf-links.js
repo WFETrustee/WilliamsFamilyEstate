@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const directory = "./public/emergency"; // Adjust as needed
+const directory = "./emergency"; // Adjust as needed
 
 function syncPdfLink(html, basename) {
   const hasPdf = fs.existsSync(path.join(directory, `${basename}.pdf`));
