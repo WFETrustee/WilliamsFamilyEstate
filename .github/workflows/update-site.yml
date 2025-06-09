@@ -16,8 +16,9 @@ on:
       - '**/*.css'
       - '**/*.js'
       - 'site-config.json'
+      - 'scripts/**'
       - '.github/scripts/**'
-      - '.github/workflows/update-manifest.yml'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
