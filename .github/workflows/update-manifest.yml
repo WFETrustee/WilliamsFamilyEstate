@@ -48,6 +48,9 @@ jobs:
       - name: Generate Page Routes
         run: node .github/scripts/generate-clean-path-redirects.js
 
+      - name: Sync up any direct link PDF files (PDF filename = HTML)
+        run: node .github/scripts/sync-pdf-links.js
+        
       - name: Strip BOM from HTML files
         run: |
           find . -type f -name '*.html' -exec sed -i '1s/^\xEF\xBB\xBF//' {} \;
