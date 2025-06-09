@@ -60,7 +60,11 @@ jobs:
 
       - name: Copy new content to root of public branch
         run: |
-          cp -r public/* ./
+          if [ -d public ] && [ "$(ls -A public)" ]; then
+            cp -r public/* ./
+          else
+            echo "No public content to copy."
+          fi
           rm -rf public
 
       - name: Configure Git identity
