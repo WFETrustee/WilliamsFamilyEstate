@@ -20,6 +20,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Show HTML files and status tags
+        run: |
+          echo "Listing all .html files..."
+          find . -name '*.html'
+          echo "Checking doc-status tags:"
+          find . -name '*.html' | while read f; do
+            echo -n "$f -> "
+            awk 'BEGIN{IGNORECASE=1}
+              /name=[\"\047]doc-status[\"\047]/ && /content=/ {
+                match($0, /content=[\"\047]([^\"\047]+)[\"\047]/, arr);
+                print tolower(arr[1])
+              }' "$f" || echo "(no status)"
+          done
+
       - name: Clean and create public folder
         run: |
           rm -rf public
