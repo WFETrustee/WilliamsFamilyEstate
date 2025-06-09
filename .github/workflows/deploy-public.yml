@@ -10,96 +10,30 @@ permissions:
 on:
   repository_dispatch:
     types: [deploy-public]
-  workflow_dispatch:
+  workflow_dispatch:  # Optional: for manual triggering
 
 jobs:
   publish-public-content:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Ensure we're on master branch
-        run: |
-          git checkout master
-          git pull
-
-      - name: Clean and create public folder
+      - name: Clean public folder
         run: |
           rm -rf public
           mkdir public
 
-<<<<<<< HEAD
-      - name: Copy root-level HTML files
-        run: |
-          find . -maxdepth 1 -type f -name '*.html' | while read file; do
-            echo "✓ Root HTML: $file"
-            cp "$file" "public/$(basename "$file")"
-=======
       - name: Copy all non-HTML assets to public/
         run: |
           find . -type f ! -name '*.html' | while read filepath; do
             dir=$(dirname "$filepath")
             mkdir -p "public/$dir"
             cp "$filepath" "public/$filepath"
->>>>>>> 923d452 (recovering old deploy-public.yml)
           done
 
-      - name: Copy styles and scripts folders
+      - name: Copy only active HTML files
         run: |
-<<<<<<< HEAD
-          for folder in styles scripts; do
-            if [ -d "$folder" ]; then
-              echo "✓ Copying $folder/"
-              mkdir -p "public/$folder"
-              cp -r "$folder/"* "public/$folder/"
-            fi
-          done
-
-      - name: Copy manifest JSON files from content folders
-        run: |
-          for folder in */; do
-            manifest="${folder%/}/${folder%/}.json"
-            if [ -f "$manifest" ]; then
-              echo "✓ Found manifest: $manifest"
-              mkdir -p "public/${folder%/}"
-              cp "$manifest" "public/${folder%/}/"
-            fi
-          done
-
-      - name: Copy valid doc-status HTMLs and matching PDFs
-        run: |
-          for file in $(find . -type f -name '*.html' ! -path './.git/*' ! -path './.github/*'); do
-            status=$(awk 'BEGIN{IGNORECASE=1}
-              /name=[\"\047]doc-status[\"\047]/ && /content=/ {
-                match($0, /content=[\"\047]([^\"\047]+)[\"\047]/, arr);
-                print tolower(arr[1])
-              }' "$file")
-
-            if [[ "$status" == "active" || "$status" == "draft" ]]; then
-              echo "✓ Including doc HTML: $file (status: $status)"
-              dir=$(dirname "$file")
-              mkdir -p "public/$dir"
-              cp "$file" "public/$file"
-
-              pdf="${file%.html}.pdf"
-              if [[ -f "$pdf" ]]; then
-                cp "$pdf" "public/$pdf"
-                echo "  └─ Included PDF: $pdf"
-              fi
-            fi
-          done
-
-      - name: Abort if public folder is empty
-        run: |
-          if [ ! "$(ls -A public)" ]; then
-            echo "No eligible content to publish. Aborting deployment."
-            exit 1
-          fi
-
-      - name: Switch to public branch and clean old content
-=======
           for file in $(find . -type f -name '*.html'); do
             base=$(basename "$file")
             dir=$(dirname "$file")
@@ -117,39 +51,25 @@ jobs:
           done
 
       - name: Switch to public branch and clean all old files
->>>>>>> 923d452 (recovering old deploy-public.yml)
         run: |
-          git fetch origin public:public || true
+          git fetch origin public || true
           git checkout public || git checkout -b public
 
           # Wipe all tracked and untracked files
           git rm -rf . || true
           git clean -fdx
 
-<<<<<<< HEAD
-      - name: Copy new public content to root
-=======
       - name: Copy new public content to branch root
->>>>>>> 923d452 (recovering old deploy-public.yml)
         run: |
           cp -r public/* ./
           rm -rf public
-
-      - name: Log deployed files
-        run: |
-          echo "Final deployed content:"
-          find . -type f ! -path './.git/*' ! -path './.github/*'
 
       - name: Configure Git identity
         run: |
           git config user.name "WFE Bot"
           git config user.email "trustee@williamsfamilyestate.org"
 
-<<<<<<< HEAD
-      - name: Commit and push to public branch
-=======
       - name: Commit and push to public
->>>>>>> 923d452 (recovering old deploy-public.yml)
         run: |
           git add .
           git commit -m "Deploy active content to public branch" || echo "No changes to commit"
