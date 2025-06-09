@@ -20,41 +20,45 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Show HTML files and status tags
+      - name: Ensure we're on master branch
         run: |
-          echo "Listing all .html files..."
-          find . -name '*.html'
-          echo "Checking doc-status tags:"
-          find . -name '*.html' | while read f; do
-            echo -n "$f -> "
-            awk 'BEGIN{IGNORECASE=1}
-              /name=[\"\047]doc-status[\"\047]/ && /content=/ {
-                match($0, /content=[\"\047]([^\"\047]+)[\"\047]/, arr);
-                print tolower(arr[1])
-              }' "$f" || echo "(no status)"
-          done
+          git checkout master
+          git pull
 
       - name: Clean and create public folder
         run: |
           rm -rf public
           mkdir public
 
-      - name: Copy static site assets (non-HTML)
+      - name: Copy root-level HTML files
         run: |
-          find . -type f \( \
-            -name '*.css' -o \
-            -name '*.js' -o \
-            -name '*.json' -o \
-            -name '*.txt' -o \
-            -name 'CNAME' \
-          \) ! -path './.git/*' ! -path './.github/*' | while read filepath; do
-            dir=$(dirname "$filepath")
-            mkdir -p "public/$dir"
-            cp "$filepath" "public/$filepath"
-            echo "✓ Copied static asset: $filepath"
+          find . -maxdepth 1 -type f -name '*.html' | while read file; do
+            echo "✓ Root HTML: $file"
+            cp "$file" "public/$(basename "$file")"
           done
 
-      - name: Copy valid HTML content and matching PDFs
+      - name: Copy styles and scripts folders
+        run: |
+          for folder in styles scripts; do
+            if [ -d "$folder" ]; then
+              echo "✓ Copying $folder/"
+              mkdir -p "public/$folder"
+              cp -r "$folder/"* "public/$folder/"
+            fi
+          done
+
+      - name: Copy manifest JSON files from content folders
+        run: |
+          for folder in */; do
+            manifest="${folder%/}/${folder%/}.json"
+            if [ -f "$manifest" ]; then
+              echo "✓ Found manifest: $manifest"
+              mkdir -p "public/${folder%/}"
+              cp "$manifest" "public/${folder%/}/"
+            fi
+          done
+
+      - name: Copy valid doc-status HTMLs and matching PDFs
         run: |
           for file in $(find . -type f -name '*.html' ! -path './.git/*' ! -path './.github/*'); do
             status=$(awk 'BEGIN{IGNORECASE=1}
@@ -62,20 +66,18 @@ jobs:
                 match($0, /content=[\"\047]([^\"\047]+)[\"\047]/, arr);
                 print tolower(arr[1])
               }' "$file")
-      
+
             if [[ "$status" == "active" || "$status" == "draft" ]]; then
-              echo "✓ Including HTML: $file (status: $status)"
+              echo "✓ Including doc HTML: $file (status: $status)"
               dir=$(dirname "$file")
               mkdir -p "public/$dir"
               cp "$file" "public/$file"
-      
+
               pdf="${file%.html}.pdf"
               if [[ -f "$pdf" ]]; then
                 cp "$pdf" "public/$pdf"
                 echo "  └─ Included PDF: $pdf"
               fi
-            else
-              echo "✗ Skipping HTML: $file (status: $status)"
             fi
           done
 
@@ -93,14 +95,14 @@ jobs:
           git rm -rf . || true
           git clean -fdx
 
-      - name: Copy generated content to public branch root
+      - name: Copy new public content to root
         run: |
           cp -r public/* ./
           rm -rf public
 
       - name: Log deployed files
         run: |
-          echo "Deployed content includes:"
+          echo "Final deployed content:"
           find . -type f ! -path './.git/*' ! -path './.github/*'
 
       - name: Configure Git identity
