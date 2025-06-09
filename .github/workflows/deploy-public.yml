@@ -43,16 +43,18 @@ jobs:
       - name: Copy valid HTML content and matching PDFs
         run: |
           for file in $(find . -type f -name '*.html' ! -path './.git/*' ! -path './.github/*'); do
-            status=$(grep -i '<meta[^>]*name=["'"'"']doc-status["'"'"']' "$file" \
-                     | sed -nE 's/.*content=["'"'"']([^"'"'"']+)["'"'"'].*/\1/p' \
-                     | tr '[:upper:]' '[:lower:]')
-
+            status=$(awk 'BEGIN{IGNORECASE=1}
+              /name=[\"\047]doc-status[\"\047]/ && /content=/ {
+                match($0, /content=[\"\047]([^\"\047]+)[\"\047]/, arr);
+                print tolower(arr[1])
+              }' "$file")
+      
             if [[ "$status" == "active" || "$status" == "draft" ]]; then
               echo "✓ Including HTML: $file (status: $status)"
               dir=$(dirname "$file")
               mkdir -p "public/$dir"
               cp "$file" "public/$file"
-
+      
               pdf="${file%.html}.pdf"
               if [[ -f "$pdf" ]]; then
                 cp "$pdf" "public/$pdf"
