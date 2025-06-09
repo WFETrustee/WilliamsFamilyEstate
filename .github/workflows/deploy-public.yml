@@ -10,7 +10,7 @@ permissions:
 on:
   repository_dispatch:
     types: [deploy-public]
-  workflow_dispatch:  # Optional: for manual triggering
+  workflow_dispatch:
 
 jobs:
   publish-public-content:
@@ -38,42 +38,4 @@ jobs:
             cp "$filepath" "public/$filepath"
           done
 
-      - name: Copy only active HTML files
-        run: |
-          for file in $(find . -type f -name '*.html' ! -path './.git/*'); do
-            if grep -Pi 'content\s*=\s*["'\'']inactive["'\'']' "$file"; then
-              echo "Skipping inactive: $file"
-              continue
-            fi
-            dir=$(dirname "$file")
-            mkdir -p "public/$dir"
-            cp "$file" "public/$file"
-            echo "Included: $file"
-          done
-
-      - name: Switch to public branch and clean old content
-        run: |
-          git fetch origin public || true
-          git checkout public || git checkout -b public
-          git rm -rf . || true
-          git clean -fdx
-
-      - name: Copy new content to root of public branch
-        run: |
-          if [ -d public ] && [ "$(ls -A public)" ]; then
-            cp -r public/* ./
-          else
-            echo "No public content to copy."
-          fi
-          rm -rf public
-
-      - name: Configure Git identity
-        run: |
-          git config user.name "WFE Bot"
-          git config user.email "trustee@williamsfamilyestate.org"
-
-      - name: Commit and push public content
-        run: |
-          git add .
-          git commit -m "Deploy active content to public branch" || echo "No changes to commit"
-          git push origin HEAD:public --force
+      - name: Copy only active or draf
