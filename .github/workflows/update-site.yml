@@ -1,4 +1,4 @@
-name: Auto-generate Manifests and Metadata Stubs
+name: Auto-generate site structure, manifest files, metadata stubs, CSS styles, etc
 
 defaults:
   run:
