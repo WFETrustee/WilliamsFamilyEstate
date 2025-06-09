@@ -3,7 +3,7 @@ name: Deploy Active Content to Public Branch
 defaults:
   run:
     shell: bash
-
+    
 permissions:
   contents: write
 
@@ -30,15 +30,25 @@ jobs:
           rm -rf public
           mkdir public
 
+<<<<<<< HEAD
       - name: Copy root-level HTML files
         run: |
           find . -maxdepth 1 -type f -name '*.html' | while read file; do
             echo "✓ Root HTML: $file"
             cp "$file" "public/$(basename "$file")"
+=======
+      - name: Copy all non-HTML assets to public/
+        run: |
+          find . -type f ! -name '*.html' | while read filepath; do
+            dir=$(dirname "$filepath")
+            mkdir -p "public/$dir"
+            cp "$filepath" "public/$filepath"
+>>>>>>> 923d452 (recovering old deploy-public.yml)
           done
 
       - name: Copy styles and scripts folders
         run: |
+<<<<<<< HEAD
           for folder in styles scripts; do
             if [ -d "$folder" ]; then
               echo "✓ Copying $folder/"
@@ -89,13 +99,38 @@ jobs:
           fi
 
       - name: Switch to public branch and clean old content
+=======
+          for file in $(find . -type f -name '*.html'); do
+            base=$(basename "$file")
+            dir=$(dirname "$file")
+
+            # Match meta tags with content="inactive"
+            pattern="(content)\\s*=\\s*[\"']inactive[\"']"
+            if grep -Pi "$pattern" "$file"; then
+              echo "Skipping inactive file: $file"
+              continue
+            fi
+
+            mkdir -p "public/$dir"
+            cp "$file" "public/$file"
+            echo "Included: $file"
+          done
+
+      - name: Switch to public branch and clean all old files
+>>>>>>> 923d452 (recovering old deploy-public.yml)
         run: |
           git fetch origin public:public || true
           git checkout public || git checkout -b public
+
+          # Wipe all tracked and untracked files
           git rm -rf . || true
           git clean -fdx
 
+<<<<<<< HEAD
       - name: Copy new public content to root
+=======
+      - name: Copy new public content to branch root
+>>>>>>> 923d452 (recovering old deploy-public.yml)
         run: |
           cp -r public/* ./
           rm -rf public
@@ -110,7 +145,11 @@ jobs:
           git config user.name "WFE Bot"
           git config user.email "trustee@williamsfamilyestate.org"
 
+<<<<<<< HEAD
       - name: Commit and push to public branch
+=======
+      - name: Commit and push to public
+>>>>>>> 923d452 (recovering old deploy-public.yml)
         run: |
           git add .
           git commit -m "Deploy active content to public branch" || echo "No changes to commit"
