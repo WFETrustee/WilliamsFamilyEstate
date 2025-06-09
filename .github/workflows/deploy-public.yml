@@ -15,16 +15,17 @@ on:
 jobs:
   publish-public-content:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Clean public folder
+      - name: Clean and create public folder
         run: |
           rm -rf public
           mkdir public
 
-      - name: Copy all non-HTML public assets
+      - name: Copy static site assets (non-HTML)
         run: |
           find . -type f \( \
             -name '*.css' -o \
@@ -32,10 +33,67 @@ jobs:
             -name '*.json' -o \
             -name '*.txt' -o \
             -name 'CNAME' \
-          \) ! -path './.git/*' | while read filepath; do
+          \) ! -path './.git/*' ! -path './.github/*' | while read filepath; do
             dir=$(dirname "$filepath")
             mkdir -p "public/$dir"
             cp "$filepath" "public/$filepath"
+            echo "✓ Copied static asset: $filepath"
           done
 
-      - name: Copy only active or draf
+      - name: Copy valid HTML content and matching PDFs
+        run: |
+          for file in $(find . -type f -name '*.html' ! -path './.git/*' ! -path './.github/*'); do
+            status=$(grep -i '<meta[^>]*name=["'"'"']doc-status["'"'"']' "$file" \
+                     | sed -nE 's/.*content=["'"'"']([^"'"'"']+)["'"'"'].*/\1/p' \
+                     | tr '[:upper:]' '[:lower:]')
+
+            if [[ "$status" == "active" || "$status" == "draft" ]]; then
+              echo "✓ Including HTML: $file (status: $status)"
+              dir=$(dirname "$file")
+              mkdir -p "public/$dir"
+              cp "$file" "public/$file"
+
+              pdf="${file%.html}.pdf"
+              if [[ -f "$pdf" ]]; then
+                cp "$pdf" "public/$pdf"
+                echo "  └─ Included PDF: $pdf"
+              fi
+            else
+              echo "✗ Skipping HTML: $file (status: $status)"
+            fi
+          done
+
+      - name: Abort if public folder is empty
+        run: |
+          if [ ! "$(ls -A public)" ]; then
+            echo "No eligible content to publish. Aborting deployment."
+            exit 1
+          fi
+
+      - name: Switch to public branch and clean old content
+        run: |
+          git fetch origin public:public || true
+          git checkout public || git checkout -b public
+          git rm -rf . || true
+          git clean -fdx
+
+      - name: Copy generated content to public branch root
+        run: |
+          cp -r public/* ./
+          rm -rf public
+
+      - name: Log deployed files
+        run: |
+          echo "Deployed content includes:"
+          find . -type f ! -path './.git/*' ! -path './.github/*'
+
+      - name: Configure Git identity
+        run: |
+          git config user.name "WFE Bot"
+          git config user.email "trustee@williamsfamilyestate.org"
+
+      - name: Commit and push to public branch
+        run: |
+          git add .
+          git commit -m "Deploy active content to public branch" || echo "No changes to commit"
+          git push origin HEAD:public --force
