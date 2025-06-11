@@ -125,6 +125,8 @@ function startPublish(config = siteConfig) {
   const baseFolder = window.location.pathname.split("/").find(p => p && p !== "index.html") || "content";
   const templatePath = `/${baseFolder}/${baseFolder}_template.html`;
   const jsonPath = `/${baseFolder}/${baseFolder}.json`;
+  //const jsonPath = `/${baseFolder}/${baseFolder}.json?ts=${Date.now()}`; //only use during dev to bypass caching
+
 
   fetch(templatePath)
     .then(res => res.text())
