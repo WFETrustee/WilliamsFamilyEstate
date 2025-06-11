@@ -26,25 +26,23 @@ jobs:
 
       - name: Copy all non-HTML assets to public/
         run: |
-          find . -type f ! -name '*.html' | while read filepath; do
+          find . -type f ! -path './.git/*' ! -path './.github/*' ! -path './public/*' \
+                 ! -path './.*' ! -name '*.html' | while read filepath; do
             dir=$(dirname "$filepath")
             mkdir -p "public/$dir"
             cp "$filepath" "public/$filepath"
           done
 
-      - name: Copy only active HTML files
+      - name: Don't copy inactive HTML files
         run: |
-          for file in $(find . -type f -name '*.html'); do
-            base=$(basename "$file")
-            dir=$(dirname "$file")
-
-            # Match meta tags with content="inactive"
+          find . -type f -name '*.html' ! -path './.git/*' ! -path './.github/*' ! -path './public/*' \
+                 ! -path './.*' | while read file; do
             pattern="(content)\\s*=\\s*[\"']inactive[\"']"
             if grep -Pi "$pattern" "$file"; then
               echo "Skipping inactive file: $file"
               continue
             fi
-
+            dir=$(dirname "$file")
             mkdir -p "public/$dir"
             cp "$file" "public/$file"
             echo "Included: $file"
