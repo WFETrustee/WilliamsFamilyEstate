@@ -33,6 +33,19 @@ jobs:
       - name: Copy only active HTML files to /tmp/public
         run: node .github/scripts/utils/copy-files.js html /tmp/public
 
+      - name: Audit staged public content
+        run: |
+          echo "Public content staged at /tmp/public:"
+          tree /tmp/public || find /tmp/public
+          echo ""
+          echo "File count:"
+          find /tmp/public -type f | wc -l
+      
+          if [ $(find /tmp/public -type f | wc -l) -eq 0 ]; then
+            echo "No files staged for deployment. Aborting to prevent blank commit."
+            exit 1
+          fi
+
       - name: Switch to public branch and clean all old files
         run: |
           git fetch origin public || true
