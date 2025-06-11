@@ -34,6 +34,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Generate dynamic site config
+        run: node .github/scripts/generate-site-config.js
+
       - name: Install script dependencies (postcss cheerio + glob + node-fetch)
         working-directory: .github/scripts
         run: npm install postcss postcss-safe-parser cheerio glob node-fetch@2 --no-save
