@@ -6,41 +6,48 @@
 // - Supports folder-specific date formats and pinned documents
 // - Avoids runtime parsing of HTML content files
 // - Allows meta-data to define date formats for each content location.
+// - Respects the declarative metadata defined in each template,
+// - Allows us to keep document rendering structured, predictable, and
+//     easily styled later via CSS without hardcoding anything.
 // ==========================================================
 
 function parseTemplateMetadata(templateHTML) {
+  // Parse the template into a DOM object so we can extract all metadata <meta> tags
   const templateDoc = document.createElement("html");
   templateDoc.innerHTML = templateHTML;
 
+  // Look for all meta fields that follow our custom doc-* naming convention
   const metaElements = Array.from(templateDoc.querySelectorAll('meta[name^="doc-"]'));
   const groupedMeta = {};
 
   metaElements.forEach(meta => {
-    const key = meta.getAttribute("name");
-    const group = meta.getAttribute("data-group") || null;
-    const style = meta.getAttribute("data-style") || null;
-    const label = meta.getAttribute("data-label") ||
+    const key = meta.getAttribute("name");                   // actual field name (e.g., doc-author)
+    const group = meta.getAttribute("data-group") || null;   // optional visual grouping for layout
+    const style = meta.getAttribute("data-style") || null;   // optional style hint
+    const label = meta.getAttribute("data-label") ||         // human-readable label override
       key.replace("doc-", "").replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
-    const formatHint = meta.getAttribute("content") || "";
+    const formatHint = meta.getAttribute("content") || "";   // used for date formats etc.
 
-    const metaDef = { key, group, style, label, formatHint };
+    // This is the magic line that creates a CSS-friendly class from our doc-* field
+    const className = key.replace("doc-", "meta-").toLowerCase();
+
+    const metaDef = { key, group, style, label, formatHint, className };
     const target = group || "__solo__";
 
     if (!groupedMeta[target]) groupedMeta[target] = [];
-    groupedMeta[target].push(metaDef);
+    groupedMeta[target].push(metaDef); // push each field into its logical display group
   });
 
   return { groupedMeta };
 }
 
-/**
- * Renders a single entry block using template definitions and folder context.
- */
 function renderContentEntry(entry, groupedMeta, baseFolder) {
+  // Start assembling the visual block
   const wrapper = document.createElement("div");
   wrapper.className = "content";
   wrapper.style.position = "relative";
 
+  // If this doc is pinned, show a pushpin icon
   const enablePin = siteConfig?.display?.enablePushpinIcon ?? true;
   if (enablePin && (entry["doc-pinned"] === "true" || entry["doc-pinned"] === true)) {
     const pin = document.createElement("img");
@@ -50,43 +57,48 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
     wrapper.appendChild(pin);
   }
 
+  // Optional document image (e.g. a preview or illustration)
   if (entry["doc-image"]) {
     const img = document.createElement("img");
     img.src = entry["doc-image"];
     img.alt = entry["doc-title"] || "Document Image";
-    img.className = "content-image"; // You can style this
+    img.className = "content-image"; // styling handled in CSS
     wrapper.appendChild(img);
   }
 
+  // Main title of the document
   const h2 = document.createElement("h2");
   h2.textContent = entry["doc-title"] || "Untitled";
   wrapper.appendChild(h2);
 
-  // Filter and organize groups
+  // Now prepare all the meta fields (besides title) and group them accordingly
   const filteredGroups = {};
   for (const [group, metas] of Object.entries(groupedMeta)) {
     const subset = metas.filter(({ key }) => key !== "doc-title");
     if (subset.length) filteredGroups[group] = subset;
   }
 
+  // Render all metadata fields into either grouped spans or standalone paragraphs
   Object.entries(filteredGroups).forEach(([groupKey, metas]) => {
     if (groupKey === "__solo__") {
-      metas.forEach(({ key, label, style, formatHint }) => {
+      // Fields that stand on their own (not in a group container)
+      metas.forEach(({ key, label, style, formatHint, className }) => {
         if (entry[key]) {
           const p = document.createElement("p");
-          p.className = "meta";
-          if (style) p.classList.add(style);
+          p.classList.add("meta", className); // Assign both default + unique CSS class
+          if (style) p.classList.add(style);  // Extra class if template requested it
           p.innerHTML = renderValue(label, entry[key], true, style, formatHint);
           wrapper.appendChild(p);
         }
       });
     } else {
+      // Fields grouped into horizontal lines (spans inside div)
       const group = document.createElement("div");
       group.className = "meta-group";
-      metas.forEach(({ key, label, style, formatHint }) => {
+      metas.forEach(({ key, label, style, formatHint, className }) => {
         if (entry[key]) {
           const span = document.createElement("span");
-          span.className = "meta";
+          span.classList.add("meta", className);
           if (style) span.classList.add(style);
           span.innerHTML = renderValue(label, entry[key], false, style, formatHint);
           group.appendChild(span);
@@ -96,6 +108,7 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
     }
   });
 
+  // Link to the full document file (HTML version)
   const link = document.createElement("a");
   link.href = `/${baseFolder}/${entry.filename}`;
   link.textContent = "View Full Document →";
@@ -104,14 +117,11 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
   return wrapper;
 }
 
-/**
- * Starts the content publishing process by loading the template and entries JSON.
- * Applies filters based on doc-status and siteConfig.mode.publish.
- */
 function startPublish(config = siteConfig) {
   const live = document.getElementById("live-content");
   if (!live) return;
 
+  // Determine the folder name from URL path
   const baseFolder = window.location.pathname.split("/").find(p => p && p !== "index.html") || "content";
   const templatePath = `/${baseFolder}/${baseFolder}_template.html`;
   const jsonPath = `/${baseFolder}/${baseFolder}.json`;
@@ -120,9 +130,11 @@ function startPublish(config = siteConfig) {
     .then(res => res.text())
     .then(templateHTML => {
       const { groupedMeta } = parseTemplateMetadata(templateHTML);
+
       return fetch(jsonPath)
         .then(res => res.json())
         .then(entries => {
+          // Only show documents based on their publication status
           const mode = config?.mode?.publish || "live";
           let filtered;
 
@@ -141,6 +153,7 @@ function startPublish(config = siteConfig) {
       const pinnedContainer = document.getElementById("pinned-content");
       const regularContainer = document.getElementById("regular-content");
 
+      // Separate pinned from unpinned, and sort newest first
       const pinned = entries
         .filter(e => e["doc-pinned"] === "true" || e["doc-pinned"] === true)
         .sort((a, b) => new Date(b["doc-date"]) - new Date(a["doc-date"]));
@@ -149,6 +162,7 @@ function startPublish(config = siteConfig) {
         .filter(e => !(e["doc-pinned"] === "true" || e["doc-pinned"] === true))
         .sort((a, b) => new Date(b["doc-date"]) - new Date(a["doc-date"]));
 
+      // Render all entries into the appropriate DOM sections
       pinned.forEach(e => pinnedContainer.appendChild(renderContentEntry(e, groupedMeta, baseFolder)));
       unpinned.forEach(e => regularContainer.appendChild(renderContentEntry(e, groupedMeta, baseFolder)));
     })
@@ -157,4 +171,3 @@ function startPublish(config = siteConfig) {
       console.error("startPublish error:", err);
     });
 }
-
