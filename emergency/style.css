@@ -27,7 +27,7 @@ main {
 .meta.id {
 }
 
-.meta.certified {
+.meta-certified {
     display: none !important;
 }
 
