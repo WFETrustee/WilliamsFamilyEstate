@@ -3,14 +3,14 @@ name: Deploy Active Content to Public Branch
 defaults:
   run:
     shell: bash
-    
+
 permissions:
   contents: write
 
 on:
   repository_dispatch:
     types: [deploy-public]
-  workflow_dispatch:  # Optional: for manual triggering
+  workflow_dispatch:
 
 jobs:
   publish-public-content:
@@ -19,48 +19,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Clean public folder
-        run: |
-          rm -rf public
-          mkdir public
+      - name: Set up Node.js (if needed)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Copy all non-HTML assets to public/
-        run: |
-          find . -type f ! -path './.git/*' ! -path './.github/*' ! -path './public/*' \
-                 ! -path './.*' ! -name '*.html' | while read filepath; do
-            dir=$(dirname "$filepath")
-            mkdir -p "public/$dir"
-            cp "$filepath" "public/$filepath"
-          done
+      - name: Create temp public staging folder
+        run: mkdir -p /tmp/public
 
-      - name: Don't copy inactive HTML files
-        run: |
-          find . -type f -name '*.html' ! -path './.git/*' ! -path './.github/*' ! -path './public/*' \
-                 ! -path './.*' | while read file; do
-            pattern="(content)\\s*=\\s*[\"']inactive[\"']"
-            if grep -Pi "$pattern" "$file"; then
-              echo "Skipping inactive file: $file"
-              continue
-            fi
-            dir=$(dirname "$file")
-            mkdir -p "public/$dir"
-            cp "$file" "public/$file"
-            echo "Included: $file"
-          done
+      - name: Copy all non-HTML assets to /tmp/public
+        run: node .github/scripts/utils/copy-files.js assets /tmp/public
+
+      - name: Copy only active HTML files to /tmp/public
+        run: node .github/scripts/utils/copy-files.js html /tmp/public
 
       - name: Switch to public branch and clean all old files
         run: |
           git fetch origin public || true
           git checkout public || git checkout -b public
-
-          # Wipe all tracked and untracked files
           git rm -rf . || true
           git clean -fdx
 
       - name: Copy new public content to branch root
-        run: |
-          cp -r public/* ./
-          rm -rf public
+        run: cp -r /tmp/public/* ./
 
       - name: Configure Git identity
         run: |
