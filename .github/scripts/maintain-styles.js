@@ -70,17 +70,34 @@ function generateCssStubs() {
 
     if (classNames.size === 0) return;
 
-    const stubCss = Array.from(classNames)
+    // Load current CSS file contents
+    let originalCss = '';
+    if (fs.existsSync(stylePath)) {
+      originalCss = fs.readFileSync(stylePath, 'utf-8');
+    }
+
+    const existingMetaRegex = /\.meta\.[a-z0-9_-]+\s*\{/gi;
+    const existingSelectors = new Set(
+      (originalCss.match(existingMetaRegex) || [])
+        .map(s => s.trim().split(' ')[0])
+    );
+
+    const missing = Array.from(classNames).filter(c => !existingSelectors.has(`.${c}`));
+    if (missing.length === 0) {
+      console.log(`✓ ${folder}/style.css already contains all meta stubs.`);
+      return;
+    }
+
+    const newStubs = missing
       .sort()
       .map(c => `.${c} {\n  /* style for ${c} */\n}`)
       .join('\n\n');
 
-    // Always regenerate for now — can be enhanced with hash checking later
-    writeFile(stylePath, stubCss.trim() + '\n');
-    console.log(`${folder}/style.css updated with ${classNames.size} stubs.`);
+    const finalCss = `${originalCss.trim()}\n\n/* Auto-generated meta stubs */\n${newStubs}\n`;
+    writeFile(stylePath, finalCss);
+    console.log(`✔ ${folder}/style.css: Appended ${missing.length} new meta stubs.`);
   });
 }
-
 
 
 // ------------------------------------------------------------
@@ -199,6 +216,7 @@ function cleanStyleLinks() {
   });
 }
 
+
 // ------------------------------------------------------------
 // 4. Inject missing <link rel="stylesheet"> tags into <head>
 // ------------------------------------------------------------
@@ -247,8 +265,9 @@ function injectStyleLinks() {
   });
 }
 
+
 // ------------------------------------------------------------
-// Execute all requested operations in order
+// Execute all requested operations in order,i didn't need to do this but it's cool and honestly it's nice for convenience
 // ------------------------------------------------------------
 (async () => {
   if (modesToRun.includes('stubs')) generateCssStubs();
