@@ -1,31 +1,31 @@
 {
   "css": {
-  "autoOrganize": true,
-  "allowInlineOverrides": true,
-  "displayPriority": {
-    ".main-nav": 1,
-    ".site-header": 2,
-    ".announce": 3,
-    ".content": 4,
-    ".meta*": 5,
-    ".site-footer": 99
-  },
-  "excludeFromRootDistribute": [
-    ".main-nav",
-    ".site-header",
-    ".site-footer",
-    "#site-header",
-    "#site-footer",
-    ".tm"
-  ],
-  "alwaysDistribute": [
-    ".announce",
-    ".content",
-    ".date",
-    ".meta-group",
-    ".meta.title",
-    ".meta.date"
-  ]
+    "autoOrganize": true,
+    "allowInlineOverrides": true,
+    "displayPriority": {
+      ".main-nav": 1,
+      ".site-header": 2,
+      ".announce": 3,
+      ".content": 4,
+      ".meta*": 5,
+      ".site-footer": 99
+    },
+    "excludeFromRootDistribute": [
+      ".main-nav",
+      ".site-header",
+      ".site-footer",
+      "#site-header",
+      "#site-footer",
+      ".tm"
+    ],
+    "alwaysDistribute": [
+      ".announce",
+      ".content",
+      ".date",
+      ".meta-group",
+      ".meta.title",
+      ".meta.date"
+    ]
   },
   "display": {
     "defaultDateFormat": "MMMM d, yyyy",
@@ -50,5 +50,7 @@
   "automation": {
     "generateSitemap": true,
     "archiveToInternetArchive": false
-  }
+  },
+  "buildHash": "bab0654",
+  "buildDate": "2025-06-12T00:48:47.817Z"
 }
