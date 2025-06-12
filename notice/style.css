@@ -1,181 +1,203 @@
-/* Injected shared styles from root style.css */
+/* ===================================== */
+/* Shared Styles – Reorganized           */
+/* ===================================== */
 
-.announce {
-    background-color: #e6f2ff;
-    color: #222;
-    padding: 1rem 2rem;
-    border-radius: 4px;
-    margin-bottom: 2rem;    
-}
-
-.build-meta {
-  font-size: 0.8em;
-  color: #777;
-  margin-top: 0.5em;
-}
-
-.content {
-  position: relative;
-  margin-bottom: 2rem;
-  padding: 1rem;
-  border-left: 4px solid #888;
-  border-radius: 6px;
-  background: #f7f7f7;
-}
-
-.content h2 {
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  font-size: 1.35rem;
-}
-
-.content p {
-  margin: 0.25rem 0;
-  line-height: 1.5;
-}
-
-.content-image {
-  width: 100%;
-  max-height: 300px;
-  object-fit: cover;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-}
-
-.content.pinned {
-  border-left-color: #663399;
-  background-color: #f9f9f9;
-}
-
-.date {
-  font-style: italic;
-  color: #555;
-}
-
-.meta-group {
-  display: flex;
-  justify-content: space-between; /* Spread evenly */
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
-  border-bottom: 1px dotted #ccc;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
-  font-size: 0.95rem;
-  color: #444;
-}
-
-.meta-group + .meta-group {
-  border-bottom: 1px dotted #ccc;
-  padding-top: 0.5em;
-  margin-top: 0.5em;
-}
-
-.meta-group span {
-  flex: 1 1 auto;
-  min-width: 100px;
-}
-
-.meta.block-id {
-  /* style for meta.block-id */
-}
-
-.meta.category {
-  /* style for meta.category */
-}
-
-.meta.commit-ledger {
-  /* style for meta.commit-ledger */
-}
-
-.meta.date {
-  /* style for meta.date */
-}
-
-.meta.id {
-  /* style for meta.id */
-}
-
-.meta.image {
-  /* style for meta.image */
-}
-
-.meta.ledger-category {
-  /* style for meta.ledger-category */
-}
-
-.meta.ledger-notes {
-  /* style for meta.ledger-notes */
-}
-
-.meta.ledger-type {
-  /* style for meta.ledger-type */
-}
-
-.meta.pinned {
-  /* style for meta.pinned */
-}
-
-.meta.private-hash {
-  /* style for meta.private-hash */
-}
-
-.meta.status {
-  /* style for meta.status */
-}
-
-.meta.summary {
-  /* style for meta.summary */
-}
-
-.meta.template-hash {
-  /* style for meta.template-hash */
-}
-
-.meta.title {
-  /* style for meta.title */
-}
-
-.meta.venue {
-  /* style for meta.venue */
-}
-
-.pdf-icon-inline {
-  height: 1em;
-  vertical-align: middle;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-.pdf-icon-inline:hover {
-  transform: scale(1.3);
-  opacity: 1;
-}
-
-.pdf-link {
-  position: static; /* or just remove this line entirely */
-  display: inline-block;
-  margin-left: 0.5em;
-}
+/* =============================== */
+/* Group: Global Layout */
+/* =============================== */
 
 body {
-    font-family: Georgia, serif;
-    margin: 0;
-    padding: 0;
     background: #fff;
     color: #222;
+    font-family: Georgia, serif;
     line-height: 1.6;
-}
-
-img.pinned {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  width: 1.5rem;
-  height: auto;
-  z-index: 5;
+    margin: 0;
+    padding: 0;
 }
 
 main {
-    max-width: 720px;
     margin: 2rem auto;
+    max-width: 720px;
     padding: 0 1rem;
+}
+
+/* =============================== */
+/* Group: Content */
+/* =============================== */
+
+.announce {
+    background-color: #e6f2ff;
+    border-radius: 4px;
+    color: #222;
+    margin-bottom: 2rem;
+    padding: 1rem 2rem;
+}
+
+.content {
+    background: #f7f7f7;
+    border-left: 4px solid #888;
+    border-radius: 6px;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    position: relative;
+}
+
+.content h2 {
+    font-size: 1.35rem;
+    margin-bottom: 0.5rem;
+    margin-top: 0;
+}
+
+.content p {
+    line-height: 1.5;
+    margin: 0.25rem 0;
+}
+
+.content-image {
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    max-height: 300px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.content.pinned {
+    background-color: #f9f9f9;
+    border-left-color: #663399;
+}
+
+.date {
+    color: #555;
+    font-style: italic;
+}
+
+img.pinned {
+    height: auto;
+    position: absolute;
+    right: 0.5rem;
+    top: 0.5rem;
+    width: 1.5rem;
+    z-index: 5;
+}
+
+/* =============================== */
+/* Group: Metadata */
+/* =============================== */
+
+.meta.block-id {
+    /* style for meta.block-id */
+}
+
+.meta.category {
+    /* style for meta.category */
+}
+
+.meta.commit-ledger {
+    /* style for meta.commit-ledger */
+}
+
+.meta.date {
+    /* style for meta.date */
+}
+
+.meta.id {
+    /* style for meta.id */
+}
+
+.meta.image {
+    /* style for meta.image */
+}
+
+.meta.ledger-category {
+    /* style for meta.ledger-category */
+}
+
+.meta.ledger-notes {
+    /* style for meta.ledger-notes */
+}
+
+.meta.ledger-type {
+    /* style for meta.ledger-type */
+}
+
+.meta.pinned {
+    /* style for meta.pinned */
+}
+
+.meta.private-hash {
+    /* style for meta.private-hash */
+}
+
+.meta.status {
+    /* style for meta.status */
+}
+
+.meta.summary {
+    /* style for meta.summary */
+}
+
+.meta.template-hash {
+    /* style for meta.template-hash */
+}
+
+.meta.title {
+    /* style for meta.title */
+}
+
+.meta.venue {
+    /* style for meta.venue */
+}
+
+.meta-group {
+    border-bottom: 1px dotted #ccc;
+    color: #444;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 0.95rem;
+    gap: 0.5rem 1rem;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+}
+
+.meta-group + .meta-group {
+    border-bottom: 1px dotted #ccc;
+    margin-top: 0.5em;
+    padding-top: 0.5em;
+}
+
+.meta-group span {
+    flex: 1 1 auto;
+    min-width: 100px;
+}
+
+/* =============================== */
+/* Group: Emergency Extras */
+/* =============================== */
+
+.pdf-icon-inline {
+    height: 1em;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    vertical-align: middle;
+}
+
+.pdf-icon-inline:hover {
+    opacity: 1;
+    transform: scale(1.3);
+}
+
+.pdf-link {
+    display: inline-block;
+    margin-left: 0.5em;
+    position: static; /* or just remove this line entirely */
+}
+
+/* =============================== */
+/* Group: Utility */
+/* =============================== */
+
+.build-meta {
+    color: #777;
+    font-size: 0.8em;
+    margin-top: 0.5em;
 }
