@@ -60,12 +60,13 @@ function generateCssStubs() {
       const name = $(el).attr('name');
       const style = $(el).attr('data-style');
 
-    if (style) {
-      classNames.add(`meta.${style}`);
-    } else if (name?.startsWith('doc-')) {
-      const className = name.replace(/^doc-/, '').toLowerCase();
-      classNames.add(`meta.${className}`);
-    }
+      if (style) {
+        classNames.add(`meta.${style}`);
+      } else if (name?.startsWith('doc-')) {
+        const className = name.replace(/^doc-/, '').toLowerCase();
+        classNames.add(`meta.${className}`);
+      }
+    }); // ← This was missing
 
     if (classNames.size === 0) return;
 
@@ -80,6 +81,7 @@ function generateCssStubs() {
     }
   });
 }
+
 
 // ------------------------------------------------------------
 // 2. Distribute root styles into folder-level style.css files
