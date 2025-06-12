@@ -24,6 +24,10 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install fs-extra dependency
+        run: npm install fs-extra --no-save
+        working-directory: .github/scripts
+
       - name: Create temp public staging folder
         run: mkdir -p /tmp/public
 
