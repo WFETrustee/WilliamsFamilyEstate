@@ -267,6 +267,58 @@ function injectStyleLinks() {
 
 
 // ------------------------------------------------------------
+// 5. Alphabetize CSS rules within each folder's style.css
+//     Respects site-config.css.autoOrganize = true
+// ------------------------------------------------------------
+async function alphabetizeCssRules() {
+  if (!config.css?.autoOrganize) return;
+
+  for (const folder of folders) {
+    const stylePath = path.join(folder, 'style.css');
+    if (!fs.existsSync(stylePath)) continue;
+
+    const cssContent = fs.readFileSync(stylePath, 'utf-8');
+    const parsed = await postcss([]).process(cssContent, {
+      from: stylePath,
+      parser: postcssSafeParser
+    });
+
+    const nodes = parsed.root.nodes;
+    const grouped = {
+      comments: [],
+      rules: [],
+      others: []
+    };
+
+    for (const node of nodes) {
+      if (node.type === 'rule') {
+        grouped.rules.push(node);
+      } else if (node.type === 'comment') {
+        grouped.comments.push(node);
+      } else {
+        grouped.others.push(node);
+      }
+    }
+
+    // Sort rules by selector name alphabetically
+    grouped.rules.sort((a, b) => (a.selector || '').localeCompare(b.selector || ''));
+
+    // Recombine all nodes in logical order
+    const sortedCss = [
+      ...grouped.comments,
+      ...grouped.rules,
+      ...grouped.others
+    ].map(n => n.toString().trim()).join('\n\n') + '\n';
+
+    if (cssContent.trim() !== sortedCss.trim()) {
+      writeFile(stylePath, sortedCss);
+      console.log(`${folder}/style.css alphabetized`);
+    }
+  }
+}
+
+
+// ------------------------------------------------------------
 // Execute all requested operations in order,i didn't need to do this but it's cool and honestly it's nice for convenience
 // ------------------------------------------------------------
 (async () => {
@@ -274,4 +326,5 @@ function injectStyleLinks() {
   if (modesToRun.includes('distribute')) await distributeSharedStyles(); // async
   if (modesToRun.includes('clean')) cleanStyleLinks();
   if (modesToRun.includes('inject')) injectStyleLinks();
+  await alphabetizeCssRules();
 })();
