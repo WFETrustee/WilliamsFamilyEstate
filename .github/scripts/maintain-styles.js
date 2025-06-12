@@ -57,8 +57,8 @@ function generateCssStubs() {
     const classNames = new Set();
 
     $('meta').each((_, el) => {
-      const name = $(el).attr('name');
-      const style = $(el).attr('data-style');
+      const name = $(el).attr('name')?.trim();
+      const style = $(el).attr('data-style')?.trim();
 
       if (style) {
         classNames.add(`meta.${style}`);
@@ -66,7 +66,7 @@ function generateCssStubs() {
         const className = name.replace(/^doc-/, '').toLowerCase();
         classNames.add(`meta.${className}`);
       }
-    }); // ← This was missing
+    });
 
     if (classNames.size === 0) return;
 
@@ -75,12 +75,12 @@ function generateCssStubs() {
       .map(c => `.${c} {\n  /* style for ${c} */\n}`)
       .join('\n\n');
 
-    if (!fs.existsSync(stylePath)) {
-      writeFile(stylePath, stubCss.trim() + '\n');
-      console.log(`${folder}/style.css created with ${classNames.size} stubs.`);
-    }
+    // Always regenerate for now — can be enhanced with hash checking later
+    writeFile(stylePath, stubCss.trim() + '\n');
+    console.log(`${folder}/style.css updated with ${classNames.size} stubs.`);
   });
 }
+
 
 
 // ------------------------------------------------------------
