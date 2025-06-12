@@ -141,6 +141,25 @@ function insertFooterYear() {
   if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 }
 
+/**
+ * Injects site build version + timestamp into #build-meta if site-config.json is available
+ */
+function insertBuildMetadata() {
+  const buildMeta = document.getElementById("build-meta");
+  if (!buildMeta) return;
+
+  fetch("/site-config.json")
+    .then(res => res.json())
+    .then(cfg => {
+      const version = cfg.buildHash || "(dev)";
+      const date = new Date(cfg.buildDate || Date.now()).toLocaleString();
+      buildMeta.textContent = `Version: ${version} – Published: ${date}`;
+    })
+    .catch(err => {
+      console.warn("Could not load site-config.json:", err);
+    });
+}
+
 // ===========================================
 // Main bootstrapping entry point
 // ===========================================
