@@ -1,94 +1,88 @@
 /* ===================================== */
+
 /* Emergency content styles              */
+
 /* ===================================== */
 
 /* Global Layout */
-body {
-    font-family: Georgia, 'Times New Roman', Times, serif;
-    margin: 0;
-    padding: 0;
-    background: #fff;
-    color: #222;
-    line-height: 1.6;
-}
-
-main {
-    padding: 0 1.25rem;
-}
 
 /* =============================== */
+
 /* Metadata and Tags */
-.meta.title {
-}
-
-.meta.date {
-}
-
-.meta.id {
-}
-
-.meta-certified {
-    display: none !important;
-}
-
-.meta.version {
-}
-
-.meta.category {
-}
-
-.meta.author {
-}
-
-.meta.use-trigger {
-}
-
-.meta.instructions {
-}
-
-.meta.filer {
-}
-
-.meta.status {
-    display: none !important;
-}
-
-.meta.pinned {
-}
-
-.meta-group {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 0.5rem 1rem;
-    border-bottom: 1px dotted #ccc;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.5rem;
-    font-size: 0.95rem;
-    color: #444;
-}
-
-    .meta-group + .meta-group {
-        padding-top: 0.5rem;
-        margin-top: 0.5rem;
-    }
-
-    .meta-group span {
-        flex: 1 1 auto;
-        min-width: 100px;
-    }
-
-img.pinned {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    width: 1.5rem;
-    height: auto;
-    z-index: 5;
-}
 
 /* =============================== */
+
 /* Emergency Entries Layout */
+
+/* =============================== */
+
+/* Instructions Section */
+
+/* =============================== */
+
+/* General Components */
+
+/* =============================== */
+
+/* Responsive Enhancements */
+
+/* =============================== */
+
+/* Print Enhancements */
+
+/* Injected shared styles from root style.css */
+
+/* Injected shared styles from root style.css */
+
+/* Auto-generated meta stubs */
+
+.announce {
+    background-color: #e6f2ff;
+    color: #222;
+    padding: 1rem 2rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+}
+
+.build-meta {
+  font-size: 0.8em;
+  color: #777;
+  margin-top: 0.5em;
+}
+
+.content {
+    padding: 1rem;
+    border-left: 4px solid #888;
+    border-radius: 6px;
+    background: #f7f7f7;
+}
+
+.content h2 {
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+        font-size: 1.35rem;
+    }
+
+.content p {
+        margin: 0.25rem 0;
+        line-height: 1.5;
+    }
+
+.content-image {
+    max-height: 300px;
+    object-fit: cover;
+    margin-bottom: 1rem;
+}
+
+.content.pinned {
+        border-left-color: #663399;
+    }
+
+.date {
+    font-style: italic;
+    color: #555;
+}
+
 .doc-header {
     display: flex;
     align-items: center;
@@ -103,40 +97,6 @@ img.pinned {
   padding-right: 3em; /* ensures text doesn't overlap PDF icon */
 }
 
-.pdf-link {
-  position: static; /* or just remove this line entirely */
-  display: inline-block;
-  margin-left: 0.5em;
-}
-
-.pdf-icon-inline {
-  height: 1em;
-  vertical-align: middle;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-.pdf-icon-inline:hover {
-  transform: scale(1.3);
-  opacity: 1;
-}
-
-.print-divider {
-    border: 0;
-    border-top: 2px dashed #999;
-    margin: 2rem 0;
-}
-
-.section-label {
-    font-weight: bold;
-    font-size: 0.85rem;
-    color: #c00;
-    margin-bottom: 0.5rem;
-    text-align: center;
-    text-transform: uppercase;
-}
-
-/* =============================== */
-/* Instructions Section */
 .instructions-section {
     border-top: 3px double #333;
     margin-top: 3rem;
@@ -144,7 +104,7 @@ img.pinned {
     background-color: #f9f9f9;
 }
 
-    .instructions-section h2 {
+.instructions-section h2 {
         font-size: 1.5rem;
         letter-spacing: 0.05em;
         color: #333;
@@ -153,106 +113,8 @@ img.pinned {
         margin-bottom: 0.75rem;
     }
 
-    .instructions-section ul {
+.instructions-section ul {
         padding-bottom: 1.5rem;
-    }
-
-/* =============================== */
-/* General Components */
-.announce {
-    background-color: #e6f2ff;
-    color: #222;
-    padding: 1rem 2rem;
-    border-radius: 4px;
-    margin-bottom: 2rem;
-}
-
-.content {
-    padding: 1rem;
-    border-left: 4px solid #888;
-    border-radius: 6px;
-    background: #f7f7f7;
-}
-
-    .content h2 {
-        margin-top: 0;
-        margin-bottom: 0.5rem;
-        font-size: 1.35rem;
-    }
-
-    .content p {
-        margin: 0.25rem 0;
-        line-height: 1.5;
-    }
-
-    .content.pinned {
-        border-left-color: #663399;
-    }
-
-.content-image {
-    max-height: 300px;
-    object-fit: cover;
-    margin-bottom: 1rem;
-}
-
-.date {
-    font-style: italic;
-    color: #555;
-}
-
-/* =============================== */
-/* Responsive Enhancements */
-@media (max-width: 600px) {
-    body {
-        font-size: 1.05rem;
-        line-height: 1.7;
-    }
-
-    .site-header {
-        background-color: #777;
-        padding: 1rem;
-    }
-
-        .site-header h1 {
-            font-family: "Scope One", serif;
-            margin: 0 auto;
-            font-size: 1.9rem;
-            line-height: 1.2;
-            max-width: 720px;
-            font-weight: 400;
-        }
-}
-
-/* =============================== */
-/* Print Enhancements */
-@media print {
-    .site-footer,
-    .pdf-link {
-        display: none;
-    }
-}
-
-/* Injected shared styles from root style.css */
-.tm {
-  font-size: 66%;
-  vertical-align: super; /* optional: lifts it like a superscript */
-  /* opacity: 0.75;         /* optional: soften it visually */
-}
-
-.site-header {
-    background-color: #777;
-    color: #f1f1f1;
-    padding: 1rem 1rem; 
-    text-align: center;
-}
-
-.site-header h1 {
-        font-family: "Scope One", serif;
-        margin: 0 auto;
-        font-size: 1.9rem;
-        line-height: 1.2;
-        max-width: 720px;
-        font-weight: 400; /* Add this line */
     }
 
 .main-nav {
@@ -264,16 +126,6 @@ img.pinned {
     text-align: center;
 }
 
-.main-nav img {
-      height: 1.25em;
-      vertical-align: middle;
-      transition: transform 0.2s ease;
-    }
-
-.main-nav a:hover img {
-      transform: scale(1.5); /* Grows 50% larger on hover */
-    }
-
 .main-nav > ul {
         max-width: 720px;
         width: 100%;
@@ -282,6 +134,16 @@ img.pinned {
         display: flex;
         gap: 1.25rem;
         list-style: none;
+    }
+
+.main-nav a:hover img {
+      transform: scale(1.5); /* Grows 50% larger on hover */
+    }
+
+.main-nav img {
+      height: 1.25em;
+      vertical-align: middle;
+      transition: transform 0.2s ease;
     }
 
 .main-nav ul li a {
@@ -309,6 +171,110 @@ img.pinned {
             z-index: 2;
         }
 
+.meta-certified {
+    display: none !important;
+}
+
+.meta-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    border-bottom: 1px dotted #ccc;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: #444;
+}
+
+.meta-group + .meta-group {
+        padding-top: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+.meta-group span {
+        flex: 1 1 auto;
+        min-width: 100px;
+    }
+
+.meta.author {
+}
+
+.meta.category {
+}
+
+.meta.certified {
+  /* style for meta.certified */
+}
+
+.meta.date {
+}
+
+.meta.filer {
+}
+
+.meta.id {
+}
+
+.meta.image {
+  /* style for meta.image */
+}
+
+.meta.instructions {
+}
+
+.meta.pinned {
+}
+
+.meta.status {
+    display: none !important;
+}
+
+.meta.template-hash {
+  /* style for meta.template-hash */
+}
+
+.meta.title {
+}
+
+.meta.use-trigger {
+}
+
+.meta.version {
+}
+
+.pdf-icon-inline {
+  height: 1em;
+  vertical-align: middle;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.pdf-icon-inline:hover {
+  transform: scale(1.3);
+  opacity: 1;
+}
+
+.pdf-link {
+  position: static; /* or just remove this line entirely */
+  display: inline-block;
+  margin-left: 0.5em;
+}
+
+.print-divider {
+    border: 0;
+    border-top: 2px dashed #999;
+    margin: 2rem 0;
+}
+
+.section-label {
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: #c00;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    text-transform: uppercase;
+}
+
 .site-footer {
     background: radial-gradient(ellipse at center, #888, #777);
     color: #f1f1f1;
@@ -321,22 +287,74 @@ img.pinned {
     box-shadow: inset 0 8px 10px -8px rgba(0, 0, 0, 0.75);    
 }
 
-/* Injected shared styles from root style.css */
-.build-meta {
-  font-size: 0.8em;
-  color: #777;
-  margin-top: 0.5em;
+.site-header {
+    background-color: #777;
+    color: #f1f1f1;
+    padding: 1rem 1rem; 
+    text-align: center;
 }
 
-/* Auto-generated meta stubs */
-.meta.certified {
-  /* style for meta.certified */
+.site-header h1 {
+        font-family: "Scope One", serif;
+        margin: 0 auto;
+        font-size: 1.9rem;
+        line-height: 1.2;
+        max-width: 720px;
+        font-weight: 400; /* Add this line */
+    }
+
+.tm {
+  font-size: 66%;
+  vertical-align: super; /* optional: lifts it like a superscript */
+  /* opacity: 0.75;         /* optional: soften it visually */
 }
 
-.meta.image {
-  /* style for meta.image */
+body {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    color: #222;
+    line-height: 1.6;
 }
 
-.meta.template-hash {
-  /* style for meta.template-hash */
+img.pinned {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 1.5rem;
+    height: auto;
+    z-index: 5;
+}
+
+main {
+    padding: 0 1.25rem;
+}
+
+@media (max-width: 600px) {
+    body {
+        font-size: 1.05rem;
+        line-height: 1.7;
+    }
+
+    .site-header {
+        background-color: #777;
+        padding: 1rem;
+    }
+
+        .site-header h1 {
+            font-family: "Scope One", serif;
+            margin: 0 auto;
+            font-size: 1.9rem;
+            line-height: 1.2;
+            max-width: 720px;
+            font-weight: 400;
+        }
+}
+
+@media print {
+    .site-footer,
+    .pdf-link {
+        display: none;
+    }
 }
