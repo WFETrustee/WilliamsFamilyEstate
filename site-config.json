@@ -1,4 +1,7 @@
 {
+  "notifications": {
+  "trusteeEmail": "trustee@williamsfamilyestate.org"
+  },
   "css": {
     "autoOrganize": true,
     "allowInlineOverrides": true,
