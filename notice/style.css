@@ -239,3 +239,10 @@ img.pinned {
     /* Top shadow line */
     box-shadow: inset 0 8px 10px -8px rgba(0, 0, 0, 0.75);    
 }
+
+/* Injected shared styles from root style.css */
+.build-meta {
+  font-size: 0.8em;
+  color: #777;
+  margin-top: 0.5em;
+}
