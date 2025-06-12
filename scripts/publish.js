@@ -9,6 +9,7 @@
 // - Respects the declarative metadata defined in each template,
 // - Allows us to keep document rendering structured, predictable, and
 //     easily styled later via CSS without hardcoding anything.
+// - Busts cache issues when publishing new content
 // ==========================================================
 
 function parseTemplateMetadata(templateHTML) {
@@ -117,45 +118,60 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
   return wrapper;
 }
 
+/**
+ * ============================================================================
+ * Function: startPublish
+ * Purpose: Dynamically loads the site config and uses its version hash to
+ *          cache-bust fetches for manifest and template files. Ensures that
+ *          the content index reflects the correct Git build version and avoids
+ *          serving stale JSON or templates from browser or CDN cache.
+ * ============================================================================
+ */
 function startPublish(config = siteConfig) {
   const live = document.getElementById("live-content");
   if (!live) return;
 
-  // Determine the folder name from URL path
+  // Determine which folder we're currently viewing (e.g. "notices", "minutes", etc.)
   const baseFolder = window.location.pathname.split("/").find(p => p && p !== "index.html") || "content";
-  const templatePath = `/${baseFolder}/${baseFolder}_template.html`;
-  const jsonPath = `/${baseFolder}/${baseFolder}.json`;
-  //const jsonPath = `/${baseFolder}/${baseFolder}.json?ts=${Date.now()}`; //only use during dev to bypass caching
 
+  // Step 1: Load site-config.json to get buildHash (used for cache-busting)
+  fetch("/site-config.json")
+    .then(res => res.json())
+    .then(siteCfg => {
+      const version = siteCfg.buildHash || Date.now(); // fallback to timestamp if Git hash missing
 
-  fetch(templatePath)
-    .then(res => res.text())
-    .then(templateHTML => {
+      // Construct full paths to manifest and template files with cache-busting query param
+      const templatePath = `/${baseFolder}/${baseFolder}_template.html?v=${version}`;
+      const jsonPath = `/${baseFolder}/${baseFolder}.json?v=${version}`;
+
+      // Step 2: Fetch both template and manifest JSON in parallel
+      return Promise.all([
+        fetch(templatePath).then(res => res.text()),
+        fetch(jsonPath).then(res => res.json()),
+        Promise.resolve(version) // pass version down for optional future use
+      ]);
+    })
+    .then(([templateHTML, entries, version]) => {
       const { groupedMeta } = parseTemplateMetadata(templateHTML);
 
-      return fetch(jsonPath)
-        .then(res => res.json())
-        .then(entries => {
-          // Only show documents based on their publication status
-          const mode = config?.mode?.publish || "live";
-          let filtered;
+      // Only show documents matching the current publish mode
+      const mode = config?.mode?.publish || "live";
+      let filtered;
 
-          if (mode === "live") {
-            filtered = entries.filter(e => e["doc-status"]?.toLowerCase() === "active");
-          } else if (mode === "draft") {
-            filtered = entries.filter(e => e["doc-status"]?.toLowerCase() === "draft");
-          } else {
-            filtered = entries; // publish: all
-          }
+      if (mode === "live") {
+        filtered = entries.filter(e => e["doc-status"]?.toLowerCase() === "active");
+      } else if (mode === "draft") {
+        filtered = entries.filter(e => e["doc-status"]?.toLowerCase() === "draft");
+      } else {
+        filtered = entries; // fallback: publish everything
+      }
 
-          return { groupedMeta, baseFolder, entries: filtered };
-        });
+      return { groupedMeta, baseFolder, entries: filtered };
     })
     .then(({ groupedMeta, baseFolder, entries }) => {
       const pinnedContainer = document.getElementById("pinned-content");
       const regularContainer = document.getElementById("regular-content");
 
-      // Separate pinned from unpinned, and sort newest first
       const pinned = entries
         .filter(e => e["doc-pinned"] === "true" || e["doc-pinned"] === true)
         .sort((a, b) => new Date(b["doc-date"]) - new Date(a["doc-date"]));
@@ -164,7 +180,6 @@ function startPublish(config = siteConfig) {
         .filter(e => !(e["doc-pinned"] === "true" || e["doc-pinned"] === true))
         .sort((a, b) => new Date(b["doc-date"]) - new Date(a["doc-date"]));
 
-      // Render all entries into the appropriate DOM sections
       pinned.forEach(e => pinnedContainer.appendChild(renderContentEntry(e, groupedMeta, baseFolder)));
       unpinned.forEach(e => regularContainer.appendChild(renderContentEntry(e, groupedMeta, baseFolder)));
     })
