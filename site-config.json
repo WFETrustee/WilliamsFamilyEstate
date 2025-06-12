@@ -1,6 +1,9 @@
 {
   "notifications": {
-    "trusteeEmail": "trustee@williamsfamilyestate.org"
+    "enabled": true,
+    "from": "trustadmin@sovereignstar.com",
+    "to": "trustee@williamsfamilyestate.org",
+    "smtpProfile": "default"
   },
   "css": {
     "autoOrganize": true,
