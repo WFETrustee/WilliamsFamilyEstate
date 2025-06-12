@@ -33,6 +33,9 @@ jobs:
       - name: Copy only active HTML files to /tmp/public
         run: node .github/scripts/utils/copy-files.js html /tmp/public
 
+      - name: Copy site-config.json to public folder
+        run: cp site-config.json /tmp/public/
+        
       - name: Audit staged public content
         run: |
           echo "Public content staged at /tmp/public:"
