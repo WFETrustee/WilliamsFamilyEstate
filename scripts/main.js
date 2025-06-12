@@ -20,14 +20,18 @@ document.addEventListener("DOMContentLoaded", () => {
       window.siteConfig = config;
 
       loadScript("/scripts/core.js", () => {
-        // Core must be loaded before we call any utilities
         if (typeof loadHTML === "function") {
           loadHTML("site-header", "/header.html", highlightActiveMenuItem, config);
-          loadHTML("site-footer", "/footer.html", insertFooterYear, config);
+          
+          // Inject both year and build version after footer loads
+          loadHTML("site-footer", "/footer.html", () => {
+            insertFooterYear();
+            insertBuildMetadata(config);
+          }, config);
         }
 
-        // If this page is dynamic, load publish.js after core
-       if (document.getElementById("live-content")) {
+        // Load dynamic publishing logic if needed
+        if (document.getElementById("live-content")) {
           loadScript("/scripts/publish.js", () => {
             if (typeof startPublish === "function") {
               startPublish(window.siteConfig);
@@ -42,4 +46,3 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("site-config.json failed to load. Aborting startup.", err);
     });
 });
-
