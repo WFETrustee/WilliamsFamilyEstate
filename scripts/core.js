@@ -142,23 +142,18 @@ function insertFooterYear() {
 }
 
 /**
- * Injects site build version + timestamp into #build-meta if site-config.json is available
+ * Injects build version + timestamp into #build-meta using the provided config.
+ * This avoids re-fetching site-config.json unnecessarily.
  */
-function insertBuildMetadata() {
+function insertBuildMetadata(config = siteConfig) {
   const buildMeta = document.getElementById("build-meta");
-  if (!buildMeta) return;
+  if (!buildMeta || !config) return;
 
-  fetch("/site-config.json")
-    .then(res => res.json())
-    .then(cfg => {
-      const version = cfg.buildHash || "(dev)";
-      const date = new Date(cfg.buildDate || Date.now()).toLocaleString();
-      buildMeta.textContent = `Version: ${version} – Published: ${date}`;
-    })
-    .catch(err => {
-      console.warn("Could not load site-config.json:", err);
-    });
+  const version = config.buildHash || "(dev)";
+  const date = new Date(config.buildDate || Date.now()).toLocaleString();
+  buildMeta.textContent = `Version: ${version} – Published: ${date}`;
 }
+
 
 // ===========================================
 // Main bootstrapping entry point
