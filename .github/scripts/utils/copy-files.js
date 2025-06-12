@@ -24,77 +24,65 @@
 
 const fs = require('fs');
 const path = require('path');
+const fse = require('fs-extra');
 
-// Parse input params
-const [, , type, dest] = process.argv;
+const SOURCE_ROOT = path.resolve(__dirname, '../../../'); // adjust as needed
+const DEST_ROOT = process.argv[3] || '/tmp/public';
+const MODE = process.argv[2] || 'html'; // 'html' | 'assets' | etc.
 
-if (!type || !dest || !['html', 'assets'].includes(type)) {
-  console.error("Usage: node copy-files.js [html|assets] <destination>");
-  process.exit(1);
-}
+// Folders you never want pushed public
+const EXCLUDED_FOLDERS = [
+  '.github',
+  '.git',
+  'logs',
+  'private',
+  '__secrets__',
+  '.DS_Store'
+];
 
-// Directories we don't want to copy – ever
-const IGNORED_DIRS = ['.git', '.github', 'public', 'node_modules'];
+// Allowlist overrides (e.g. allow public scripts folder)
+const ALLOWLISTED_PATHS = [
+  'scripts'
+];
 
-// Helper: Check if file lives inside an ignored dir
-function shouldIgnore(filePath) {
-  return IGNORED_DIRS.some(dir =>
-    filePath.includes(`/${dir}/`) || filePath.startsWith(`${dir}/`)
+// Check whether a folder should be excluded from public push
+function isExcluded(relativePath) {
+  const firstSegment = relativePath.split(path.sep)[0];
+  return (
+    EXCLUDED_FOLDERS.includes(firstSegment) &&
+    !ALLOWLISTED_PATHS.includes(firstSegment)
   );
 }
 
-// Helper: For HTML only – is this marked inactive via meta tag?
-function isInactiveHTML(filePath) {
-  const content = fs.readFileSync(filePath, 'utf8');
-  const inactivePattern = /content\s*=\s*["']inactive["']/i;
-  return inactivePattern.test(content);
-}
+// Recursively copy files based on mode, skipping excluded folders
+function copyFiles(currentDir = SOURCE_ROOT, destDir = DEST_ROOT) {
+  fs.readdirSync(currentDir).forEach(item => {
+    const srcPath = path.join(currentDir, item);
+    const relPath = path.relative(SOURCE_ROOT, srcPath);
+    const destPath = path.join(destDir, relPath);
 
-// Helper: Create target folder if needed and copy file over
-function copyFile(filePath, destRoot) {
-  const destPath = path.join(destRoot, filePath);
-  fs.mkdirSync(path.dirname(destPath), { recursive: true });
-  fs.copyFileSync(filePath, destPath);
-}
+    // Skip excluded folders
+    if (isExcluded(relPath)) return;
 
-// Recursive directory walker – reads every file under .
-function walk(dir = '.') {
-  let results = [];
-
-  for (const entry of fs.readdirSync(dir)) {
-    // Skip dotfiles/folders right away
-    if (entry.startsWith('.')) continue;
-
-    const fullPath = path.join(dir, entry);
-    const stat = fs.statSync(fullPath);
-
-    if (stat.isDirectory()) {
-      // Recurse only if not ignored
-      if (!IGNORED_DIRS.includes(entry)) {
-        results = results.concat(walk(fullPath));
-      }
+    const stats = fs.statSync(srcPath);
+    if (stats.isDirectory()) {
+      copyFiles(srcPath, destDir);
     } else {
-      results.push(fullPath);
-    }
-  }
+      // Filter by mode if needed
+      const isHTML = srcPath.endsWith('.html');
+      const isAsset = !srcPath.endsWith('.html') && !srcPath.endsWith('.js') && !srcPath.endsWith('.json');
 
-  return results;
+      if (
+        (MODE === 'html' && isHTML) ||
+        (MODE === 'assets' && isAsset) ||
+        (MODE === 'all')
+      ) {
+        fse.ensureDirSync(path.dirname(destPath));
+        fs.copyFileSync(srcPath, destPath);
+        console.log(`✔ Copied ${relPath}`);
+      }
+    }
+  });
 }
 
-// Start walking the working dir and process based on mode
-const files = walk();
-
-files.forEach(file => {
-  if (shouldIgnore(file)) return;
-
-  // Mode: assets (copy everything that isn't .html)
-  if (type === 'assets' && !file.endsWith('.html')) {
-    copyFile(file, dest);
-  }
-
-  // Mode: html (copy only if not inactive)
-  else if (type === 'html' && file.endsWith('.html') && !isInactiveHTML(file)) {
-    copyFile(file, dest);
-    console.log(`Included: ${file}`);
-  }
-});
+copyFiles();
