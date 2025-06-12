@@ -14,25 +14,27 @@
   <meta name="doc-status" content="active" data-style="status">
   <meta name="doc-pinned" content="false" data-style="pinned">
   <meta name="doc-image" content="images/template.jpg" data-label="Image">
-  
+
   <!-- metadata fields enabling auto-commit to private trust ledgers -->
   <meta name="doc-commit-ledger" content="true" data-label="Commit to Ledger">
   <meta name="doc-ledger-type" content="Asset" data-label="Ledger Type">
   <meta name="doc-ledger-category" content="Real Property" data-label="Ledger Category">
   <meta name="doc-ledger-notes" content="Legal title recorded with public registry and beneficial title transferred to private trust.">
-  
-  <!-- Optional future-proof fields -->
+
+  <!-- optional future-proof fields (blockchain, security hash, etc-->
   <meta name="doc-block-id" content="0xA7BC9D..." data-label="Blockchain Record ID">
   <meta name="doc-private-hash" content="f97c2a3c57e8c..." data-label="Private Record Hash">
 
   <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="/notice/style.css"></head>
+  <link rel="stylesheet" href="/notice/style.css">
+</head>
 <body>
 
-  <!-- Dynamic Header -->
+  <!-- #BEGIN:site-header -->
   <div id="site-header"></div>
+  <!-- #END:site-header -->
 
-  <!-- Page Content -->
+  <!-- #BEGIN:main-content -->
   <main>
     <div class="doc-title-wrapper">
       <h1>Example Content Title</h1>
@@ -44,15 +46,14 @@
 
     <p>The formatting will match the site-wide styles automatically.</p>
   </main>
+  <!-- #END:main-content -->
 
-  <!-- Dynamic Footer -->
+  <!-- #BEGIN:site-footer -->
   <div id="site-footer"></div>
+  <!-- #END:site-footer -->
 
+  <!-- #BEGIN:main-script -->
   <script src="/scripts/main.js"></script>
-
-
-
-
-
-
-</body></html>
+  <!-- #END:main-script -->
+</body>
+</html>
