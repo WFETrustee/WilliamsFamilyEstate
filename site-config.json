@@ -1,6 +1,6 @@
 {
   "notifications": {
-  "trusteeEmail": "trustee@williamsfamilyestate.org"
+    "trusteeEmail": "trustee@williamsfamilyestate.org"
   },
   "css": {
     "autoOrganize": true,
@@ -54,6 +54,6 @@
     "generateSitemap": true,
     "archiveToInternetArchive": false
   },
-  "buildHash": "7f7ee9f",
-  "buildDate": "2025-06-12T01:21:01.750Z"
+  "buildHash": "a5adda6",
+  "buildDate": "2025-06-12T01:40:50.019Z"
 }
