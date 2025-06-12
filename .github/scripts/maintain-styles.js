@@ -46,45 +46,24 @@ function matchesAny(selector, regexList) {
 // ------------------------------------------------------------
 // 1. Generate class stubs based on <meta data-style="">
 // ------------------------------------------------------------
-function generateCssStubs() {
-  folders.forEach(folder => {
-    const templatePath = path.join(folder, `${folder}_template.html`);
-    const stylePath = path.join(folder, 'style.css');
-    if (!fs.existsSync(templatePath)) return;
+const html = fs.readFileSync(templatePath, 'utf-8');
+const $ = cheerio.load(html);
+const classNames = new Set();
 
-    const html = fs.readFileSync(templatePath, 'utf-8');
-    const $ = cheerio.load(html);
-    const classNames = new Set();
+$('meta').each((_, el) => {
+  const name = $(el).attr('name');
+  const style = $(el).attr('data-style');
+  
+  // Prefer explicit data-style
+  if (style) {
+    classNames.add(style);
+  } else if (name?.startsWith('doc-')) {
+    const className = name.replace(/^doc-/, '').toLowerCase();
+    classNames.add(className);
+  }
+});
 
-    // Include both data-style and all meta[name] for broader coverage
-    $('meta[data-style], meta[name]').each((_, el) => {
-      const key = $(el).attr('data-style') || $(el).attr('name');
-      if (key?.startsWith('doc-')) {
-        // convert to valid CSS class name: doc-template-hash → template-hash
-        const className = key.replace(/^doc-/, '');
-        classNames.add(className);
-      }
-    });
 
-    if (classNames.size === 0) return;
-
-    const stubCss = Array.from(classNames)
-      .sort()
-      .map(c => `.${c} {\n  /* style for ${c} */\n}`)
-      .join('\n\n');
-
-    if (!fs.existsSync(stylePath)) {
-      writeFile(stylePath, stubCss.trim() + '\n');
-      console.log(`${folder}/style.css created with ${classNames.size} stubs.`);
-    } else {
-      // Only append missing classes (if desired later)
-    }
-  });
-}
-
-// ------------------------------------------------------------
-// 2. Distribute root styles into folder-level style.css files
-// ------------------------------------------------------------
 // ------------------------------------------------------------
 // 2. Distribute root styles into folder-level style.css files
 //    Supports exclusions, always-includes, and displayPriority
