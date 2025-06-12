@@ -46,23 +46,41 @@ function matchesAny(selector, regexList) {
 // ------------------------------------------------------------
 // 1. Generate class stubs based on <meta data-style="">
 // ------------------------------------------------------------
-const html = fs.readFileSync(templatePath, 'utf-8');
-const $ = cheerio.load(html);
-const classNames = new Set();
+function generateCssStubs() {
+  folders.forEach(folder => {
+    const templatePath = path.join(folder, `${folder}_template.html`);
+    const stylePath = path.join(folder, 'style.css');
+    if (!fs.existsSync(templatePath)) return;
 
-$('meta').each((_, el) => {
-  const name = $(el).attr('name');
-  const style = $(el).attr('data-style');
-  
-  // Prefer explicit data-style
-  if (style) {
-    classNames.add(style);
-  } else if (name?.startsWith('doc-')) {
-    const className = name.replace(/^doc-/, '').toLowerCase();
-    classNames.add(className);
-  }
-});
+    const html = fs.readFileSync(templatePath, 'utf-8');
+    const $ = cheerio.load(html);
+    const classNames = new Set();
 
+    $('meta').each((_, el) => {
+      const name = $(el).attr('name');
+      const style = $(el).attr('data-style');
+
+      if (style) {
+        classNames.add(style);
+      } else if (name?.startsWith('doc-')) {
+        const className = name.replace(/^doc-/, '').toLowerCase();
+        classNames.add(className);
+      }
+    });
+
+    if (classNames.size === 0) return;
+
+    const stubCss = Array.from(classNames)
+      .sort()
+      .map(c => `.${c} {\n  /* style for ${c} */\n}`)
+      .join('\n\n');
+
+    if (!fs.existsSync(stylePath)) {
+      writeFile(stylePath, stubCss.trim() + '\n');
+      console.log(`${folder}/style.css created with ${classNames.size} stubs.`);
+    }
+  });
+}
 
 // ------------------------------------------------------------
 // 2. Distribute root styles into folder-level style.css files
