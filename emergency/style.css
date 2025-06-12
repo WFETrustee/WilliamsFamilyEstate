@@ -1,47 +1,151 @@
 /* ===================================== */
+
 /* Emergency Content Styles */
+
 /* ===================================== */
 
 /* =============================== */
+
 /* Group: Global Layout */
-/* =============================== */
-
-body {
-    background: #fff;
-    color: #222;
-    font-family: Georgia, 'Times New Roman', Times, serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-}
-
-main {
-    padding: 0 1.25rem;
-}
 
 /* =============================== */
+
+/* =============================== */
+
 /* Group: Header */
-/* =============================== */
-
-.site-header {
-    background-color: #777;
-    color: #f1f1f1;
-    padding: 1rem 1rem;
-    text-align: center;
-}
-
-.site-header h1 {
-    font-family: "Scope One", serif;
-    font-size: 1.9rem;
-    font-weight: 400;
-    line-height: 1.2;
-    margin: 0 auto;
-    max-width: 720px;
-}
 
 /* =============================== */
+
+/* =============================== */
+
 /* Group: Navigation */
+
 /* =============================== */
+
+/* =============================== */
+
+/* Group: Content */
+
+/* =============================== */
+
+/* =============================== */
+
+/* Group: Metadata */
+
+/* =============================== */
+
+/* =============================== */
+
+/* Group: Footer */
+
+/* =============================== */
+
+/* =============================== */
+
+/* Group: Emergency Extras */
+
+/* =============================== */
+
+/* =============================== */
+
+/* Group: Responsive Enhancements */
+
+/* =============================== */
+
+/* =============================== */
+
+/* Group: Print Enhancements */
+
+/* =============================== */
+
+/* =============================== */
+
+/* Group: Utility */
+
+/* =============================== */
+
+/* Auto-generated meta stubs */
+
+.announce {
+    background-color: #e6f2ff;
+    border-radius: 4px;
+    color: #222;
+    margin-bottom: 2rem;
+    padding: 1rem 2rem;
+}
+
+.build-meta {
+    color: #777;
+    font-size: 0.8em;
+    margin-top: 0.5em;
+}
+
+.content {
+    background: #f7f7f7;
+    border-left: 4px solid #888;
+    border-radius: 6px;
+    padding: 1rem;
+}
+
+.content h2 {
+    font-size: 1.35rem;
+    margin-bottom: 0.5rem;
+    margin-top: 0;
+}
+
+.content p {
+    line-height: 1.5;
+    margin: 0.25rem 0;
+}
+
+.content-image {
+    margin-bottom: 1rem;
+    max-height: 300px;
+    object-fit: cover;
+}
+
+.content.pinned {
+    border-left-color: #663399;
+}
+
+.date {
+    color: #555;
+    font-style: italic;
+}
+
+.doc-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.doc-title-wrapper {
+    display: block;
+    padding-right: 3em; /* ensures text doesn't overlap PDF icon */
+    position: relative;
+    width: 100%;
+}
+
+.instructions-section {
+    background-color: #f9f9f9;
+    border-top: 3px double #333;
+    margin-top: 3rem;
+    padding: 1.5rem 1rem 0;
+}
+
+.instructions-section h2 {
+    border-bottom: 2px solid #ccc;
+    color: #333;
+    font-size: 1.5rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.25rem;
+}
+
+.instructions-section ul {
+    padding-bottom: 1.5rem;
+}
 
 .main-nav {
     background-color: #fff;
@@ -93,95 +197,6 @@ main {
     z-index: 2;
 }
 
-/* =============================== */
-/* Group: Content */
-/* =============================== */
-
-.announce {
-    background-color: #e6f2ff;
-    border-radius: 4px;
-    color: #222;
-    margin-bottom: 2rem;
-    padding: 1rem 2rem;
-}
-
-.content {
-    background: #f7f7f7;
-    border-left: 4px solid #888;
-    border-radius: 6px;
-    padding: 1rem;
-}
-
-.content h2 {
-    font-size: 1.35rem;
-    margin-bottom: 0.5rem;
-    margin-top: 0;
-}
-
-.content p {
-    line-height: 1.5;
-    margin: 0.25rem 0;
-}
-
-.content.pinned {
-    border-left-color: #663399;
-}
-
-.content-image {
-    margin-bottom: 1rem;
-    max-height: 300px;
-    object-fit: cover;
-}
-
-.date {
-    color: #555;
-    font-style: italic;
-}
-
-.tm {
-    font-size: 66%;
-    vertical-align: super; /* optional: lifts it like a superscript */
-    /* opacity: 0.75;         /* optional: soften it visually */
-}
-
-/* =============================== */
-/* Group: Metadata */
-/* =============================== */
-
-.meta.author {
-}
-
-.meta.category {
-}
-
-.meta.date {
-}
-
-.meta.filer {
-}
-
-.meta.id {
-}
-
-.meta.instructions {
-}
-
-.meta.pinned {
-}
-
-.meta.status {
-    display: none !important;
-}
-
-.meta.title {
-}
-
-.meta.use-trigger {
-}
-
-.meta.version {
-}
-
 .meta-certified {
     display: none !important;
 }
@@ -208,66 +223,50 @@ main {
     min-width: 100px;
 }
 
-img.pinned {
-    height: auto;
-    position: absolute;
-    right: 0.5rem;
-    top: 0.5rem;
-    width: 1.5rem;
-    z-index: 5;
+.meta.author {
 }
 
-/* =============================== */
-/* Group: Footer */
-/* =============================== */
-
-.site-footer {
-    background: radial-gradient(ellipse at center, #888, #777);
-    box-shadow: inset 0 8px 10px -8px rgba(0, 0, 0, 0.75);
-    color: #f1f1f1;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    padding: 0.50rem 1rem 1rem;
-    text-align: center;
-    #background-color: #777;
+.meta.category {
 }
 
-/* =============================== */
-/* Group: Emergency Extras */
-/* =============================== */
-
-.doc-header {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    position: relative;
+.meta.certified {
+  /* style for meta.certified */
 }
 
-.doc-title-wrapper {
-    display: block;
-    padding-right: 3em; /* ensures text doesn't overlap PDF icon */
-    position: relative;
-    width: 100%;
+.meta.date {
 }
 
-.instructions-section {
-    background-color: #f9f9f9;
-    border-top: 3px double #333;
-    margin-top: 3rem;
-    padding: 1.5rem 1rem 0;
+.meta.filer {
 }
 
-.instructions-section h2 {
-    border-bottom: 2px solid #ccc;
-    color: #333;
-    font-size: 1.5rem;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.25rem;
+.meta.id {
 }
 
-.instructions-section ul {
-    padding-bottom: 1.5rem;
+.meta.image {
+  /* style for meta.image */
+}
+
+.meta.instructions {
+}
+
+.meta.pinned {
+}
+
+.meta.status {
+    display: none !important;
+}
+
+.meta.template-hash {
+  /* style for meta.template-hash */
+}
+
+.meta.title {
+}
+
+.meta.use-trigger {
+}
+
+.meta.version {
 }
 
 .pdf-icon-inline {
@@ -302,9 +301,60 @@ img.pinned {
     text-transform: uppercase;
 }
 
-/* =============================== */
-/* Group: Responsive Enhancements */
-/* =============================== */
+.site-footer {
+    background: radial-gradient(ellipse at center, #888, #777);
+    box-shadow: inset 0 8px 10px -8px rgba(0, 0, 0, 0.75);
+    color: #f1f1f1;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    padding: 0.50rem 1rem 1rem;
+    text-align: center;
+    #background-color: #777;
+}
+
+.site-header {
+    background-color: #777;
+    color: #f1f1f1;
+    padding: 1rem 1rem;
+    text-align: center;
+}
+
+.site-header h1 {
+    font-family: "Scope One", serif;
+    font-size: 1.9rem;
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0 auto;
+    max-width: 720px;
+}
+
+.tm {
+    font-size: 66%;
+    vertical-align: super; /* optional: lifts it like a superscript */
+    /* opacity: 0.75;         /* optional: soften it visually */
+}
+
+body {
+    background: #fff;
+    color: #222;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+img.pinned {
+    height: auto;
+    position: absolute;
+    right: 0.5rem;
+    top: 0.5rem;
+    width: 1.5rem;
+    z-index: 5;
+}
+
+main {
+    padding: 0 1.25rem;
+}
 
 @media (max-width: 600px) {
     body {
@@ -327,25 +377,9 @@ img.pinned {
     }
 }
 
-/* =============================== */
-/* Group: Print Enhancements */
-/* =============================== */
-
 @media print {
     .pdf-link,
     .site-footer {
         display: none;
     }
 }
-
-/* =============================== */
-/* Group: Utility */
-/* =============================== */
-
-.build-meta {
-    color: #777;
-    font-size: 0.8em;
-    margin-top: 0.5em;
-}
-
-
