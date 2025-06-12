@@ -13,27 +13,32 @@
  */
 
 const fs = require("fs");
+const path = require("path");
 const { execSync } = require("child_process");
 
-// Attempt to get current short Git commit hash for tracking + caching
+const CONFIG_PATH = path.join(__dirname, "../../site-config.json");
+
+// Step 1: Load existing config or fallback to empty
+let config = {};
+if (fs.existsSync(CONFIG_PATH)) {
+  try {
+    config = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf-8"));
+  } catch (err) {
+    console.warn("Failed to parse existing site-config.json. Starting fresh.");
+  }
+}
+
+// Step 2: Inject Git hash and timestamp
 let buildHash = "unknown";
 try {
   buildHash = execSync("git rev-parse --short HEAD").toString().trim();
 } catch (err) {
-  console.warn("Could not resolve Git hash. Using fallback.");
+  console.warn("Git not available. Using fallback version hash.");
 }
 
-// Compose site-wide configuration object
-const config = {
-  siteName: "Williams Family Estate",
-  domain: "williamsfamilyestate.org",
-  buildHash,
-  buildDate: new Date().toISOString(),
-  automation: {
-    generateSitemap: true // can be toggled off by workflows or override logic
-  }
-};
+config.buildHash = buildHash;
+config.buildDate = new Date().toISOString();
 
-// Write to root-level config file
-fs.writeFileSync("site-config.json", JSON.stringify(config, null, 2));
-console.log(`site-config.json written with version ${buildHash}`);
+// Step 3: Write back updated config
+fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), "utf-8");
+console.log(`site-config.json updated with version ${buildHash}`);
