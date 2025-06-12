@@ -246,3 +246,21 @@ img.pinned {
   color: #777;
   margin-top: 0.5em;
 }
+
+/* Injected shared styles from root style.css */
+.pdf-link {
+  position: static; /* or just remove this line entirely */
+  display: inline-block;
+  margin-left: 0.5em;
+}
+
+.pdf-icon-inline {
+  height: 1em;
+  vertical-align: middle;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.pdf-icon-inline:hover {
+  transform: scale(1.3);
+  opacity: 1;
+}
