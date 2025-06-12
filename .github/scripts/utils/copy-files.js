@@ -4,21 +4,13 @@
  * -----------------------------------------------------------------------------
  * TRUST AUTOMATION – FILE STAGING SCRIPT
  * -----------------------------------------------------------------------------
- * This script is part of the Trust publishing system. It's used to pre-process
- * and stage files (both HTML and non-HTML) for deployment to the `public` branch.
- * 
- * We use it inside GitHub Actions to:
- *   1. Copy all static assets EXCEPT .html files (unless flagged active)
- *   2. Copy only .html files that are *not* marked as inactive via a meta tag
- * 
- * Inactive HTML files are skipped by design – only "live" public documents
- * should be deployed to the trust's public record.
- * 
- * This is part of the broader system ensuring the Trust operates with integrity,
- * minimizes manual steps, and stays DRY.
- * 
- * Usage:
- *   node scripts/copy-files.js [html|assets] /path/to/dest
+ * Copies selected files from the root repo into a temporary public folder
+ * based on MODE. It excludes internal folders unless explicitly whitelisted.
+ *
+ * Modes:
+ *   html   → Copies only active .html files (skips inactive ones)
+ *   assets → Copies all other files (CSS, JS, images, etc)
+ *   all    → Copies everything (use with caution)
  * -----------------------------------------------------------------------------
  */
 
@@ -26,60 +18,73 @@ const fs = require('fs');
 const path = require('path');
 const fse = require('fs-extra');
 
-const SOURCE_ROOT = path.resolve(__dirname, '../../../'); // adjust as needed
+const SOURCE_ROOT = path.resolve(__dirname, '../../../');
 const DEST_ROOT = process.argv[3] || '/tmp/public';
-const MODE = process.argv[2] || 'html'; // 'html' | 'assets' | etc.
+const MODE = process.argv[2] || 'html';
 
-// Folders you never want pushed public
+// Folders to always exclude unless allowlisted
 const EXCLUDED_FOLDERS = [
   '.github',
   '.git',
   'logs',
   'private',
   '__secrets__',
-  '.DS_Store'
+  'drafts'
 ];
 
-// Allowlist overrides (e.g. allow public scripts folder)
-const ALLOWLISTED_PATHS = [
-  'scripts'
-];
+// Folder overrides that are allowed even if they appear in EXCLUDED_FOLDERS
+const ALLOWLISTED_PATHS = ['scripts'];
 
-// Check whether a folder should be excluded from public push
-function isExcluded(relativePath) {
-  const firstSegment = relativePath.split(path.sep)[0];
+// Determines if a file or folder path should be excluded
+function isExcluded(relPath) {
+  const firstSegment = relPath.split(path.sep)[0];
   return (
     EXCLUDED_FOLDERS.includes(firstSegment) &&
     !ALLOWLISTED_PATHS.includes(firstSegment)
   );
 }
 
-// Recursively copy files based on mode, skipping excluded folders
+// Checks whether an HTML file is inactive (via meta tag)
+function isInactiveHtml(filePath) {
+  const content = fs.readFileSync(filePath, 'utf8');
+  const inactivePattern = /<meta\s+name=["']doc-status["']\s+content=["']inactive["']/i;
+  return inactivePattern.test(content);
+}
+
+// Main recursive file copier
 function copyFiles(currentDir = SOURCE_ROOT, destDir = DEST_ROOT) {
   fs.readdirSync(currentDir).forEach(item => {
     const srcPath = path.join(currentDir, item);
     const relPath = path.relative(SOURCE_ROOT, srcPath);
     const destPath = path.join(destDir, relPath);
 
-    // Skip excluded folders
     if (isExcluded(relPath)) return;
 
     const stats = fs.statSync(srcPath);
     if (stats.isDirectory()) {
       copyFiles(srcPath, destDir);
     } else {
-      // Filter by mode if needed
       const isHTML = srcPath.endsWith('.html');
-      const isAsset = !srcPath.endsWith('.html') && !srcPath.endsWith('.js') && !srcPath.endsWith('.json');
+      const isAsset = !isHTML;
 
-      if (
-        (MODE === 'html' && isHTML) ||
-        (MODE === 'assets' && isAsset) ||
-        (MODE === 'all')
-      ) {
+      if (MODE === 'html' && isHTML) {
+        if (isInactiveHtml(srcPath)) {
+          console.log(`⚠ Skipped inactive HTML: ${relPath}`);
+          return;
+        }
         fse.ensureDirSync(path.dirname(destPath));
         fs.copyFileSync(srcPath, destPath);
-        console.log(`✔ Copied ${relPath}`);
+        console.log(`✔ Copied active HTML: ${relPath}`);
+
+      } else if (MODE === 'assets' && isAsset) {
+        fse.ensureDirSync(path.dirname(destPath));
+        fs.copyFileSync(srcPath, destPath);
+        console.log(`✔ Copied asset: ${relPath}`);
+
+      } else if (MODE === 'all') {
+        fse.ensureDirSync(path.dirname(destPath));
+        fs.copyFileSync(srcPath, destPath);
+        console.log(`✔ Copied: ${relPath}`);
       }
     }
   });
