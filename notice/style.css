@@ -1,28 +1,37 @@
 /* ===================================== */
+
 /* Shared Styles – Reorganized           */
+
 /* ===================================== */
 
 /* =============================== */
+
 /* Group: Global Layout */
-/* =============================== */
-
-body {
-    background: #fff;
-    color: #222;
-    font-family: Georgia, serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-}
-
-main {
-    margin: 2rem auto;
-    max-width: 720px;
-    padding: 0 1rem;
-}
 
 /* =============================== */
+
+/* =============================== */
+
 /* Group: Content */
+
+/* =============================== */
+
+/* =============================== */
+
+/* Group: Metadata */
+
+/* =============================== */
+
+/* =============================== */
+
+/* Group: Emergency Extras */
+
+/* =============================== */
+
+/* =============================== */
+
+/* Group: Utility */
+
 /* =============================== */
 
 .announce {
@@ -31,6 +40,12 @@ main {
     color: #222;
     margin-bottom: 2rem;
     padding: 1rem 2rem;
+}
+
+.build-meta {
+    color: #777;
+    font-size: 0.8em;
+    margin-top: 0.5em;
 }
 
 .content {
@@ -71,18 +86,28 @@ main {
     font-style: italic;
 }
 
-img.pinned {
-    height: auto;
-    position: absolute;
-    right: 0.5rem;
-    top: 0.5rem;
-    width: 1.5rem;
-    z-index: 5;
+.meta-group {
+    border-bottom: 1px dotted #ccc;
+    color: #444;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 0.95rem;
+    gap: 0.5rem 1rem;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
 }
 
-/* =============================== */
-/* Group: Metadata */
-/* =============================== */
+.meta-group + .meta-group {
+    border-bottom: 1px dotted #ccc;
+    margin-top: 0.5em;
+    padding-top: 0.5em;
+}
+
+.meta-group span {
+    flex: 1 1 auto;
+    min-width: 100px;
+}
 
 .meta.block-id {
     /* style for meta.block-id */
@@ -148,33 +173,6 @@ img.pinned {
     /* style for meta.venue */
 }
 
-.meta-group {
-    border-bottom: 1px dotted #ccc;
-    color: #444;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: 0.95rem;
-    gap: 0.5rem 1rem;
-    justify-content: space-between;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.5rem;
-}
-
-.meta-group + .meta-group {
-    border-bottom: 1px dotted #ccc;
-    margin-top: 0.5em;
-    padding-top: 0.5em;
-}
-
-.meta-group span {
-    flex: 1 1 auto;
-    min-width: 100px;
-}
-
-/* =============================== */
-/* Group: Emergency Extras */
-/* =============================== */
-
 .pdf-icon-inline {
     height: 1em;
     transition: transform 0.2s ease, opacity 0.2s ease;
@@ -192,12 +190,26 @@ img.pinned {
     position: static; /* or just remove this line entirely */
 }
 
-/* =============================== */
-/* Group: Utility */
-/* =============================== */
+body {
+    background: #fff;
+    color: #222;
+    font-family: Georgia, serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
 
-.build-meta {
-    color: #777;
-    font-size: 0.8em;
-    margin-top: 0.5em;
+img.pinned {
+    height: auto;
+    position: absolute;
+    right: 0.5rem;
+    top: 0.5rem;
+    width: 1.5rem;
+    z-index: 5;
+}
+
+main {
+    margin: 2rem auto;
+    max-width: 720px;
+    padding: 0 1rem;
 }
