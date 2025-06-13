@@ -129,7 +129,7 @@ img.pinned {
     /* style for meta.summary */
 }
 .meta.template-hash {
-    /* style for meta.template-hash */
+    display: none !important;
 }
 .meta.title {
     /* style for meta.title */
