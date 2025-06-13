@@ -140,11 +140,7 @@ function reassembleCss(groups, autoOrganize) {
     .flatMap(([, lines]) => lines);
 
   final.push(...leftovers);
-  return final.join('
-').replace(/
-{3,}/g, '
-
-');
+  return final.join('\n').replace(/\n{3,}/g, '\n\n');
 }
 
 async function parseTemplate(templatePath) {
@@ -254,21 +250,23 @@ async function distributeSharedStyles() {
   }
 }
 
-function cleanStyleLinks() {
-  folders.forEach(folder => {
+async function cleanStyleLinks() {
+  for (const folder of folders) {
     const folderPath = path.join('.', folder);
     try {
-  await fs.access(folderPath);
-} catch {
-  return;
-}
-    const files = fs.readdirSync(folderPath).filter(f => f.endsWith('.html'));
-    files.forEach(file => {
+      await fs.access(folderPath);
+    } catch {
+      continue;
+    }
+
+    const files = await fs.readdir(folderPath);
+    for (const file of files.filter(f => f.endsWith('.html'))) {
       const fullPath = path.join(folderPath, file);
-      const originalHtml = fs.readFileSync(fullPath, 'utf-8');
+      const originalHtml = await fs.readFile(fullPath, 'utf-8');
       const $ = cheerio.load(originalHtml);
       const seenHrefs = new Set();
       let removedCount = 0;
+
       $('link[href$="style.css"]').each((i, el) => {
         const href = $(el).attr('href');
         if (seenHrefs.has(href)) {
@@ -278,14 +276,16 @@ function cleanStyleLinks() {
           seenHrefs.add(href);
         }
       });
+
       const updatedHtml = $.html();
       if (removedCount > 0 && updatedHtml !== originalHtml) {
-        writeFile(fullPath, updatedHtml);
+        await writeFile(fullPath, updatedHtml);
         console.log(`${folder}/${file}: Removed ${removedCount} duplicate style link(s).`);
       }
-    });
-  });
+    }
+  }
 }
+
 
 function injectStyleLinks() {
   folders.forEach(folder => {
