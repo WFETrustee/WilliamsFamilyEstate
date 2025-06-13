@@ -281,14 +281,60 @@ img.pinned {
 
 /* ==================== */
 /* Group: Print Enhancements */
-
 @media print {
-    .pdf-link,
-    .site-footer {
-        display: none;
+    .site-footer,
+    .summary-section,
+    body * {
+        display: none !important;
     }
-}
 
+  body.printing-notice .print-notice,
+  body.printing-notice .print-notice * {
+    display: block !important;
+  }
+
+  body.printing-instructions .print-instructions,
+  body.printing-instructions .print-instructions * {
+    display: block !important;
+  }
+
+  .pdf-icon-inline,
+  .pdf-link {
+    display: none !important;
+  }
+
+   #print-buttons,
+  .screen-only {
+    display: none !important;
+  } 
+
+  /* Optional: full-page output styling */
+  .print-notice,
+  .print-instructions {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem;
+    background: white;
+    z-index: 9999;
+  }
+
+  /* Avoid page breaks in awkward places */
+  h2, h3 {
+    page-break-after: avoid;
+  }
+
+  ul, ol {
+    page-break-inside: avoid;
+  }
+
+  .print-divider,
+  .section-label {
+    display: none !important;
+  }
+}
+    
 /* ==================== */
 /* Group: Utility */
 
@@ -303,8 +349,6 @@ img.pinned {
     /* opacity: 0.75;         /* optional: soften it visually */
 }
 
-/* ==================== */
-/* Group: Ungrouped */
 /* ==================== */
 /* Group: Ungrouped */
 /* ===================================== */
