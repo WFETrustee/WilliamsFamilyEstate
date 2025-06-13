@@ -1,78 +1,99 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
   <!-- #BEGIN:head -->
   <head>
-  <!-- Page Metadata -->
-  <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="page-title">[Insert Notice Title]</title>
+    <!-- Page Metadata -->
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">[Insert Notice Title]</title>
 
-  <!-- Emergency Notice Metadata Block -->
-  <meta name="doc-template-hash" content="fb16ddecc1837897653e1913ae0b40b444cf35a8266f2b0dfe8e4ce85a4ba3ab">
-  <meta name="doc-title" content="[Insert Notice Title]" data-label="Title">
-  <meta name="doc-date" content="2025-05-21" data-label="Date" data-style="date" data-group="1">
-  <meta name="doc-id" content="EMG-XXX" data-label="ID" data-group="1">
-  <meta name="doc-certified" content="false">
-  <meta name="doc-version" content="1.0" data-label="Version" data-group="1">
-  <meta name="doc-category" content="[e.g. Legal – Detainment]" data-label="Category" data-group="2">
-  <meta name="doc-author" content="Gregory-Alan: Williams, Trustee" data-label="Author" data-group="2">
-  <meta name="doc-use-trigger" content="[Describe trigger event, e.g. Trustee is detained]" data-label="Trigger Event">
-  <meta name="doc-instructions" content="[e.g. File with Clerk of Court and local Sheriff, get stamped copy]" data-label="Instructions">
-  <meta name="doc-filer" content="[e.g. Partner, or any next friend or successor Trustee]" data-label="Who Can File?">
-  <meta name="doc-status" content="Active" data-style="status">
-  <meta name="doc-pinned" content="false" data-style="pinned">
-  <meta name="doc-image" content="images/template.jpg" data-label="Image">
+    <!-- Emergency Notice Metadata Block -->
+    <meta name="doc-template-hash" content="fb16ddecc1837897653e1913ae0b40b444cf35a8266f2b0dfe8e4ce85a4ba3ab">
+    <meta name="doc-title" content="[Insert Notice Title]" data-label="Title">
+    <meta name="doc-date" content="2025-05-21" data-label="Date" data-style="date" data-group="1">
+    <meta name="doc-id" content="EMG-XXX" data-label="ID" data-group="1">
+    <meta name="doc-certified" content="false">
+    <meta name="doc-version" content="1.0" data-label="Version" data-group="1">
+    <meta name="doc-category" content="[e.g. Legal – Detainment]" data-label="Category" data-group="2">
+    <meta name="doc-author" content="Gregory-Alan: Williams, Trustee" data-label="Author" data-group="2">
+    <meta name="doc-use-trigger" content="[Describe trigger event, e.g. Trustee is detained]" data-label="Trigger Event">
+    <meta name="doc-instructions" content="[e.g. File with Clerk of Court and local Sheriff, get stamped copy]" data-label="Instructions">
+    <meta name="doc-filer" content="[e.g. Partner, or any next friend or successor Trustee]" data-label="Who Can File?">
+    <meta name="doc-status" content="Active" data-style="status">
+    <meta name="doc-pinned" content="false" data-style="pinned">
+    <meta name="doc-image" content="images/template.jpg" data-label="Image">
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="/emergency/style.css">
-</head>
-<!-- #END:head -->
+    <!-- Styles -->
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/emergency/style.css">
+  </head>
+  <!-- #END:head -->
 
-<body>
-  <!-- #BEGIN:site-header -->
-  <div id="site-header"></div>
-  <!-- #END:site-header -->
+  <body>
+    <!-- #BEGIN:site-header -->
+    <div id="site-header"></div>
+    <!-- #END:site-header -->
 
-  <!-- #BEGIN:main-content -->
-  <main aria-label="Emergency Document Content">
-    <div class="doc-title-wrapper">
-      <h1>Document Title</h1>
-    </div>
+    <!-- #BEGIN:main-content -->
+    <main aria-label="Emergency Document Content">
 
-    <section>
-      <h2>Summary</h2>
+      <!-- Print Buttons -->
       <div id="print-buttons" class="screen-only">
         <button onclick="printSection('notice')">🖨 Print Writ Only</button>
         <button onclick="printSection('instructions')">🖨 Print Instructions</button>
       </div>
-      <p><strong>Use Scenario:</strong> [e.g. Trustee is detained, arrested, or incapacitated]</p>
-      <p><strong>Authorized Filer:</strong> [e.g. Partner Sonia, Next Friend, Successor Trustee]</p>
-      <p><strong>Instructions:</strong> [e.g. Print 2 copies. File with Clerk of Court and Sheriff's Office. Obtain stamped receipt.]</p>
-      <p><strong>Status:</strong> Active</p>
-      <p><strong>Version:</strong> 1.0</p>
-    </section>
 
-    <hr>
+      <!-- Primary Content Block -->
+      <div class="print-notice">
+        <div class="doc-title-wrapper">
+          <h1>Document Title</h1>
+          <!-- Optional PDF icon (hidden on print) -->
+          <a href="[PDF_PATH]" class="pdf-link" target="_blank" rel="noopener noreferrer">
+            <img src="/images/pdf_icon.svg" alt="PDF" class="pdf-icon-inline">
+          </a>
+        </div>
 
-    <section>
-      <h2>Document Body</h2>
-      <p><em>This section contains the full body of the emergency document. Replace this placeholder with actual content such as writ, affidavit, or notice text.</em></p>
+        <section class="summary-section">
+          <h2>Summary</h2>
+          <p><strong>Use Scenario:</strong> [e.g. Trustee is detained, arrested, or incapacitated]</p>
+          <p><strong>Authorized Filer:</strong> [e.g. Partner Sonia, Next Friend, Successor Trustee]</p>
+          <p><strong>Instructions:</strong> [e.g. Print 2 copies. File with Clerk of Court and Sheriff's Office. Obtain stamped receipt.]</p>
+          <p><strong>Status:</strong> Active</p>
+          <p><strong>Version:</strong> 1.0</p>
+        </section>
 
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet,
-        adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam.
-      </p>
-    </section>
-  </main>
-  <!-- #END:main-content -->
+        <section>
+          <h2>Document Body</h2>
+          <p><em>This section contains the full body of the emergency document. Replace this placeholder with actual content such as writ, affidavit, or notice text.</em></p>
+        </section>
+      </div> <!-- /.print-notice -->
 
-  <!-- #BEGIN:site-footer -->
-  <div id="site-footer"></div>
-  <!-- #END:site-footer -->
+      <!-- Print Divider -->
+      <hr class="print-divider">
+      <p class="section-label">SEPARATE — NOT PART OF THE WRIT</p>
 
-  <!-- #BEGIN:main-script -->
-  <script src="/scripts/main.js"></script>
-  <!-- #END:main-script -->
-</body>
+      <!-- Instructions Section -->
+      <div class="print-instructions">
+        <section class="instructions-section">
+          <h2>Condensed Instructions &amp; Legal Basis</h2>
+          <p>This document functions as:</p>        
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet,
+            adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam.
+          </p>
+        </section>
+      </div>
+
+    </main>
+    <!-- #END:main-content -->
+
+    <!-- #BEGIN:site-footer -->
+    <div id="site-footer"></div>
+    <!-- #END:site-footer -->
+
+    <!-- #BEGIN:main-script -->
+    <script src="/scripts/core.js"></script>
+    <!-- #END:main-script -->
+  </body>
 </html>
