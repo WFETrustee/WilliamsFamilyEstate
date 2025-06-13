@@ -281,33 +281,24 @@ img.pinned {
 
 /* ==================== */
 /* Group: Print Enhancements */
-@media print {
-    .site-footer,
-    .summary-section,
-    body * {
-        display: none !important;
-    }
-
-  body.printing-notice .print-notice,
-  body.printing-notice .print-notice * {
-    display: block !important;
-  }
-
-  body.printing-instructions .print-instructions,
-  body.printing-instructions .print-instructions * {
-    display: block !important;
-  }
-
-  .pdf-icon-inline,
-  .pdf-link {
-    display: none !important;
-  }
 
    #print-buttons,
   .screen-only {
     display: none !important;
-  } 
-
+  }
+  .pdf-icon-inline,
+  .pdf-link {
+    display: none !important;
+  }
+  .print-divider,
+  .section-label {
+    display: none !important;
+  }
+}
+  /* Avoid page breaks in awkward places */
+  h2, h3 {
+    page-break-after: avoid;
+  }
   /* Optional: full-page output styling */
   .print-notice,
   .print-instructions {
@@ -319,22 +310,24 @@ img.pinned {
     background: white;
     z-index: 9999;
   }
-
-  /* Avoid page breaks in awkward places */
-  h2, h3 {
-    page-break-after: avoid;
+  body.printing-instructions .print-instructions,
+  body.printing-instructions .print-instructions * {
+    display: block !important;
   }
-
+  body.printing-notice .print-notice,
+  body.printing-notice .print-notice * {
+    display: block !important;
+  }
   ul, ol {
     page-break-inside: avoid;
   }
+@media print {
+    .site-footer,
+    .summary-section,
+    body * {
+        display: none !important;
+    }
 
-  .print-divider,
-  .section-label {
-    display: none !important;
-  }
-}
-    
 /* ==================== */
 /* Group: Utility */
 
@@ -351,11 +344,24 @@ img.pinned {
 
 /* ==================== */
 /* Group: Ungrouped */
+/* ==================== */
+/* Group: Ungrouped */
 /* ===================================== */
 /* Emergency Content Styles              */
 /* ===================================== */
 
 /* =============================== */
+
+/* Injected shared styles from root style.css */
+.main-nav ul li a:hover {
+    #background-color: #777;
+}
+
+.build-meta {
+    color: #777;
+    font-size: 0.8em;
+    margin-top: 0.5em;
+}
 
 /* Injected shared styles from root style.css */
 .main-nav ul li a:hover {
