@@ -125,7 +125,7 @@ function reassembleCss(groups, autoOrganize) {
 
     let lines = groups[groupName];
 
-    // Remove existing group comments to avoid duplication
+    // Remove any duplicate or embedded group headers
     lines = lines.filter(line => {
       const trimmed = line.trim();
       return !/^\/\*\s*(=+|Group:)/.test(trimmed);
@@ -133,7 +133,6 @@ function reassembleCss(groups, autoOrganize) {
 
     const hasRules = lines.some(line => line.trim().match(/[^{]+\s*\{/));
 
-    // Add clean group header
     final.push(`/* ==================== */`);
     final.push(`/* Group: ${groupName} */`);
 
@@ -147,7 +146,7 @@ function reassembleCss(groups, autoOrganize) {
     final.push('');
   }
 
-  // Append leftover rules in Ungrouped block
+  // Handle leftovers that don't match predefined groups
   const leftovers = Object.entries(groups)
     .filter(([key]) => !order.includes(key))
     .flatMap(([, lines]) => lines);
@@ -156,6 +155,7 @@ function reassembleCss(groups, autoOrganize) {
     final.push('/* ==================== */');
     final.push('/* Group: Ungrouped */');
     final.push(...leftovers);
+    final.push('');
   }
 
   return final
@@ -165,33 +165,6 @@ function reassembleCss(groups, autoOrganize) {
     .trim() + '\n';
 }
 
-
-  // Handle any leftover/unclassified selectors
-  const leftovers = Object.entries(groups)
-    .filter(([key]) => !order.includes(key))
-    .flatMap(([, lines]) => lines);
-
-  if (leftovers.length > 0) {
-    final.push('/* ==================== */');
-    final.push('/* Group: Ungrouped */');
-    final.push(...leftovers);
-  }
-
-  return final
-    .map(line => line.trimEnd())                // clean trailing spaces
-    .join('\n')
-    .replace(/\n{3,}/g, '\n\n')                 // prevent excessive blank lines
-    .trim() + '\n';                             // ensure file ends with exactly one newline
-}
-
-
-  const leftovers = Object.entries(groups)
-    .filter(([key]) => !order.includes(key))
-    .flatMap(([, lines]) => lines);
-
-  final.push(...leftovers);
-  return final.join('\n').replace(/\n{3,}/g, '\n\n');
-}
 
 async function parseTemplate(templatePath) {
   const content = await fs.readFile(templatePath, 'utf-8');
