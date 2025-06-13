@@ -1,6 +1,3 @@
-/* ==================== */
-/* Group: Global Layout */
-
 body {
     background: #fff;
     color: #222;
@@ -14,10 +11,6 @@ main {
     max-width: 720px;
     padding: 0 1rem;
 }
-
-/* ==================== */
-/* Group: Content */
-
 .announce {
     background-color: #e6f2ff;
     border-radius: 4px;
@@ -65,10 +58,6 @@ img.pinned {
     width: 1.5rem;
     z-index: 5;
 }
-
-/* ==================== */
-/* Group: Metadata */
-
 .meta-group {
     border-bottom: 1px dotted #ccc;
     color: #444;
@@ -137,10 +126,6 @@ img.pinned {
 .meta.venue {
     /* style for meta.venue */
 }
-
-/* ==================== */
-/* Group: Emergency Extras */
-
 .pdf-icon-inline {
     height: 1em;
     transition: transform 0.2s ease, opacity 0.2s ease;
@@ -155,21 +140,11 @@ img.pinned {
     margin-left: 0.5em;
     position: static; /* or just remove this line entirely */
 }
-
-/* ==================== */
-/* Group: Utility */
-
 .build-meta {
     color: #777;
     font-size: 0.8em;
     margin-top: 0.5em;
 }
-
-/* ==================== */
-/* Group: Ungrouped */
-/* Notice Styles                         */
-
-/* Injected shared styles from root style.css */
 .main-nav > ul {
     display: flex;
     gap: 1.25rem;
@@ -179,17 +154,14 @@ img.pinned {
     padding: 0;
     width: 100%;
 }
-
 .main-nav img {
     height: 1.25em;
     transition: transform 0.2s ease;
     vertical-align: middle;
 }
-
 .main-nav a:hover img {
     transform: scale(1.5); /* Grows 50% larger on hover */
 }
-
 .main-nav ul li a {
     border-radius: 4px;
     color: #333;
@@ -199,7 +171,6 @@ img.pinned {
     text-decoration: none;
     transition: background-color 0.2s ease;
 }
-
 .main-nav ul li a.active {
     background-color: #777;
     border-top-left-radius: 6px;
@@ -211,11 +182,9 @@ img.pinned {
     position: relative;
     z-index: 2;
 }
-
 .main-nav ul li a:hover {
     #background-color: #777;
 }
-
 .site-header h1 {
     font-family: "Scope One", serif;
     font-size: 1.9rem;
