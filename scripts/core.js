@@ -55,6 +55,17 @@ function applyFormat(date, formatStr) {
 }
 
 /**
+ * Applies different formsat rules for printing
+ */
+function printSection(type) {
+  document.body.classList.remove('printing-notice', 'printing-instructions');
+  document.body.classList.add(`printing-${type}`);
+  window.print();
+  // Optional: Clean up class after printing
+  setTimeout(() => document.body.classList.remove(`printing-${type}`), 1000);
+}
+
+/**
  * Attempts to infer locale formatting style from a sample string.
  */
 function guessLocaleFromExample(example) {
