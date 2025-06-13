@@ -149,8 +149,10 @@ function reassembleCss(groups, autoOrganize) {
   // Handle leftovers that don't match predefined groups
   const leftovers = Object.entries(groups)
     .filter(([key]) => !order.includes(key))
-    .flatMap(([, lines]) => lines);
-
+    .flatMap(([, lines]) =>
+      lines.filter(line => !/^\/\*\s*(=+|Group:)/.test(line.trim()))
+    );
+  
   if (leftovers.length > 0) {
     final.push('/* ==================== */');
     final.push('/* Group: Ungrouped */');
