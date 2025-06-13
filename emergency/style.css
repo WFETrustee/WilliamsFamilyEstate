@@ -162,14 +162,9 @@ main {
 /* ==================== */
 /* Group: Metadata */
 
-.meta.template-hash {
-  display: none !important;
-}
-
 .meta.certified {
   /* style for meta.certified */
 }
-
 .meta.image {
   /* style for meta.image */
 }
@@ -225,6 +220,9 @@ img.pinned {
     top: 0.5rem;
     width: 1.5rem;
     z-index: 5;
+}
+.meta.template-hash {
+  display: none !important;
 }
 
 /* ==================== */
@@ -307,11 +305,24 @@ img.pinned {
 
 /* ==================== */
 /* Group: Ungrouped */
+/* ==================== */
+/* Group: Ungrouped */
 /* ===================================== */
 /* Emergency Content Styles              */
 /* ===================================== */
 
 /* =============================== */
+
+/* Injected shared styles from root style.css */
+.main-nav ul li a:hover {
+    #background-color: #777;
+}
+
+.build-meta {
+    color: #777;
+    font-size: 0.8em;
+    margin-top: 0.5em;
+}
 
 /* Injected shared styles from root style.css */
 .main-nav ul li a:hover {
