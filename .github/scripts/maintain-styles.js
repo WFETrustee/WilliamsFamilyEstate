@@ -19,7 +19,7 @@
 // ============================================================
 import fs from 'fs/promises';
 import path from 'path';
-import * as cheerio from 'cheerio';
+import cheerio from 'cheerio';
 import postcss from 'postcss';
 import postcssSafeParser from 'postcss-safe-parser';
 import { loadSiteConfig } from './utils/load-config.js';
