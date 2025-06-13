@@ -273,13 +273,13 @@ img.pinned {
 
 /* ==================== */
 /* Group: Print Enhancements */
+
     #print-buttons {
         margin: 1rem 0;
         display: flex;
         gap: 1rem;
         justify-content: flex-end;
     }
-    
     #print-buttons button {
         background-color: #444;
         color: #fff;
@@ -290,7 +290,6 @@ img.pinned {
         cursor: pointer;
         transition: background-color 0.2s ease;
     }
-    
     #print-buttons button:hover {
         background-color: #222;
     }
@@ -355,6 +354,15 @@ img.pinned {
 /* ==================== */
 /* Group: Ungrouped */
 /* ==================== */
+/* Group: Ungrouped */
+/* ==================== */
+
+/* Injected shared styles from root style.css */
+.build-meta {
+    color: #777;
+    font-size: 0.8em;
+    margin-top: 0.5em;
+}
 
 /* Injected shared styles from root style.css */
 .build-meta {
