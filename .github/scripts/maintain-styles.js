@@ -12,11 +12,10 @@
 //   - postcss + postcss-safe-parser: parsing and manipulating CSS rules
 //   - fs/promises: for modern async file reads/writes
 // Usage:
-//   node maintain-styles.js all --dry   // dry-run full pipeline
-//   node maintain-styles.js stubs       // only generate missing meta class stubs
-//   node maintain-styles.js inject      // inject missing <link rel="stylesheet">
+//   node maintain-styles.js all --dry
 // Author: Gregory-Alan Williams, with help from my AI co-architect The GPT
 // ============================================================
+
 import fs from 'fs/promises';
 import path from 'path';
 import * as cheerio from 'cheerio';
@@ -31,17 +30,17 @@ const folders = getAllContentFolders('.');
 const mode = process.argv[2] || 'all';
 const DRY_RUN = process.argv.includes('--dry');
 
-let modesToRun = (mode === 'all') ? ['stubs', 'distribute', 'clean', 'inject'] : [mode];
+let modesToRun = mode === 'all'
+  ? ['stubs', 'distribute', 'clean', 'inject']
+  : [mode];
 if (!config.css?.autoOrganize) modesToRun = modesToRun.filter(m => m !== 'distribute');
 
 function getRegexList(array = []) {
-  return array.map(pattern => {
-    if (pattern.includes('*')) {
-      return new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
-    } else {
-      return new RegExp('^' + pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$');
-    }
-  });
+  return array.map(pattern =>
+    pattern.includes('*')
+      ? new RegExp('^' + pattern.replace(/\*/g, '.*') + '$')
+      : new RegExp('^' + pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$')
+  );
 }
 
 const excludeRegexes = getRegexList(config.css?.excludeFromRootDistribute || []);
@@ -64,11 +63,12 @@ function extractGroups(cssText) {
       groups[currentGroup].push(...buffer);
       buffer = [];
       currentGroup = groupMatch[1];
-      groups[currentGroup] = [`/* ==================== */`, line];
+      groups[currentGroup] = [`/* ==================== */`, `/* Group: ${groupMatch[1]} */`];
     } else {
       buffer.push(line);
     }
   }
+
   if (!groups[currentGroup]) groups[currentGroup] = [];
   groups[currentGroup].push(...buffer);
   return groups;
@@ -98,9 +98,9 @@ function ensureMetaStyles(metaFields, metadataGroupLines) {
     })
   );
 
-  const newStyles = metaFields.filter(field => !presentFields.has(field)).map(
-    field => `\n.meta.${field} {\n  /* style for meta.${field} */\n}`
-  );
+  const newStyles = metaFields
+    .filter(field => !presentFields.has(field))
+    .map(field => `.meta.${field} {\n  /* style for meta.${field} */\n}`);
   return [...metadataGroupLines, ...newStyles];
 }
 
@@ -115,27 +115,27 @@ function reassembleCss(groups, autoOrganize) {
     'Emergency Extras',
     'Responsive Enhancements',
     'Print Enhancements',
-    'Utility',
+    'Utility'
   ];
 
-  let final = [];
+  const final = [];
 
   for (const groupName of order) {
     if (!groups[groupName]) continue;
 
     let lines = groups[groupName];
 
-    // Remove any duplicate or embedded group headers
-    lines = lines.filter(line => {
-      const trimmed = line.trim();
-      return !/^\/\*\s*(=+|Group:)/.test(trimmed);
-    });
+    // Preserve top-level and group headers
+    const preservedHeaders = lines.filter(line =>
+      /^\/\*.*(Group:|===|Document Styles)/.test(line)
+    );
+    lines = lines.filter(line =>
+      !/^\/\*\s*(=+|Group:)/.test(line.trim())
+    );
 
     const hasRules = lines.some(line => line.trim().match(/[^{]+\s*\{/));
 
-    final.push(`/* ==================== */`);
-    final.push(`/* Group: ${groupName} */`);
-
+    final.push(...preservedHeaders);
     if (hasRules) {
       if (autoOrganize) lines = alphabetizeGroup(lines).flat();
       final.push(...lines);
@@ -146,13 +146,10 @@ function reassembleCss(groups, autoOrganize) {
     final.push('');
   }
 
-  // Handle leftovers that don't match predefined groups
   const leftovers = Object.entries(groups)
     .filter(([key]) => !order.includes(key))
-    .flatMap(([, lines]) =>
-      lines.filter(line => !/^\/\*\s*(=+|Group:)/.test(line.trim()))
-    );
-  
+    .flatMap(([, lines]) => lines);
+
   if (leftovers.length > 0) {
     final.push('/* ==================== */');
     final.push('/* Group: Ungrouped */');
@@ -160,13 +157,8 @@ function reassembleCss(groups, autoOrganize) {
     final.push('');
   }
 
-  return final
-    .map(line => line.trimEnd())
-    .join('\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim() + '\n';
+  return final.map(line => line.trimEnd()).join('\n').replace(/\n{3,}/g, '\n\n').trim() + '\n';
 }
-
 
 async function parseTemplate(templatePath) {
   const content = await fs.readFile(templatePath, 'utf-8');
@@ -185,7 +177,6 @@ async function parseTemplate(templatePath) {
 
 async function writeUpdatedCss(cssPath, newCssText, originalCssText) {
   const normalizedCss = await normalizeCss(newCssText);
-
   if (normalizedCss === originalCssText) {
     console.log(`No changes needed for ${cssPath}`);
     return;
@@ -199,7 +190,6 @@ async function writeUpdatedCss(cssPath, newCssText, originalCssText) {
     console.log(`Updated: ${cssPath}`);
   }
 }
-
 
 async function generateCssStubs() {
   for (const folder of folders) {
@@ -262,7 +252,9 @@ async function distributeSharedStyles() {
       }
     }
 
-    const additions = rootRules.filter(rule => !existingSelectors.has(rule.selector)).map(r => r.cssText);
+    const additions = rootRules
+      .filter(rule => !existingSelectors.has(rule.selector))
+      .map(r => r.cssText);
 
     if (additions.length > 0) {
       const newCSS = `${folderCSS.trim()}\n\n/* Injected shared styles from root style.css */\n${additions.join('\n\n')}`;
@@ -315,7 +307,6 @@ async function cleanStyleLinks() {
   }
 }
 
-
 async function injectStyleLinks() {
   for (const folder of folders) {
     const folderPath = path.join('.', folder);
@@ -362,51 +353,40 @@ async function injectStyleLinks() {
 
 async function normalizeCss(cssText) {
   const result = await postcss([]).process(cssText, { parser: postcssSafeParser });
-
-  const cleanedLines = [];
+  const topLevelRules = [];
+  const mediaBlocks = {};
   const emittedSelectors = new Set();
-  let currentMedia = null;
 
   for (const node of result.root.nodes) {
-    if (node.type === 'comment') {
-      // Preserve all top-level comments (group headers, notes, etc.)
-      cleanedLines.push(`/* ${node.text.trim()} */`);
-    }
-
-    if (node.type === 'rule') {
-      if (!emittedSelectors.has(node.selector)) {
-        cleanedLines.push(node.toString().trim());
-        emittedSelectors.add(node.selector);
-        cleanedLines.push(''); // Add spacing between blocks
-      }
+    if (node.type === 'rule' && !emittedSelectors.has(node.selector)) {
+      topLevelRules.push(node);
+      emittedSelectors.add(node.selector);
     }
 
     if (node.type === 'atrule' && node.name === 'media') {
-      currentMedia = [`@media ${node.params} {`];
+      const mediaQuery = node.params;
+      if (!mediaBlocks[mediaQuery]) {
+        mediaBlocks[mediaQuery] = postcss.atRule({ name: 'media', params: mediaQuery });
+        mediaBlocks[mediaQuery].nodes = [];
+      }
 
       for (const child of node.nodes || []) {
-        if (child.type === 'comment') {
-          currentMedia.push(`  /* ${child.text.trim()} */`);
-        } else if (child.type === 'rule' && !emittedSelectors.has(child.selector)) {
-          const block = child.toString().split('\n').map(l => '  ' + l.trim());
-          currentMedia.push(...block);
-          currentMedia.push('');
+        if (child.type === 'rule' && !emittedSelectors.has(child.selector)) {
+          mediaBlocks[mediaQuery].nodes.push(child);
           emittedSelectors.add(child.selector);
         }
       }
-
-      currentMedia.push('}');
-      cleanedLines.push(currentMedia.join('\n'));
-      cleanedLines.push('');
     }
   }
 
-  return cleanedLines
-    .map(line => line.trimEnd())
-    .join('\n')
-    .replace(/\n{3,}/g, '\n\n') + '\n';
-}
+  const cleanedRoot = postcss.root();
+  topLevelRules.forEach(rule => cleanedRoot.append(rule));
+  Object.entries(mediaBlocks)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .forEach(([, block]) => cleanedRoot.append(block));
 
+  return cleanedRoot.toString().replace(/\n{3,}/g, '\n\n').trim() + '\n';
+}
 
 // Main execution block
 (async () => {
@@ -415,4 +395,3 @@ async function normalizeCss(cssText) {
   if (modesToRun.includes('clean')) await cleanStyleLinks();
   if (modesToRun.includes('inject')) await injectStyleLinks();
 })();
-
