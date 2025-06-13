@@ -120,19 +120,31 @@ function reassembleCss(groups, autoOrganize) {
 
   let final = [];
   for (const groupName of order) {
-    if (groups[groupName]) {
-      let lines = groups[groupName];
+  if (groups[groupName]) {
+    let lines = groups[groupName];
+    const nonEmptyLines = lines.filter(line => line.trim() !== '' && !/^\/\*/.test(line.trim()));
+    if (nonEmptyLines.length === 0) {
+      final.push(`/* ==================== */`);
+      final.push(`/* Group: ${groupName} */`);
+      final.push(`/* (no styles in this group yet) */`);
+    } else {
       if (autoOrganize) lines = alphabetizeGroup(lines).flat();
-      final.push(...lines, '');
+      if (final.length > 0) final.push('');
+      final.push(...lines);
     }
   }
+}
 
   const leftovers = Object.entries(groups)
     .filter(([key]) => !order.includes(key))
     .flatMap(([, lines]) => lines);
 
   final.push(...leftovers);
-  return final.join('\n');
+  return final.join('
+').replace(/
+{3,}/g, '
+
+');
 }
 
 async function parseTemplate(templatePath) {
@@ -245,7 +257,11 @@ async function distributeSharedStyles() {
 function cleanStyleLinks() {
   folders.forEach(folder => {
     const folderPath = path.join('.', folder);
-    if (!fs.existsSync(folderPath)) return;
+    try {
+  await fs.access(folderPath);
+} catch {
+  return;
+}
     const files = fs.readdirSync(folderPath).filter(f => f.endsWith('.html'));
     files.forEach(file => {
       const fullPath = path.join(folderPath, file);
