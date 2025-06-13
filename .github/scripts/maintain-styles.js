@@ -317,7 +317,7 @@ async function injectStyleLinks() {
         }
       }
     });
-  });
+  })();
 }
 
 (async () => {
