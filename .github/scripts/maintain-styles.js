@@ -184,19 +184,22 @@ async function parseTemplate(templatePath) {
 }
 
 async function writeUpdatedCss(cssPath, newCssText, originalCssText) {
-  if (newCssText === originalCssText) {
+  const normalizedCss = await normalizeCss(newCssText);
+
+  if (normalizedCss === originalCssText) {
     console.log(`No changes needed for ${cssPath}`);
     return;
   }
 
   if (DRY_RUN) {
     console.log(`--- DRY RUN: ${cssPath} ---`);
-    console.log(newCssText);
+    console.log(normalizedCss);
   } else {
-    await writeFile(cssPath, newCssText);
+    await writeFile(cssPath, normalizedCss);
     console.log(`Updated: ${cssPath}`);
   }
 }
+
 
 async function generateCssStubs() {
   for (const folder of folders) {
@@ -355,6 +358,47 @@ async function injectStyleLinks() {
       }
     }
   }
+}
+async function normalizeCss(cssText) {
+  const result = await postcss([]).process(cssText, { parser: postcssSafeParser });
+
+  const topLevelRules = [];
+  const mediaBlocks = {};
+  const emittedSelectors = new Set();
+
+  for (const node of result.root.nodes) {
+    if (node.type === 'rule') {
+      if (!emittedSelectors.has(node.selector)) {
+        topLevelRules.push(node);
+        emittedSelectors.add(node.selector);
+      }
+    }
+
+    if (node.type === 'atrule' && node.name === 'media') {
+      const mediaQuery = node.params;
+
+      if (!mediaBlocks[mediaQuery]) {
+        mediaBlocks[mediaQuery] = postcss.atRule({ name: 'media', params: mediaQuery });
+        mediaBlocks[mediaQuery].nodes = [];
+      }
+
+      for (const child of node.nodes || []) {
+        if (child.type === 'rule' && !emittedSelectors.has(child.selector)) {
+          mediaBlocks[mediaQuery].nodes.push(child);
+          emittedSelectors.add(child.selector);
+        }
+      }
+    }
+  }
+
+  // Rebuild final CSS from the top-level rules and sorted media blocks
+  const cleanedRoot = postcss.root();
+  topLevelRules.forEach(rule => cleanedRoot.append(rule));
+  Object.entries(mediaBlocks)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .forEach(([, block]) => cleanedRoot.append(block));
+
+  return cleanedRoot.toString().replace(/\n{3,}/g, '\n\n').trim() + '\n';
 }
 
 // Main execution block
