@@ -119,21 +119,52 @@ function reassembleCss(groups, autoOrganize) {
   ];
 
   let final = [];
+
   for (const groupName of order) {
-  if (groups[groupName]) {
+    if (!groups[groupName]) continue;
+
     let lines = groups[groupName];
-    const nonEmptyLines = lines.filter(line => line.trim() !== '' && !/^\/\*/.test(line.trim()));
-    if (nonEmptyLines.length === 0) {
-      final.push(`/* ==================== */`);
-      final.push(`/* Group: ${groupName} */`);
-      final.push(`/* (no styles in this group yet) */`);
-    } else {
+
+    // Filter out duplicate headers already embedded in group content
+    lines = lines.filter(line => {
+      const trimmed = line.trim();
+      return !/^\/\*\s*(=+|Group:)/.test(trimmed);
+    });
+
+    const hasRules = lines.some(line => line.trim().match(/[^{]+\s*\{/));
+
+    // Only insert group headers if there are visible rules or we want to indicate empty group
+    final.push(`/* ==================== */`);
+    final.push(`/* Group: ${groupName} */`);
+
+    if (hasRules) {
       if (autoOrganize) lines = alphabetizeGroup(lines).flat();
-      if (final.length > 0) final.push('');
       final.push(...lines);
+    } else {
+      final.push(`/* (no styles in this group yet) */`);
     }
+
+    final.push('');
   }
+
+  // Handle any leftover/unclassified selectors
+  const leftovers = Object.entries(groups)
+    .filter(([key]) => !order.includes(key))
+    .flatMap(([, lines]) => lines);
+
+  if (leftovers.length > 0) {
+    final.push('/* ==================== */');
+    final.push('/* Group: Ungrouped */');
+    final.push(...leftovers);
+  }
+
+  return final
+    .map(line => line.trimEnd())                // clean trailing spaces
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')                 // prevent excessive blank lines
+    .trim() + '\n';                             // ensure file ends with exactly one newline
 }
+
 
   const leftovers = Object.entries(groups)
     .filter(([key]) => !order.includes(key))
