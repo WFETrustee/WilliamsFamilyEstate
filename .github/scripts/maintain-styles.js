@@ -1,31 +1,41 @@
 // ============================================================
 // File: maintain-styles.js
-// Purpose: Central CSS maintenance: class stubs, style distribution, <link> injection, deduplication
-// Supports: alwaysDistribute and excludeFromRootDistribute via site-config.json
+// Purpose: Central CSS maintenance tool for my GitHub Pages site
+// Features:
+//   - Auto-generates .meta.* class stubs from template <meta> tags
+//   - Organizes and alphabetizes CSS by functional group
+//   - Injects root shared styles into content folders
+//   - Ensures <link> tags are present and deduplicated
+//   - Honors `site-config.json` options like autoOrganize, exclude rules, and dry run
+// Dependencies:
+//   - cheerio: HTML parsing for <meta> and <link>
+//   - postcss + postcss-safe-parser: parsing and manipulating CSS rules
+//   - fs/promises: for modern async file reads/writes
+// Usage:
+//   node maintain-styles.js all --dry   // dry-run full pipeline
+//   node maintain-styles.js stubs       // only generate missing meta class stubs
+//   node maintain-styles.js inject      // inject missing <link rel="stylesheet">
+// Author: Gregory-Alan Williams, with help from my AI co-architect The GPT
 // ============================================================
-
-const fs = require('fs');
-const path = require('path');
-const cheerio = require('cheerio');
-const postcss = require('postcss');
-const postcssSafeParser = require('postcss-safe-parser');
-const { loadSiteConfig } = require('./utils/load-config');
-const { getAllContentFolders } = require('./utils/template-metadata');
-const { writeFile } = require('./utils/write-file');
+import fs from 'fs/promises';
+import path from 'path';
+import cheerio from 'cheerio';
+import postcss from 'postcss';
+import postcssSafeParser from 'postcss-safe-parser';
+import { loadSiteConfig } from './utils/load-config.js';
+import { getAllContentFolders } from './utils/template-metadata.js';
+import { writeFile } from './utils/write-file.js';
 
 const config = loadSiteConfig();
-const mode = process.argv[2] || 'all';
 const folders = getAllContentFolders('.');
+const mode = process.argv[2] || 'all';
+const DRY_RUN = process.argv.includes('--dry');
 
 let modesToRun = (mode === 'all') ? ['stubs', 'distribute', 'clean', 'inject'] : [mode];
 if (!config.css?.autoOrganize) modesToRun = modesToRun.filter(m => m !== 'distribute');
 
-// ------------------------------------------------------------
-// Helper: Convert string patterns into regex
-// ------------------------------------------------------------
 function getRegexList(array = []) {
   return array.map(pattern => {
-    // Escape if needed and convert wildcards (*) to regex
     if (pattern.includes('*')) {
       return new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
     } else {
@@ -34,100 +44,165 @@ function getRegexList(array = []) {
   });
 }
 
-// Preprocess config regex rules
 const excludeRegexes = getRegexList(config.css?.excludeFromRootDistribute || []);
 const alwaysDistributeRegexes = getRegexList(config.css?.alwaysDistribute || []);
 
-// Check if a selector matches any regex in a given list
 function matchesAny(selector, regexList) {
   return regexList.some(rx => rx.test(selector));
 }
 
-// ------------------------------------------------------------
-// 1. Generate class stubs based on <meta data-style="">
-// ------------------------------------------------------------
-function generateCssStubs() {
-  folders.forEach(folder => {
-    const templatePath = path.join(folder, `${folder}_template.html`);
-    const stylePath = path.join(folder, 'style.css');
-    if (!fs.existsSync(templatePath)) return;
+function extractGroups(cssText) {
+  const groups = {};
+  const lines = cssText.split(/\r?\n/);
+  let currentGroup = 'Ungrouped';
+  let buffer = [];
 
-    const html = fs.readFileSync(templatePath, 'utf-8');
-    const $ = cheerio.load(html);
-    const classNames = new Set();
-
-    $('meta').each((_, el) => {
-      const name = $(el).attr('name')?.trim();
-      const style = $(el).attr('data-style')?.trim();
-
-      if (style) {
-        classNames.add(`meta.${style}`);
-      } else if (name?.startsWith('doc-')) {
-        const className = name.replace(/^doc-/, '').toLowerCase();
-        classNames.add(`meta.${className}`);
-      }
-    });
-
-    if (classNames.size === 0) return;
-
-    // Load current CSS file contents
-    let originalCss = '';
-    if (fs.existsSync(stylePath)) {
-      originalCss = fs.readFileSync(stylePath, 'utf-8');
+  for (const line of lines) {
+    const groupMatch = line.match(/\/\*+\s*Group: (.+?)\s*\*+\//);
+    if (groupMatch) {
+      if (!groups[currentGroup]) groups[currentGroup] = [];
+      groups[currentGroup].push(...buffer);
+      buffer = [];
+      currentGroup = groupMatch[1];
+      groups[currentGroup] = [`/* ==================== */`, line];
+    } else {
+      buffer.push(line);
     }
-
-    const existingMetaRegex = /\.meta\.[a-z0-9_-]+\s*\{/gi;
-    const existingSelectors = new Set(
-      (originalCss.match(existingMetaRegex) || [])
-        .map(s => s.trim().split(' ')[0])
-    );
-
-    const missing = Array.from(classNames).filter(c => !existingSelectors.has(`.${c}`));
-    if (missing.length === 0) {
-      console.log(`✓ ${folder}/style.css already contains all meta stubs.`);
-      return;
-    }
-
-    const newStubs = missing
-      .sort()
-      .map(c => `.${c} {\n  /* style for ${c} */\n}`)
-      .join('\n\n');
-
-    const finalCss = `${originalCss.trim()}\n\n/* Auto-generated meta stubs */\n${newStubs}\n`;
-    writeFile(stylePath, finalCss);
-    console.log(`✔ ${folder}/style.css: Appended ${missing.length} new meta stubs.`);
-  });
+  }
+  if (!groups[currentGroup]) groups[currentGroup] = [];
+  groups[currentGroup].push(...buffer);
+  return groups;
 }
 
+function alphabetizeGroup(lines) {
+  const blocks = [];
+  let block = [];
+  for (const line of lines) {
+    if (/^\s*$/.test(line)) {
+      if (block.length) blocks.push(block);
+      blocks.push([line]);
+      block = [];
+    } else {
+      block.push(line);
+    }
+  }
+  if (block.length) blocks.push(block);
+  return blocks.sort((a, b) => (a[0] || '').localeCompare(b[0] || ''));
+}
 
-// ------------------------------------------------------------
-// 2. Distribute root styles into folder-level style.css files
-//    Supports exclusions, always-includes, and displayPriority
-// ------------------------------------------------------------
+function ensureMetaStyles(metaFields, metadataGroupLines) {
+  const presentFields = new Set(
+    metadataGroupLines.flatMap(line => {
+      const match = line.match(/\.meta\.([a-zA-Z0-9_-]+)/);
+      return match ? [match[1]] : [];
+    })
+  );
+
+  const newStyles = metaFields.filter(field => !presentFields.has(field)).map(
+    field => `\n.meta.${field} {\n  /* style for meta.${field} */\n}`
+  );
+  return [...metadataGroupLines, ...newStyles];
+}
+
+function reassembleCss(groups, autoOrganize) {
+  const order = [
+    'Global Layout',
+    'Header',
+    'Navigation',
+    'Content',
+    'Metadata',
+    'Footer',
+    'Emergency Extras',
+    'Responsive Enhancements',
+    'Print Enhancements',
+    'Utility',
+  ];
+
+  let final = [];
+  for (const groupName of order) {
+    if (groups[groupName]) {
+      let lines = groups[groupName];
+      if (autoOrganize) lines = alphabetizeGroup(lines).flat();
+      final.push(...lines, '');
+    }
+  }
+
+  const leftovers = Object.entries(groups)
+    .filter(([key]) => !order.includes(key))
+    .flatMap(([, lines]) => lines);
+
+  final.push(...leftovers);
+  return final.join('\n');
+}
+
+async function parseTemplate(templatePath) {
+  const content = await fs.readFile(templatePath, 'utf-8');
+  const $ = cheerio.load(content);
+  const metaMatches = new Set();
+
+  $('meta').each((_, el) => {
+    const name = $(el).attr('name');
+    const dataStyle = $(el).attr('data-style');
+    if (dataStyle) metaMatches.add(dataStyle);
+    else if (name?.startsWith('doc-')) metaMatches.add(name.replace(/^doc-/, ''));
+  });
+
+  return [...metaMatches];
+}
+
+async function writeUpdatedCss(cssPath, newCssText, originalCssText) {
+  if (newCssText === originalCssText) {
+    console.log(`No changes needed for ${cssPath}`);
+    return;
+  }
+
+  if (DRY_RUN) {
+    console.log(`--- DRY RUN: ${cssPath} ---`);
+    console.log(newCssText);
+  } else {
+    await writeFile(cssPath, newCssText);
+    console.log(`Updated: ${cssPath}`);
+  }
+}
+
+async function generateCssStubs() {
+  for (const folder of folders) {
+    const templatePath = path.join(folder, `${folder}_template.html`);
+    const stylePath = path.join(folder, 'style.css');
+    if (!await fs.stat(templatePath).catch(() => false)) continue;
+
+    const metaFields = await parseTemplate(templatePath);
+
+    let originalCss = '';
+    if (await fs.stat(stylePath).catch(() => false)) {
+      originalCss = await fs.readFile(stylePath, 'utf-8');
+    }
+
+    const groups = extractGroups(originalCss);
+    if (!groups['Metadata']) groups['Metadata'] = ['/* ==================== */', '/* Group: Metadata */'];
+    groups['Metadata'] = ensureMetaStyles(metaFields, groups['Metadata']);
+
+    const newCss = config.css?.autoOrganize ? reassembleCss(groups, true) : reassembleCss(groups, false);
+    await writeUpdatedCss(stylePath, newCss, originalCss);
+  }
+}
+
 async function distributeSharedStyles() {
   const rootCssPath = path.join('.', 'style.css');
-  if (!fs.existsSync(rootCssPath)) return;
+  if (!await fs.stat(rootCssPath).catch(() => false)) return;
 
-  const rootCSS = fs.readFileSync(rootCssPath, 'utf-8');
+  const rootCSS = await fs.readFile(rootCssPath, 'utf-8');
   const rootAST = await postcss([]).process(rootCSS, { from: rootCssPath, parser: postcssSafeParser });
 
-  // Build maps and lists from config
-  const excludePatterns = (config.css?.excludeFromRootDistribute || []).map(p => new RegExp(p));
-  const alwaysIncludePatterns = (config.css?.alwaysDistribute || []).map(p => new RegExp(p));
   const priorityMap = config.css?.displayPriority || {};
 
-  // Extract all root rules
   const rootRules = [];
   for (const node of rootAST.root.nodes) {
     if (node.type === 'rule' && node.selector?.trim()) {
       const selector = node.selector.trim();
-
-      const isExcluded = excludePatterns.some(re => re.test(selector));
-      const isAlwaysIncluded = alwaysIncludePatterns.some(re => re.test(selector));
-
-      // Skip if excluded and not always included
+      const isExcluded = matchesAny(selector, excludeRegexes);
+      const isAlwaysIncluded = matchesAny(selector, alwaysDistributeRegexes);
       if (isExcluded && !isAlwaysIncluded) continue;
-
       rootRules.push({
         selector,
         cssText: node.toString().trim(),
@@ -136,15 +211,12 @@ async function distributeSharedStyles() {
     }
   }
 
-  // Sort by display priority (if specified)
   rootRules.sort((a, b) => a.priority - b.priority);
 
-  // Inject missing styles into each content folder
   for (const folder of folders) {
     const targetPath = path.join(folder, 'style.css');
-    if (!fs.existsSync(targetPath)) continue;
-
-    const folderCSS = fs.readFileSync(targetPath, 'utf-8');
+    if (!await fs.stat(targetPath).catch(() => false)) continue;
+    const folderCSS = await fs.readFile(targetPath, 'utf-8');
     const folderAST = await postcss([]).process(folderCSS, { from: targetPath, parser: postcssSafeParser });
 
     const existingSelectors = new Set();
@@ -154,49 +226,33 @@ async function distributeSharedStyles() {
       }
     }
 
-    const additions = [];
-    for (const rule of rootRules) {
-      if (!existingSelectors.has(rule.selector)) {
-        additions.push(rule.cssText);
-      }
-    }
+    const additions = rootRules.filter(rule => !existingSelectors.has(rule.selector)).map(r => r.cssText);
 
     if (additions.length > 0) {
-      const finalCSS = `${folderCSS.trim()}\n\n/* Injected shared styles from root style.css */\n${additions.join('\n\n')}`;
-      writeFile(targetPath, finalCSS);
-      console.log(`✔ Injected ${additions.length} styles into ${targetPath}`);
-    } else {
-      console.log(`✓ ${targetPath} already contains all required selectors. No changes.`);
+      const newCSS = `${folderCSS.trim()}\n\n/* Injected shared styles from root style.css */\n${additions.join('\n\n')}`;
+      await writeUpdatedCss(targetPath, newCSS, folderCSS);
     }
   }
 
-  // Local helper to resolve numeric priority
   function getPriority(selector, map) {
     for (const pattern in map) {
       if (new RegExp(pattern).test(selector)) return map[pattern];
     }
-    return 9999; // Lowest priority if not listed
+    return 9999;
   }
 }
 
-
-// ------------------------------------------------------------
-// 3. Remove duplicate <link href="style.css"> tags
-// ------------------------------------------------------------
 function cleanStyleLinks() {
   folders.forEach(folder => {
     const folderPath = path.join('.', folder);
     if (!fs.existsSync(folderPath)) return;
-
     const files = fs.readdirSync(folderPath).filter(f => f.endsWith('.html'));
     files.forEach(file => {
       const fullPath = path.join(folderPath, file);
       const originalHtml = fs.readFileSync(fullPath, 'utf-8');
       const $ = cheerio.load(originalHtml);
-
       const seenHrefs = new Set();
       let removedCount = 0;
-
       $('link[href$="style.css"]').each((i, el) => {
         const href = $(el).attr('href');
         if (seenHrefs.has(href)) {
@@ -206,7 +262,6 @@ function cleanStyleLinks() {
           seenHrefs.add(href);
         }
       });
-
       const updatedHtml = $.html();
       if (removedCount > 0 && updatedHtml !== originalHtml) {
         writeFile(fullPath, updatedHtml);
@@ -216,44 +271,27 @@ function cleanStyleLinks() {
   });
 }
 
-
-// ------------------------------------------------------------
-// 4. Inject missing <link rel="stylesheet"> tags into <head>
-// ------------------------------------------------------------
 function injectStyleLinks() {
   folders.forEach(folder => {
     const folderPath = path.join('.', folder);
     const files = fs.readdirSync(folderPath).filter(f => f.endsWith('.html'));
-
     files.forEach(file => {
       const fullPath = path.join(folderPath, file);
       const originalHtml = fs.readFileSync(fullPath, 'utf-8');
       const $ = cheerio.load(originalHtml, { decodeEntities: false });
       const head = $('head');
       if (!head.length) return;
-
       const hasRootLink = $('link[href="/style.css"]').length > 0;
       const hasFolderLink = $(`link[href="/${folder}/style.css"]`).length > 0;
       let changed = false;
-
       if (!hasRootLink) {
-        head.append($('<link>').attr({
-          rel: 'stylesheet',
-          href: '/style.css'
-        }));
-        console.log(`${folder}/${file}: Injecting root style link`);
+        head.append($('<link>').attr({ rel: 'stylesheet', href: '/style.css' }));
         changed = true;
       }
-
       if (!hasFolderLink) {
-        head.append($('<link>').attr({
-          rel: 'stylesheet',
-          href: `/${folder}/style.css`
-        }));
-        console.log(`${folder}/${file}: Injecting folder style link`);
+        head.append($('<link>').attr({ rel: 'stylesheet', href: `/${folder}/style.css` }));
         changed = true;
       }
-
       if (changed) {
         const updatedHtml = $.html().replace(/(\r?\n){3,}/g, '\n\n').trim();
         if (updatedHtml !== originalHtml.trim()) {
@@ -265,66 +303,9 @@ function injectStyleLinks() {
   });
 }
 
-
-// ------------------------------------------------------------
-// 5. Alphabetize CSS rules within each folder's style.css
-//     Respects site-config.css.autoOrganize = true
-// ------------------------------------------------------------
-async function alphabetizeCssRules() {
-  if (!config.css?.autoOrganize) return;
-
-  for (const folder of folders) {
-    const stylePath = path.join(folder, 'style.css');
-    if (!fs.existsSync(stylePath)) continue;
-
-    const cssContent = fs.readFileSync(stylePath, 'utf-8');
-    const parsed = await postcss([]).process(cssContent, {
-      from: stylePath,
-      parser: postcssSafeParser
-    });
-
-    const nodes = parsed.root.nodes;
-    const grouped = {
-      comments: [],
-      rules: [],
-      others: []
-    };
-
-    for (const node of nodes) {
-      if (node.type === 'rule') {
-        grouped.rules.push(node);
-      } else if (node.type === 'comment') {
-        grouped.comments.push(node);
-      } else {
-        grouped.others.push(node);
-      }
-    }
-
-    // Sort rules by selector name alphabetically
-    grouped.rules.sort((a, b) => (a.selector || '').localeCompare(b.selector || ''));
-
-    // Recombine all nodes in logical order
-    const sortedCss = [
-      ...grouped.comments,
-      ...grouped.rules,
-      ...grouped.others
-    ].map(n => n.toString().trim()).join('\n\n') + '\n';
-
-    if (cssContent.trim() !== sortedCss.trim()) {
-      writeFile(stylePath, sortedCss);
-      console.log(`${folder}/style.css alphabetized`);
-    }
-  }
-}
-
-
-// ------------------------------------------------------------
-// Execute all requested operations in order,i didn't need to do this but it's cool and honestly it's nice for convenience
-// ------------------------------------------------------------
 (async () => {
-  if (modesToRun.includes('stubs')) generateCssStubs();
-  if (modesToRun.includes('distribute')) await distributeSharedStyles(); // async
+  if (modesToRun.includes('stubs')) await generateCssStubs();
+  if (modesToRun.includes('distribute')) await distributeSharedStyles();
   if (modesToRun.includes('clean')) cleanStyleLinks();
   if (modesToRun.includes('inject')) injectStyleLinks();
-  await alphabetizeCssRules();
 })();
