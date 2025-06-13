@@ -359,47 +359,54 @@ async function injectStyleLinks() {
     }
   }
 }
+
 async function normalizeCss(cssText) {
   const result = await postcss([]).process(cssText, { parser: postcssSafeParser });
 
-  const topLevelRules = [];
-  const mediaBlocks = {};
+  const cleanedLines = [];
   const emittedSelectors = new Set();
+  let currentMedia = null;
 
   for (const node of result.root.nodes) {
+    if (node.type === 'comment') {
+      // Preserve all top-level comments (group headers, notes, etc.)
+      cleanedLines.push(`/* ${node.text.trim()} */`);
+    }
+
     if (node.type === 'rule') {
       if (!emittedSelectors.has(node.selector)) {
-        topLevelRules.push(node);
+        cleanedLines.push(node.toString().trim());
         emittedSelectors.add(node.selector);
+        cleanedLines.push(''); // Add spacing between blocks
       }
     }
 
     if (node.type === 'atrule' && node.name === 'media') {
-      const mediaQuery = node.params;
-
-      if (!mediaBlocks[mediaQuery]) {
-        mediaBlocks[mediaQuery] = postcss.atRule({ name: 'media', params: mediaQuery });
-        mediaBlocks[mediaQuery].nodes = [];
-      }
+      currentMedia = [`@media ${node.params} {`];
 
       for (const child of node.nodes || []) {
-        if (child.type === 'rule' && !emittedSelectors.has(child.selector)) {
-          mediaBlocks[mediaQuery].nodes.push(child);
+        if (child.type === 'comment') {
+          currentMedia.push(`  /* ${child.text.trim()} */`);
+        } else if (child.type === 'rule' && !emittedSelectors.has(child.selector)) {
+          const block = child.toString().split('\n').map(l => '  ' + l.trim());
+          currentMedia.push(...block);
+          currentMedia.push('');
           emittedSelectors.add(child.selector);
         }
       }
+
+      currentMedia.push('}');
+      cleanedLines.push(currentMedia.join('\n'));
+      cleanedLines.push('');
     }
   }
 
-  // Rebuild final CSS from the top-level rules and sorted media blocks
-  const cleanedRoot = postcss.root();
-  topLevelRules.forEach(rule => cleanedRoot.append(rule));
-  Object.entries(mediaBlocks)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .forEach(([, block]) => cleanedRoot.append(block));
-
-  return cleanedRoot.toString().replace(/\n{3,}/g, '\n\n').trim() + '\n';
+  return cleanedLines
+    .map(line => line.trimEnd())
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n') + '\n';
 }
+
 
 // Main execution block
 (async () => {
