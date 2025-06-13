@@ -140,11 +140,7 @@ function reassembleCss(groups, autoOrganize) {
     .flatMap(([, lines]) => lines);
 
   final.push(...leftovers);
-  return final.join('
-').replace(/
-{3,}/g, '
-
-');
+  return final.join('\n').replace(/\n{3,}/g, '\n\n');
 }
 
 async function parseTemplate(templatePath) {
@@ -254,9 +250,9 @@ async function distributeSharedStyles() {
   }
 }
 
-function cleanStyleLinks() {
-  folders.forEach(folder => {
-        const folderPath = path.join('.', folder);
+async function cleanStyleLinks() {
+  for (const folder of folders) {
+    const folderPath = path.join('.', folder);
     try {
       await fs.access(folderPath);
     } catch {
@@ -264,41 +260,33 @@ function cleanStyleLinks() {
     }
 
     const files = (await fs.readdir(folderPath)).filter(f => f.endsWith('.html'));
-        for (const file of files) {
+
+    for (const file of files) {
       const fullPath = path.join(folderPath, file);
       const originalHtml = await fs.readFile(fullPath, 'utf-8');
-      const $ = cheerio.load(originalHtml, { decodeEntities: false });
+      const $ = cheerio.load(originalHtml);
+      const seenHrefs = new Set();
+      let removedCount = 0;
 
-      const head = $('head');
-      if (!head.length) continue;
-
-      const hasRootLink = $('link[href="/style.css"]').length > 0;
-      const hasFolderLink = $(`link[href="/${folder}/style.css"]`).length > 0;
-      let changed = false;
-
-      if (!hasRootLink) {
-        head.append($('<link>').attr({ rel: 'stylesheet', href: '/style.css' }));
-        changed = true;
-      }
-      if (!hasFolderLink) {
-        head.append($('<link>').attr({ rel: 'stylesheet', href: `/${folder}/style.css` }));
-        changed = true;
-      }
-
-      if (changed) {
-        const updatedHtml = $.html().replace(/(
-?
-){3,}/g, '
-
-').trim();
-        if (updatedHtml !== originalHtml.trim()) {
-          await writeFile(fullPath, updatedHtml);
-          console.log(`${folder}/${file}: Injected missing style link(s).`);
+      $('link[href$="style.css"]').each((i, el) => {
+        const href = $(el).attr('href');
+        if (seenHrefs.has(href)) {
+          $(el).remove();
+          removedCount++;
+        } else {
+          seenHrefs.add(href);
         }
+      });
+
+      const updatedHtml = $.html();
+      if (removedCount > 0 && updatedHtml !== originalHtml) {
+        await writeFile(fullPath, updatedHtml);
+        console.log(`${folder}/${file}: Removed ${removedCount} duplicate style link(s).`);
       }
     }
   }
 }
+
 
 async function injectStyleLinks() {
   for (const folder of folders) {
