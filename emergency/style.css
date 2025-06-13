@@ -163,7 +163,7 @@ main {
 /* Group: Metadata */
 
 .meta.template-hash {
-  /* style for meta.template-hash */
+  display: none !important;
 }
 
 .meta.certified {
