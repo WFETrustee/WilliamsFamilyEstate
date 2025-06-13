@@ -291,38 +291,52 @@ async function cleanStyleLinks() {
 async function injectStyleLinks() {
   for (const folder of folders) {
     const folderPath = path.join('.', folder);
-    const files = fs.readdirSync(folderPath).filter(f => f.endsWith('.html'));
-    files.forEach(file => {
+    try {
+      await fs.access(folderPath);
+    } catch {
+      continue;
+    }
+
+    const files = (await fs.readdir(folderPath)).filter(f => f.endsWith('.html'));
+
+    for (const file of files) {
       const fullPath = path.join(folderPath, file);
-      const originalHtml = fs.readFileSync(fullPath, 'utf-8');
+      const originalHtml = await fs.readFile(fullPath, 'utf-8');
       const $ = cheerio.load(originalHtml, { decodeEntities: false });
+
       const head = $('head');
-      if (!head.length) return;
+      if (!head.length) continue;
+
       const hasRootLink = $('link[href="/style.css"]').length > 0;
       const hasFolderLink = $(`link[href="/${folder}/style.css"]`).length > 0;
       let changed = false;
+
       if (!hasRootLink) {
         head.append($('<link>').attr({ rel: 'stylesheet', href: '/style.css' }));
         changed = true;
       }
+
       if (!hasFolderLink) {
         head.append($('<link>').attr({ rel: 'stylesheet', href: `/${folder}/style.css` }));
         changed = true;
       }
+
       if (changed) {
         const updatedHtml = $.html().replace(/(\r?\n){3,}/g, '\n\n').trim();
         if (updatedHtml !== originalHtml.trim()) {
-          writeFile(fullPath, updatedHtml);
+          await writeFile(fullPath, updatedHtml);
           console.log(`${folder}/${file}: Injected missing style link(s).`);
         }
       }
-    });
-  })();
+    }
+  }
 }
 
+// Main execution block
 (async () => {
   if (modesToRun.includes('stubs')) await generateCssStubs();
   if (modesToRun.includes('distribute')) await distributeSharedStyles();
-  if (modesToRun.includes('clean')) cleanStyleLinks();
-  if (modesToRun.includes('inject')) injectStyleLinks();
+  if (modesToRun.includes('clean')) await cleanStyleLinks();
+  if (modesToRun.includes('inject')) await injectStyleLinks();
 })();
+
