@@ -273,7 +273,27 @@ img.pinned {
 
 /* ==================== */
 /* Group: Print Enhancements */
-
+    #print-buttons {
+        margin: 1rem 0;
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+    
+    #print-buttons button {
+        background-color: #444;
+        color: #fff;
+        font-size: 0.95rem;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    
+    #print-buttons button:hover {
+        background-color: #222;
+    }
     .pdf-icon-inline,
     .pdf-link {
         display: none !important;
