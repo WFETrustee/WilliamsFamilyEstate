@@ -125,7 +125,7 @@ function reassembleCss(groups, autoOrganize) {
 
     let lines = groups[groupName];
 
-    // Filter out duplicate headers already embedded in group content
+    // Remove existing group comments to avoid duplication
     lines = lines.filter(line => {
       const trimmed = line.trim();
       return !/^\/\*\s*(=+|Group:)/.test(trimmed);
@@ -133,7 +133,7 @@ function reassembleCss(groups, autoOrganize) {
 
     const hasRules = lines.some(line => line.trim().match(/[^{]+\s*\{/));
 
-    // Only insert group headers if there are visible rules or we want to indicate empty group
+    // Add clean group header
     final.push(`/* ==================== */`);
     final.push(`/* Group: ${groupName} */`);
 
@@ -146,6 +146,25 @@ function reassembleCss(groups, autoOrganize) {
 
     final.push('');
   }
+
+  // Append leftover rules in Ungrouped block
+  const leftovers = Object.entries(groups)
+    .filter(([key]) => !order.includes(key))
+    .flatMap(([, lines]) => lines);
+
+  if (leftovers.length > 0) {
+    final.push('/* ==================== */');
+    final.push('/* Group: Ungrouped */');
+    final.push(...leftovers);
+  }
+
+  return final
+    .map(line => line.trimEnd())
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim() + '\n';
+}
+
 
   // Handle any leftover/unclassified selectors
   const leftovers = Object.entries(groups)
