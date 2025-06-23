@@ -1,44 +1,20 @@
 [
   {
-    "filename": "EMG-HC01_Writ_of_Habeas_Corpus.html",
-    "lastModified": "2025-06-23T18:20:51.394Z",
-    "doc-date": "2025-05-22",
-    "doc-id": "EMG-HC01",
+    "filename": "NOL000-GeneralLiability.html",
+    "lastModified": "2025-06-23T18:27:23.292Z",
+    "doc-date": "2025-06-23",
+    "doc-id": "NOL-XXX",
     "doc-version": "1.0",
-    "doc-category": "Legal – Detainment",
+    "doc-category": "Legal – Liability Notice",
     "doc-author": "Gregory-Alan: Williams, Trustee",
-    "doc-title": "Writ of Habeas Corpus for Gregory-Alan: Williams",
-    "doc-certified": "true",
-    "doc-use-trigger": "Trustee is arrested, detained, or obstructed from acting in his private or trust capacity under color of law.",
-    "doc-instructions": "Print 2 copies. File with Clerk of Court and Sheriff",
-    "doc-filer": "Partner Sonia, any next friend, or Successor Trustee",
+    "doc-template-hash": "fb16ddecc1837897653e1913ae0b40b444cf35a8266f2b0dfe8e4ce85a4ba3ab",
+    "doc-title": "Notice of Liability – [Insert Harm or Substance]",
+    "doc-certified": "false",
+    "doc-use-trigger": "Evidence of harm or constructive fraud involving a public or corporate actor",
+    "doc-instructions": "Customize, notarize, and serve via certified or registered mail. Post to your public notice registry after 21 days of non-response.",
+    "doc-filer": "Any affected man/woman or appointed trustee",
     "doc-status": "active",
-    "doc-pinned": "false"
-  },
-  {
-    "filename": "EMG-REM001_Demand_ER_Unlawful_Conversion.html",
-    "lastModified": "2025-06-23T18:20:51.394Z",
-    "doc-date": "2025-05-27",
-    "doc-id": "EMG-REM001",
-    "doc-version": "1.0",
-    "doc-category": "Emergency – Property Defense",
-    "doc-author": "Gregory-Alan: Williams, Trustee",
-    "doc-title": "Demand for Emergency Relief – Unlawful Conversion of Trust Property",
-    "doc-use-trigger": "If any party attempts to convert, foreclose, repossess, or encumber trust property without verified authority or rebuttal of perfected claim.",
-    "doc-instructions": "Deliver to Clerk of Court, Sheriff, creditor, or enforcement agent attempting to take trust property.",
-    "doc-filer": "Gregory-Alan: Williams, Trustee",
-    "doc-status": "draft",
-    "doc-pinned": "true"
-  },
-  {
-    "filename": "EMG-REM002_Demand_ER_Unlawful_Seizure.html",
-    "lastModified": "2025-06-23T18:20:51.395Z",
-    "doc-date": "2025-05-28",
-    "doc-id": "EMG-REM002",
-    "doc-version": "1.0",
-    "doc-category": "Emergency Document",
-    "doc-author": "Gregory-Alan: Williams, Trustee",
-    "doc-title": "Demand for Emergency Relief – Unlawful Seizure of Trust Vehicle",
-    "doc-status": "draft"
+    "doc-pinned": "false",
+    "doc-image": "/images/nol-default.jpg"
   }
 ]
