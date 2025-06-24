@@ -1,7 +1,7 @@
 [
   {
     "filename": "EMG-HC01_Writ_of_Habeas_Corpus.html",
-    "lastModified": "2025-06-24T01:50:04.551Z",
+    "lastModified": "2025-06-24T21:14:14.419Z",
     "doc-date": "2025-05-22",
     "doc-id": "EMG-HC01",
     "doc-version": "1.0",
@@ -17,28 +17,36 @@
   },
   {
     "filename": "EMG-REM001_Demand_ER_Unlawful_Conversion.html",
-    "lastModified": "2025-06-24T01:50:04.551Z",
+    "lastModified": "2025-06-24T21:14:14.419Z",
     "doc-date": "2025-05-27",
     "doc-id": "EMG-REM001",
     "doc-version": "1.0",
-    "doc-category": "Emergency – Property Defense",
+    "doc-category": "Emergency - Property Defense",
     "doc-author": "Gregory-Alan: Williams, Trustee",
-    "doc-title": "Demand for Emergency Relief – Unlawful Conversion of Trust Property",
+    "doc-template-hash": "fb16ddecc1837897653e1913ae0b40b444cf35a8266f2b0dfe8e4ce85a4ba3ab",
+    "doc-title": "Demand for Emergency Relief - Unlawful Conversion of Trust Property",
     "doc-use-trigger": "If any party attempts to convert, foreclose, repossess, or encumber trust property without verified authority or rebuttal of perfected claim.",
     "doc-instructions": "Deliver to Clerk of Court, Sheriff, creditor, or enforcement agent attempting to take trust property.",
     "doc-filer": "Gregory-Alan: Williams, Trustee",
     "doc-status": "draft",
-    "doc-pinned": "true"
+    "doc-pinned": "true",
+    "doc-image": "/images/emergency-property.jpg"
   },
   {
     "filename": "EMG-REM002_Demand_ER_Unlawful_Seizure.html",
-    "lastModified": "2025-06-24T01:50:04.552Z",
+    "lastModified": "2025-06-24T21:14:14.420Z",
     "doc-date": "2025-05-28",
     "doc-id": "EMG-REM002",
     "doc-version": "1.0",
-    "doc-category": "Emergency Document",
+    "doc-category": "Emergency - Property Defense",
     "doc-author": "Gregory-Alan: Williams, Trustee",
-    "doc-title": "Demand for Emergency Relief – Unlawful Seizure of Trust Vehicle",
-    "doc-status": "draft"
+    "doc-template-hash": "fb16ddecc1837897653e1913ae0b40b444cf35a8266f2b0dfe8e4ce85a4ba3ab",
+    "doc-title": "Demand for Emergency Relief - Unlawful Seizure of Trust Vehicle",
+    "doc-use-trigger": "When a vehicle or movable trust asset is at risk of seizure or conversion by any public or corporate actor.",
+    "doc-instructions": "Deliver to any party attempting to seize, tow, or impound a trust vehicle. Keep notarized copy in vehicle at all times.",
+    "doc-filer": "Trustee, partner, or authorized next friend",
+    "doc-status": "draft",
+    "doc-pinned": "true",
+    "doc-image": "/images/emergency-vehicle.jpg"
   }
 ]
