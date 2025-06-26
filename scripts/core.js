@@ -60,7 +60,7 @@ function applyFormat(date, formatStr) {
 function printSection(type) {
   document.body.classList.remove('printing-notice', 'printing-instructions');
   document.body.classList.add(`printing-${type}`);
-  window.print();
+  setTimeout(() => window.print(), 150);
   // Optional: Clean up class after printing
   setTimeout(() => document.body.classList.remove(`printing-${type}`), 1000);
 }
