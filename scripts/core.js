@@ -58,15 +58,24 @@ function applyFormat(date, formatStr) {
  * Applies different formsat rules for printing
  */
 function printSection(type) {
+  // Clear any previous print class
   document.body.classList.remove('printing-notice', 'printing-instructions');
+
+  // Add the correct one
   document.body.classList.add(`printing-${type}`);
 
-  // Let the browser apply styles before print fires
-  setTimeout(() => {
-    window.print();
-    document.body.classList.remove(`printing-${type}`);
-  }, 150); // Delay ensures print styles are rendered
+  // Wait until next paint, then another small frame
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      window.print();
+      // Remove print class after print completes
+      setTimeout(() => {
+        document.body.classList.remove(`printing-${type}`);
+      }, 1000);
+    });
+  });
 }
+
 
 /**
  * Attempts to infer locale formatting style from a sample string.
