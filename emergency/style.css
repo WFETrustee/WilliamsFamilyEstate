@@ -288,71 +288,75 @@ img.pinned {
 /* ==================== */
 /* Group: Print Enhancements */
 @media print {
-    body * {
-        display: none !important;
-    }
+  /* ALLOWLIST: Only show print-targeted sections */
+  body.printing-notice .print-notice,
+  body.printing-notice .print-notice * {
+    display: block !important;
+  }
 
-    .site-footer,
-    .summary-section,
-    .pdf-icon-inline,
-    .pdf-link,
-    .print-divider,
-    .section-label,
-    #print-buttons,
-    .screen-only {
-        display: none !important;
-    }
+  body.printing-instructions .print-instructions,
+  body.printing-instructions .print-instructions * {
+    display: block !important;
+  }
 
-    body.printing-notice .print-notice,
-    body.printing-notice .print-notice * {
-        display: block !important;
-    }
+  .print-notice,
+  .print-instructions {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem;
+    background: white;
+    z-index: 9999;
+  }
 
-    body.printing-instructions .print-instructions,
-    body.printing-instructions .print-instructions * {
-        display: block !important;
-    }
+  h2, h3 {
+    page-break-after: avoid;
+  }
 
-    .print-notice,
-    .print-instructions {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        padding: 1rem;
-        background: white;
-        z-index: 9999;
-    }
+  ul, ol {
+    page-break-inside: avoid;
+  }
 
-    h2, h3 {
-        page-break-after: avoid;
-    }
+  /* DENYLIST: Hide everything else (after allowlist) */
+  body * {
+    display: none !important;
+  }
 
-    ul, ol {
-        page-break-inside: avoid;
-    }
+  /* Redundant but explicit: these should never print */
+  .site-footer,
+  .summary-section,
+  .pdf-icon-inline,
+  .pdf-link,
+  .print-divider,
+  .section-label,
+  #print-buttons,
+  .screen-only {
+    display: none !important;
+  }
 
-    #print-buttons {
-        margin: 1rem 0;
-        display: flex;
-        gap: 1rem;
-        justify-content: flex-end;
-    }
+  /* Optional: style print buttons (if shown in print preview for testing) */
+  #print-buttons {
+    margin: 1rem 0;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
 
-    #print-buttons button {
-        background-color: #444;
-        color: #fff;
-        font-size: 0.95rem;
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-    }
+  #print-buttons button {
+    background-color: #444;
+    color: #fff;
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
 
-    #print-buttons button:hover {
-        background-color: #222;
-    }
+  #print-buttons button:hover {
+    background-color: #222;
+  }
 }
 
 /* ==================== */
