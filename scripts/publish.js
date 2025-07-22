@@ -174,11 +174,25 @@ function startPublish(config = siteConfig) {
 
       const pinned = entries
         .filter(e => e["doc-pinned"] === "true" || e["doc-pinned"] === true)
-        .sort((a, b) => new Date(b["doc-date"]) - new Date(a["doc-date"]));
+        //this new sort logic is to avoid the UTC date calculation which was printing the previous day's date
+        .sort((a, b) => {
+          const parseLocalDate = str => {
+            const [y, m, d] = str.split("-").map(Number);
+            return new Date(y, m - 1, d); // Local midnight
+          };
+          return parseLocalDate(b["doc-date"]) - parseLocalDate(a["doc-date"]);
+        });
+
 
       const unpinned = entries
         .filter(e => !(e["doc-pinned"] === "true" || e["doc-pinned"] === true))
-        .sort((a, b) => new Date(b["doc-date"]) - new Date(a["doc-date"]));
+        .sort((a, b) => {
+          const parseLocalDate = str => {
+            const [y, m, d] = str.split("-").map(Number);
+            return new Date(y, m - 1, d); // Local midnight
+          };
+          return parseLocalDate(b["doc-date"]) - parseLocalDate(a["doc-date"]);
+        });
 
       pinned.forEach(e => pinnedContainer.appendChild(renderContentEntry(e, groupedMeta, baseFolder)));
       unpinned.forEach(e => regularContainer.appendChild(renderContentEntry(e, groupedMeta, baseFolder)));
