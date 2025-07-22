@@ -21,7 +21,15 @@ const decodeHTML = str => {
  * Supports ISO, custom formats (e.g. "MMMM d, yyyy"), or locale inference from example string.
  */
 function processDate(rawValue, formatHint = "") {
-  const inputDate = new Date(rawValue);
+  let inputDate;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(rawValue)) {
+    // Manually parse as local time to avoid UTC offset
+    const [y, m, d] = rawValue.split("-").map(Number);
+    inputDate = new Date(y, m - 1, d);
+  } else {
+    inputDate = new Date(rawValue);
+  }
+
   if (isNaN(inputDate)) return rawValue;
 
   if (/y{2,4}|M{1,4}|d{1,2}/i.test(formatHint)) {
