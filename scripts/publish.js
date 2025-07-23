@@ -69,7 +69,11 @@ function renderContentEntry(entry, groupedMeta, baseFolder) {
 
   // Main title of the document
   const h2 = document.createElement("h2");
-  h2.textContent = entry["doc-title"] || "Untitled";
+  const titleLink = document.createElement("a");
+  titleLink.href = `/${baseFolder}/${entry.filename}`;
+  titleLink.textContent = entry["doc-title"] || "Untitled";
+  titleLink.classList.add("title-link"); // optional: style separately
+  h2.appendChild(titleLink);
   wrapper.appendChild(h2);
 
   // Now prepare all the meta fields (besides title) and group them accordingly

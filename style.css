@@ -128,6 +128,17 @@ main {
     margin-top: 0;
 }
 
+.content h2 .title-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.content h2 .title-link:hover {
+  text-decoration: underline;
+  color: #444;
+}
+
+
 .content p {
     line-height: 1.5;
     margin: 0.25rem 0;
