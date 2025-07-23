@@ -41,6 +41,7 @@ main {
     max-width: 720px;
 }
 
+
 /* =============================== */
 /* Group: Navigation */
 /* =============================== */
@@ -251,7 +252,7 @@ img.pinned {
 /* Group: Responsive Enhancements */
 /* =============================== */
 
-@media (max-width: 600px) {
+@media (max-width: 480px) {
     body {
         font-size: 1.05rem;
         line-height: 1.7;
