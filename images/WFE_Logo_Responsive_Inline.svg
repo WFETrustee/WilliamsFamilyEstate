@@ -1,8 +1,4 @@
-<header class="site-header">
-  <div class="logo-container">
-    <a href="/">
-      <!-- Paste the FULL contents of WFE_Logo_Responsive_Final_Inline.svg here -->
-      <svg
+<svg
    version="1.1"
    id="svg1"
    viewBox="0 0 2612 512"
@@ -359,27 +355,3 @@
 
 
 </g></svg>
-    </a>
-  </div>
-</header>
-
-
-<nav class="main-nav">
-  <ul>
-    <li><a href="/index.html">Home</a></li>
-    <li><a href="/about.html">About</a></li>
-    <li><a href="/notice/">Notices</a></li>
-    <!--<li><a href="/NOL/">NOL</a></li>-->
-    <li><a href="/send-notice.html">Send Notice</a></li>
-    <li><a href="mailto:trustee@williamsfamilyestate.org">Contact</a></li>
-    <li><a href="/emergency/" title="Docs"><img src="/images/Edit.png" alt="Edit"></a></li>
-  </ul>
-</nav>
-
-<!-- Core JS injected for all pages -->
-<script src="/scripts/core.js"></script>
-<script src="/scripts/publish.js"></script>
-
-
-
-
