@@ -185,9 +185,9 @@ function insertBuildMetadata(config = siteConfig) {
   buildMeta.textContent = `Version: ${version} – Published: ${date}`;
 }
 
-// ===========================================
-// Supports dynamic loading of fully responsive site logo
-// ===========================================
+/**
+ * Supports dynamic loading of fully responsive site logo
+ */
 function loadLogoJS() {
   const logoScript = document.createElement("script");
   logoScript.src = "/scripts/logo.js";
