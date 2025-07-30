@@ -208,6 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       loadHTML("site-header", "/header.html", highlightActiveMenuItem, config);
       loadHTML("site-footer", "/footer.html", insertFooterYear, config);
+      console.log("calling loadLogoJS()");
       loadLogoJS();
 
       if (document.getElementById("live-content") && typeof startPublish === "function") {
