@@ -7,6 +7,20 @@
 // It integrates with the global `siteConfig` object (from site-config.json)
 // to respect site-wide preferences and behaviors.
 // ==========================================================
+(() => {
+  if (typeof console.log !== "function") {
+    alert("🚨 console.log is missing!");
+  } else {
+    try {
+      const testStr = "🧪 console.log test";
+      console.log(testStr);
+      if (!window.consoleHistory) window.consoleHistory = [];
+      window.consoleHistory.push(testStr);
+    } catch (e) {
+      alert("🚨 console.log failed silently");
+    }
+  }
+})();
 
 const TM_MARKER = '<span class="tm">&trade;</span>';
 
