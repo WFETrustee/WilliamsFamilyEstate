@@ -206,6 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(config => {
       window.siteConfig = config;
 
+      console.log("calling loadHTML()");
       loadHTML("site-header", "/header.html", highlightActiveMenuItem, config);
       loadHTML("site-footer", "/footer.html", insertFooterYear, config);
       console.log("calling loadLogoJS()");
