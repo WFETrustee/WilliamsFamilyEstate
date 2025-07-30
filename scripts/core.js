@@ -185,6 +185,16 @@ function insertBuildMetadata(config = siteConfig) {
   buildMeta.textContent = `Version: ${version} – Published: ${date}`;
 }
 
+// ===========================================
+// Supports dynamic loading of fully responsive site logo
+// ===========================================
+function loadLogoJS() {
+  const logoScript = document.createElement("script");
+  logoScript.src = "/scripts/logo.js";
+  logoScript.onload = () => console.log("✅ logo.js loaded and running.");
+  logoScript.onerror = () => console.warn("❌ Failed to load logo.js");
+  document.body.appendChild(logoScript);
+}
 
 // ===========================================
 // Main bootstrapping entry point
@@ -197,6 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       loadHTML("site-header", "/header.html", highlightActiveMenuItem, config);
       loadHTML("site-footer", "/footer.html", insertFooterYear, config);
+      loadLogoJS();
 
       if (document.getElementById("live-content") && typeof startPublish === "function") {
         startPublish(config);
@@ -207,4 +218,3 @@ document.addEventListener("DOMContentLoaded", () => {
       window.siteConfig = {};
     });
 });
-
