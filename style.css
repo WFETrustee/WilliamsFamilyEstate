@@ -25,22 +25,37 @@ main {
 /* Group: Header */
 /* =============================== */
 
+/* =============================== */
+/* Group: Header */
+/* =============================== */
+
 .site-header {
-    background-color: #555;
-    color: #f1f1f1;
-    padding: 1rem 1rem;
-    text-align: center;
+  background-color: #555;
+  color: #f1f1f1;
+  padding: 1rem 0;
+  text-align: center;
 }
 
-.site-header h1 {
-    font-family: "Scope One", serif;
-    font-size: 1.9rem;
-    font-weight: 400;
-    line-height: 1.2;
-    margin: 0 auto;
-    max-width: 720px;
+.site-header .logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1rem;
 }
 
+.site-header .logo-container svg {
+  display: block;
+  max-width: 90vw;
+  min-width: 450px;
+  width: 100%;
+  height: auto;
+}
+
+/* Optional if internal SVG stacking will occur */
+.site-header #seal,
+.site-header #text {
+  transform: translateX(0);
+}
 
 /* =============================== */
 /* Group: Navigation */
@@ -263,7 +278,31 @@ img.pinned {
 /* Group: Responsive Enhancements */
 /* =============================== */
 
-@media (max-width: 480px) {
+@media screen and (max-width: 480px) {
+   .logo-container {
+    flex-direction: column;
+  }
+
+  .logo-container svg {
+        max-width: 95vw;
+        min-width: 320px;
+    }
+
+    /* Use flex-like vertical stacking inside the SVG */
+    svg {
+        display: block;
+    }
+
+    #seal {
+        transform: translate(0, 0);
+        display: block;
+    }
+
+    #text {
+        transform: translate(0, 20px); /* add vertical spacing */
+        display: block;
+    }
+
     body {
         font-size: 1.05rem;
         line-height: 1.7;
@@ -289,3 +328,4 @@ img.pinned {
         padding: 2rem 1rem;
     }
 }
+

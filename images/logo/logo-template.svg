@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  version="1.1"
+  viewBox="0 0 1200 400"
+  preserveAspectRatio="xMidYMid meet"
+  width="60vw"
+  style="min-width:450px; max-width:60vw; height:auto; display:block; margin:auto;"
+>
+  <style type="text/css">
+    svg {{
+      font-family: 'Playfair Display', serif;
+    }}
+
+    .container {{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }}
+
+    #seal {{
+      width: 30%;
+      max-width: 300px;
+      margin-right: 3%;
+    }}
+
+    #text {{
+      width: 60%;
+      max-width: 600px;
+    }}
+
+    @media (max-width: 600px) {{
+      .container {{
+        flex-direction: column;
+      }}
+
+      #seal {{
+        margin: 0 auto 20px auto;
+        width: 40%;
+      }}
+
+      #text {{
+        width: 80%;
+        text-align: center;
+      }}
+    }}
+  </style>
+
+  <g class="container">
+    <!-- === SEAL SECTION === -->
+    <g id="seal">
+      <!-- {{SEAL_CONTENT}} -->
+    </g>
+
+    <!-- === TEXT SECTION === -->
+    <g id="text">
+      <!-- {{TEXT_CONTENT}} -->
+    </g>
+  </g>
+</svg>
