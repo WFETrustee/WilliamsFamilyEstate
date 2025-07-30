@@ -189,6 +189,7 @@ function insertBuildMetadata(config = siteConfig) {
  * Supports dynamic loading of fully responsive site logo
  */
 function loadLogoJS() {
+  console.log("loadLogoJS() called");
   const logoScript = document.createElement("script");
   logoScript.src = "/scripts/logo.js";
   logoScript.onload = () => console.log("logo.js loaded and running.");
