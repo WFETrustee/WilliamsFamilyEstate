@@ -191,9 +191,9 @@ function insertBuildMetadata(config = siteConfig) {
 function loadLogoJS() {
   const logoScript = document.createElement("script");
   logoScript.src = "/scripts/logo.js";
-  logoScript.onload = () => console.log("✅ logo.js loaded and running.");
-  logoScript.onerror = () => console.warn("❌ Failed to load logo.js");
-  document.body.appendChild(logoScript);
+  logoScript.onload = () => console.log("logo.js loaded and running.");
+  logoScript.onerror = () => console.warn("Failed to load logo.js");
+  document.head.appendChild(logoScript);
 }
 
 // ===========================================
