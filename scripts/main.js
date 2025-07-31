@@ -49,11 +49,18 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Calling loadHTML for site-footer...");
         loadHTML("site-footer", "/footer.html", insertFooterYear, config);
 
-        if (document.getElementById("live-content") && typeof startPublish === "function") {
-          console.log("Calling startPublish()");
-          startPublish(config);
+        if (document.getElementById("live-content")) {
+          console.log("live-content found. Loading publish.js...");
+          loadScript("/scripts/publish.js", () => {
+            if (typeof startPublish === "function") {
+              console.log("Calling startPublish()");
+              startPublish(config);
+            } else {
+              console.error("startPublish is not defined after publish.js loaded.");
+            }
+          });
         } else {
-          console.log("startPublish not called.");
+          console.log("live-content not present. Skipping publish.js load.");
         }
       });
     })
