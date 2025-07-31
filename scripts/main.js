@@ -5,6 +5,10 @@
 // loads header, footer, and dynamic content rendering if needed.
 // =============================
 
+// =============================
+// File: main.js
+// =============================
+
 function loadScript(url, callback) {
   const script = document.createElement("script");
   script.src = url;
@@ -30,25 +34,31 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Parsed site-config.json", config);
       window.siteConfig = config;
 
-      console.log("Calling loadHTML for site-header...");
-      loadHTML("site-header", "/header.html", () => {
-        highlightActiveMenuItem();
-        console.log("calling loadLogoJS() from inside header callback");
-        loadLogoJS();
-      }, config);
+      // ✅ Now load core.js before using its functions
+      loadScript("/scripts/core.js", () => {
+        console.log("/scripts/core.js loaded OK");
 
-      console.log("Calling loadHTML for site-footer...");
-      loadHTML("site-footer", "/footer.html", insertFooterYear, config);
+        // ✅ These now work because core.js is loaded
+        console.log("Calling loadHTML for site-header...");
+        loadHTML("site-header", "/header.html", () => {
+          highlightActiveMenuItem();
+          console.log("calling loadLogoJS() from inside header callback");
+          loadLogoJS();
+        }, config);
 
-      if (document.getElementById("live-content") && typeof startPublish === "function") {
-        console.log("Calling startPublish()");
-        startPublish(config);
-      } else {
-        console.log("startPublish not called.");
-      }
+        console.log("Calling loadHTML for site-footer...");
+        loadHTML("site-footer", "/footer.html", insertFooterYear, config);
+
+        if (document.getElementById("live-content") && typeof startPublish === "function") {
+          console.log("Calling startPublish()");
+          startPublish(config);
+        } else {
+          console.log("startPublish not called.");
+        }
+      });
     })
     .catch(err => {
-      console.warn("site-config.json not found or invalid. Using defaults.", err);
+      console.error("site-config.json failed to load. Aborting startup.", err);
       window.siteConfig = {};
     });
 });
