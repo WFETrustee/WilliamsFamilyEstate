@@ -3,7 +3,7 @@
   const warn = (...args) => console.warn("[logo.js]", ...args);
 
   try {
-    log("Starting fetches...");
+    log("Starting fragment fetches...");
 
     const [sealResp, textResp] = await Promise.all([
       fetch('/images/logo/seal-wfe.svgfrag'),
@@ -11,7 +11,7 @@
     ]);
 
     if (!sealResp.ok || !textResp.ok) {
-      warn("Failed to fetch one or more logo fragments:", {
+      warn("Fragment fetch failed", {
         seal: sealResp.status,
         text: textResp.status
       });
@@ -23,33 +23,26 @@
       textResp.text()
     ]);
 
-    const logoDiv = document.getElementById("logo");
-    if (!logoDiv) {
-      warn("Missing #logo container in DOM.");
-      return;
-    }
+    const wrapper = document.getElementById('logo-wrapper');
+    if (!wrapper) return warn("No #logo-wrapper found.");
 
-    // Clear fallback PNG
-    logoDiv.innerHTML = "";
+    // Clear fallback <img>
+    wrapper.innerHTML = '';
 
-    // Build HTML structure
-    const container = document.createElement("div");
-    container.className = "logo-container";
+    // Create SVG shell
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 2612 512");
+    svg.setAttribute("width", "100%");
+    svg.setAttribute("height", "auto");
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    svg.classList.add("dynamic");
 
-    const sealDiv = document.createElement("div");
-    sealDiv.id = "seal";
-    sealDiv.innerHTML = seal;
+    // Inject fragments
+    svg.innerHTML = seal + text;
 
-    const textDiv = document.createElement("div");
-    textDiv.id = "text";
-    textDiv.innerHTML = text;
-
-    container.appendChild(sealDiv);
-    container.appendChild(textDiv);
-    logoDiv.appendChild(container);
-
+    wrapper.appendChild(svg);
     log("SVG logo fragments injected.");
   } catch (err) {
-    warn("Unexpected error during logo injection:", err);
+    warn("Unexpected logo.js error:", err);
   }
 })();
