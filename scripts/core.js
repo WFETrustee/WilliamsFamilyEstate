@@ -221,10 +221,13 @@ document.addEventListener("DOMContentLoaded", () => {
       window.siteConfig = config;
 
       console.log("calling loadHTML()");
-      loadHTML("site-header", "/header.html", highlightActiveMenuItem, config);
+      loadHTML("site-header", "/header.html", () => {
+        highlightActiveMenuItem();
+        console.log("calling loadLogoJS() from inside header callback");
+        loadLogoJS();
+      }, config);
+
       loadHTML("site-footer", "/footer.html", insertFooterYear, config);
-      console.log("calling loadLogoJS()");
-      loadLogoJS();
 
       if (document.getElementById("live-content") && typeof startPublish === "function") {
         startPublish(config);
