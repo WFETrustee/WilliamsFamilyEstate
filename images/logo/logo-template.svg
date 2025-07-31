@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg:svg height="auto" id="svg1" inkscape:export-filename="WFE Logo_dark.png" inkscape:export-xdpi="96" inkscape:export-ydpi="96" inkscape:version="1.4.2 (ebf0e940, 2025-05-08)" preserveAspectRatio="xMidYMid meet" sodipodi:docname="WFE_Logo_Dark_Responsive_Flattened.svg" version="1.1" viewBox="0 0 2612 512" width="100%" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"><style type="text/css">
+<svg height="auto" preserveAspectRatio="xMidYMid meet" version="1.1" viewBox="0 0 2612 512" width="100%" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"><style type="text/css">
 svg {
   font-family: 'Playfair Display', serif;
 }
@@ -37,4 +37,9 @@ svg {
     text-align: center;
   }
 }
-</style><svg:g class="container"><svg:g id="seal">&lt;!-- {{SEAL_CONTENT}} --&gt;</svg:g><svg:g id="text">&lt;!-- {{TEXT_CONTENT}} --&gt;</svg:g></svg:g></svg:svg>
+</style>
+<g class="container">
+<g id="seal"><!-- {{SEAL_CONTENT}} --></g>
+<g id="text"><!-- {{TEXT_CONTENT}} --></g>
+</g>
+</svg>
