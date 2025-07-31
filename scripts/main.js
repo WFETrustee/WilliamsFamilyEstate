@@ -8,8 +8,13 @@
 function loadScript(url, callback) {
   const script = document.createElement("script");
   script.src = url;
-  script.onload = () => callback?.();
-  script.onerror = () => console.error(`Failed to load script: ${url}`);
+  script.onload = () => {
+    console.log(`${url} loaded OK`);
+    callback?.();
+  };
+  script.onerror = () => {
+    console.error(`❌ Failed to load script: ${url}`);
+  };
   document.head.appendChild(script);
 }
 
