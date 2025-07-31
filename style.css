@@ -279,28 +279,23 @@ img.pinned {
 /* =============================== */
 
 @media screen and (max-width: 480px) {
-   .logo-container {
-    flex-direction: column;
-  }
+    .site-header .logo-container {
+        flex-direction: column;
+    }
 
-  .logo-container svg {
+    .site-header #seal {
+        width: 40%;
+        margin-bottom: 20px;
+    }
+
+    .site-header #text {
+        width: 80%;
+        text-align: center;
+    }
+
+    .site-header .logo-container svg {
         max-width: 95vw;
         min-width: 320px;
-    }
-
-    /* Use flex-like vertical stacking inside the SVG */
-    svg {
-        display: block;
-    }
-
-    #seal {
-        transform: translate(0, 0);
-        display: block;
-    }
-
-    #text {
-        transform: translate(0, 20px); /* add vertical spacing */
-        display: block;
     }
 
     body {

@@ -5,45 +5,51 @@
   try {
     log("Starting fetches...");
 
-    // Fire all 3 fetches in parallel
-    const [sealResp, textResp, layoutResp] = await Promise.all([
+    const [sealResp, textResp] = await Promise.all([
       fetch('/images/logo/seal-wfe.svgfrag'),
-      fetch('/images/logo/text-wfe.svgfrag'),
-      fetch('/images/logo/logo-template.svg')
+      fetch('/images/logo/text-wfe.svgfrag')
     ]);
 
-    // Check all responses
-    if (!sealResp.ok || !textResp.ok || !layoutResp.ok) {
-      warn("One or more SVG fetches failed:", {
+    if (!sealResp.ok || !textResp.ok) {
+      warn("Failed to fetch one or more logo fragments:", {
         seal: sealResp.status,
-        text: textResp.status,
-        layout: layoutResp.status
+        text: textResp.status
       });
       return;
     }
 
-    // Read content in parallel too
-    const [seal, text, layoutRaw] = await Promise.all([
+    const [seal, text] = await Promise.all([
       sealResp.text(),
-      textResp.text(),
-      layoutResp.text()
+      textResp.text()
     ]);
 
-    // Compose final SVG
-    const layout = layoutRaw
-      .replace('<!-- {{SEAL_CONTENT}} -->', seal)
-      .replace('<!-- {{TEXT_CONTENT}} -->', text);
-
-    // Inject into DOM
-    const container = document.getElementById('logo');
-    if (!container) {
-      warn("Container #logo not found in DOM.");
+    const logoDiv = document.getElementById("logo");
+    if (!logoDiv) {
+      warn("Missing #logo container in DOM.");
       return;
     }
 
-    container.innerHTML = layout;
-    log("SVG successfully injected into #logo.");
+    // Clear fallback PNG
+    logoDiv.innerHTML = "";
+
+    // Build HTML structure
+    const container = document.createElement("div");
+    container.className = "logo-container";
+
+    const sealDiv = document.createElement("div");
+    sealDiv.id = "seal";
+    sealDiv.innerHTML = seal;
+
+    const textDiv = document.createElement("div");
+    textDiv.id = "text";
+    textDiv.innerHTML = text;
+
+    container.appendChild(sealDiv);
+    container.appendChild(textDiv);
+    logoDiv.appendChild(container);
+
+    log("SVG logo fragments injected.");
   } catch (err) {
-    warn("Unexpected error during SVG injection:", err);
+    warn("Unexpected error during logo injection:", err);
   }
 })();
