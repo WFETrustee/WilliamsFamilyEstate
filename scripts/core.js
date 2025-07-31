@@ -148,6 +148,7 @@ function enableGoogleFonts(config = siteConfig) {
  * Dynamically loads an external HTML file into the given DOM element.
  */
 function loadHTML(id, url, callback, config = siteConfig) {
+  console.log(`Fetching HTML for #${id} from ${url}`);
   fetch(url)
     .then(response => {
       if (!response.ok) throw new Error(`Failed to load ${url}`);
@@ -156,13 +157,17 @@ function loadHTML(id, url, callback, config = siteConfig) {
     .then(html => {
       const container = document.getElementById(id);
       if (container) {
+        console.log(`Injecting into #${id}`);
         container.innerHTML = html;
         enableGoogleFonts(config);
         if (callback) callback();
+      } else {
+        console.warn(`No element with id "${id}" found for ${url}`);
       }
     })
     .catch(error => console.error(`Error loading ${url}:`, error));
 }
+
 
 /**
  * Highlights current menu item in header navigation.

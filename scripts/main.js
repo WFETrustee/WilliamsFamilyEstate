@@ -14,35 +14,36 @@ function loadScript(url, callback) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("/site-config.json")
-    .then(res => res.json())
+  console.log("DOMContentLoaded event fired");
+
+  fetch('/site-config.json')
+    .then(res => {
+      console.log("site-config.json fetch OK");
+      return res.json();
+    })
     .then(config => {
+      console.log("Parsed site-config.json", config);
       window.siteConfig = config;
 
-      loadScript("/scripts/core.js", () => {
-        if (typeof loadHTML === "function") {
-          loadHTML("site-header", "/header.html", highlightActiveMenuItem, config);
-          
-          // Inject both year and build version after footer loads
-          loadHTML("site-footer", "/footer.html", () => {
-            insertFooterYear();
-            insertBuildMetadata(config);
-          }, config);
-        }
+      console.log("Calling loadHTML for site-header...");
+      loadHTML("site-header", "/header.html", () => {
+        highlightActiveMenuItem();
+        console.log("calling loadLogoJS() from inside header callback");
+        loadLogoJS();
+      }, config);
 
-        // Load dynamic publishing logic if needed
-        if (document.getElementById("live-content")) {
-          loadScript("/scripts/publish.js", () => {
-            if (typeof startPublish === "function") {
-              startPublish(window.siteConfig);
-            } else {
-              console.error("startPublish is not defined in publish.js");
-            }
-          });
-        }
-      });
+      console.log("Calling loadHTML for site-footer...");
+      loadHTML("site-footer", "/footer.html", insertFooterYear, config);
+
+      if (document.getElementById("live-content") && typeof startPublish === "function") {
+        console.log("Calling startPublish()");
+        startPublish(config);
+      } else {
+        console.log("startPublish not called.");
+      }
     })
     .catch(err => {
-      console.error("site-config.json failed to load. Aborting startup.", err);
+      console.warn("site-config.json not found or invalid. Using defaults.", err);
+      window.siteConfig = {};
     });
 });
