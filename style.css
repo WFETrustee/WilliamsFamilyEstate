@@ -44,7 +44,7 @@ main {
 }
 
 #seal svg {
-  height: 100%;
+  height: 50%;
   width: auto;
   display: block;
 }
@@ -232,13 +232,18 @@ img.pinned {
     min-width: 100px;
 }
 
-.meta.pinned {
+.meta.pinned,
+.meta.status,
+.meta.meta-template-hash,
+.meta.meta-commit-ledger,
+.meta.meta-ledger-type,
+.meta.meta-ledger-category,
+.meta.meta-ledger-notes,
+.meta.meta-block-id,
+.meta.meta-private-hash {
     display: none !important;
 }
 
-.meta.status {
-    display: none !important;
-}
 
 /* =============================== */
 /* Group: Emergency Extras */
