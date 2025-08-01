@@ -290,7 +290,7 @@ img.pinned {
 /* Group: Responsive Enhancements */
 /* =============================== */
 
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 600px) {
     #logo-wrapper {
         flex-direction: column;
         align-items: center;
