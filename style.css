@@ -27,36 +27,37 @@ main {
 
 #logo-wrapper {
   display: flex;
+  align-items: flex-end; /* bottom-align seal + text */
+  gap: 1rem;
   justify-content: center;
-  align-items: flex-end;
-  gap: 2vw; /* spacing between seal and text */
-  padding: 0 1rem;
   flex-wrap: wrap;
+  padding: 0 1rem;
 }
 
-/* Seal container – scale RELATIVE to text */
-#seal {
-  height: 1.25em; /* 125% of text’s em height */
-  aspect-ratio: 1 / 1; /* keeps it square */
+#text {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end;
+  height: auto;
 }
 
-#seal svg {
-  height: 50%;
+#seal {
+  display: flex;
+  align-items: flex-end;
+  height: auto;
+}
+
+/* Match seal to 125% of text's height */
+#text svg {
+  height: 100%;
   width: auto;
   display: block;
 }
 
-/* Text container – the baseline */
-#text {
-  font-size: 1em;
-  line-height: 1;
-  display: flex;
-  align-items: flex-end;
+#seal svg {
+  height: 125%;
+  width: auto;
+  display: block;
 }
-
 
 /* =============================== */
 /* Group: Header */
