@@ -35,11 +35,18 @@ main {
   max-width: 100%;
 }
 
-#seal, #text {
+#seal {
   display: block;
   height: auto;
   width: auto;
   max-height: 140px;
+}
+
+#text {
+  display: block;
+  height: auto;
+  width: auto;
+  max-height: 100px;
 }
 
 /* =============================== */
@@ -287,7 +294,7 @@ img.pinned {
 
     #seal {
         max-height: 90px;
-        margin-bottom: 0.0rem;
+        margin-bottom: -0.25rem;
     }
 
     #text {
