@@ -291,7 +291,7 @@ img.pinned {
     }
 
     #text {
-        max-height: 70px;
+        max-width: 300px;
     }
         
     body {
