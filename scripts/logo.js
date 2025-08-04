@@ -23,8 +23,21 @@
       textResp.text()
     ]);
 
-    const wrapSvg = (inner, viewBox = "0 0 512 512") => {
-      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">${inner}</svg>`;
+    const wrapSvg = (inner, viewBox, id) => {
+      return `
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          viewBox="${viewBox}" 
+          width="100%" 
+          height="auto" 
+          preserveAspectRatio="xMidYMid meet"
+          class="dynamic"
+          aria-labelledby="${id}-title"
+          role="img"
+        >
+          <title id="${id}-title">${id} logo</title>
+          ${inner}
+        </svg>`;
     };
 
     const wrapper = document.getElementById('logo-wrapper');
@@ -34,16 +47,16 @@
 
     const sealDiv = document.createElement("div");
     sealDiv.id = "seal";
-    sealDiv.innerHTML = wrapSvg(sealContent, "0 0 512 512"); // adjust viewBox as needed
+    sealDiv.innerHTML = wrapSvg(sealContent, "0 0 512 512", "seal");
 
     const textDiv = document.createElement("div");
     textDiv.id = "text";
-    textDiv.innerHTML = wrapSvg(textContent, "0 0 2100 512"); // adjust viewBox as needed
+    textDiv.innerHTML = wrapSvg(textContent, "0 0 2100 512", "text");
 
     wrapper.appendChild(sealDiv);
     wrapper.appendChild(textDiv);
 
-    log("Injected logo with valid SVG wrapping.");
+    log("✅ Logo injected with proper SVG and layout.");
   } catch (err) {
     warn("Unexpected logo.js error:", err);
   }

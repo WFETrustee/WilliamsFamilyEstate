@@ -40,22 +40,18 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: 0 0 auto;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   overflow: hidden;
 }
 
 #seal svg {
   max-height: 100px;
-  width: auto;
-  display: block;
 }
 
 #text svg {
   max-height: 80px;
-  width: auto;
-  display: block;
-}
+}   
 
 
 /* =============================== */
