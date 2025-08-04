@@ -18,40 +18,32 @@
       return;
     }
 
-    let [seal, text] = await Promise.all([
+    const [sealContent, textContent] = await Promise.all([
       sealResp.text(),
       textResp.text()
     ]);
 
-    // Ensure each is wrapped in <svg> if not already
-    const wrapInSvg = (content) => {
-      const hasSvg = content.trim().startsWith("<svg");
-      return hasSvg ? content : `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">${content}</svg>`;
+    const wrapSvg = (inner, viewBox = "0 0 512 512") => {
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">${inner}</svg>`;
     };
-
-    seal = wrapInSvg(seal);
-    text = wrapInSvg(text);
 
     const wrapper = document.getElementById('logo-wrapper');
     if (!wrapper) return warn("No #logo-wrapper found.");
 
-    // Clear fallback <img>
     wrapper.innerHTML = '';
 
-    // Create wrapper divs
     const sealDiv = document.createElement("div");
     sealDiv.id = "seal";
-    sealDiv.innerHTML = seal;
+    sealDiv.innerHTML = wrapSvg(sealContent, "0 0 512 512"); // adjust viewBox as needed
 
     const textDiv = document.createElement("div");
     textDiv.id = "text";
-    textDiv.innerHTML = text;
+    textDiv.innerHTML = wrapSvg(textContent, "0 0 2100 512"); // adjust viewBox as needed
 
-    // Append to wrapper
     wrapper.appendChild(sealDiv);
     wrapper.appendChild(textDiv);
 
-    log("Injected logo using HTML containers and verified SVG wrapping.");
+    log("Injected logo with valid SVG wrapping.");
   } catch (err) {
     warn("Unexpected logo.js error:", err);
   }

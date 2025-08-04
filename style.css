@@ -36,31 +36,27 @@ main {
   margin: 0 auto;  
 }
 
-#text {
+#seal, #text {
   display: flex;
-  align-items: flex-end;
-  height: auto;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
+  width: 100%;
+  overflow: hidden;
 }
 
-#seal {
-  display: flex;
-  align-items: flex-end;
-  height: auto;
+#seal svg {
+  max-height: 100px;
+  width: auto;
+  display: block;
 }
 
-/* Match seal to 125% of text's height */
 #text svg {
   max-height: 80px;
-  height: auto;
   width: auto;
   display: block;
 }
-#seal svg {
-  max-height: 100px; /* ~125% of text */
-  height: auto;
-  width: auto;
-  display: block;
-}
+
 
 /* =============================== */
 /* Group: Header */
@@ -307,12 +303,12 @@ img.pinned {
 
     #seal {
         margin-bottom: 1rem;
-        height: auto;
-        max-height: 120px;
     }
 
-    #text {
-        text-align: center;
+    #seal svg,
+    #text svg {
+        max-width: 90vw;
+        height: auto;
     }
     
     body {
