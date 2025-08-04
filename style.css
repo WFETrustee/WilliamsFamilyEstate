@@ -27,37 +27,20 @@ main {
 
 #logo-wrapper {
   display: flex;
-  flex-direction: row;   
-  align-items: center;
   justify-content: center;
+  align-items: center;
   gap: 1rem;
-  padding: 1rem;
-  flex-wrap: wrap;  /* Allows stacking if screen is arrow */
-}
-
-#logo-wrapper img {
-  display: block;
-  margin: 0 auto;
-  max-height: 100px;
+  flex-wrap: wrap;
+  padding: 1rem 0;
+  max-width: 100%;
 }
 
 #seal, #text {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: block;
+  height: auto;
   width: auto;
-  max-width: 100%;
-  overflow: hidden;
-}
-
-#seal svg {
   max-height: 100px;
 }
-
-#text svg {
-  max-height: 80px;
-}   
-
 
 /* =============================== */
 /* Group: Header */
@@ -298,26 +281,19 @@ img.pinned {
 
 @media screen and (max-width: 600px) {
     #logo-wrapper {
-        display: flex;
-        flex-direction: column;  
+        flex-direction: column;
         align-items: center;
-        padding: 1rem 0;
     }
-  
-    #seal {
-        margin-bottom: .5rem;
-    }
-    
-    #text {
-        text-align: center;
-    }    
 
-    #seal svg,
-    #text svg {
-        max-width: 90vw;
-        height: auto;
+    #seal {
+        max-height: 90px;
+        margin-bottom: 0.5rem;
     }
-    
+
+    #text {
+        max-height: 70px;
+    }
+        
     body {
         font-size: 1.05rem;
         line-height: 1.7;
