@@ -27,11 +27,13 @@ main {
 
 #logo-wrapper {
   display: flex;
-  align-items: flex-end; /* bottom-align seal + text */
+  align-items: center; 
   gap: 1rem;
   justify-content: center;
   flex-wrap: wrap;
   padding: 0 1rem;
+  max-width: 1200px;
+  margin: 0 auto;  
 }
 
 #text {
@@ -48,13 +50,14 @@ main {
 
 /* Match seal to 125% of text's height */
 #text svg {
-  height: 100%;
+  max-height: 80px;
+  height: auto;
   width: auto;
   display: block;
 }
-
 #seal svg {
-  height: 125%;
+  max-height: 100px; /* ~125% of text */
+  height: auto;
   width: auto;
   display: block;
 }
