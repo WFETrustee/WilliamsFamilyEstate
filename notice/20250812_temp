@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notice of Intent to Discharge Debt</title>
+
+  <!-- Metadata used by script.js for rendering in index -->
+  <meta name="doc-title" content="Notice of Intent to Discharge Debt" data-label="Title"/>
+  <meta name="doc-date" content="2025-08-12"  data-label="Published"  data-style="date" data-line="1"/>
+  <meta name="doc-category" content="Notice"  data-label="Category" data-line="1"/>
+  <meta name="doc-venue" content="U.S. Department of the Treasury" data-label="Recorded in" data-line="2"/>
+  <meta name="doc-id" content="NOD-20250812"  data-label="ID" data-line="2"/>
+  <meta name="doc-summary" content="Administrative notice to invoke discharge right under HJR-192, UCC, and lawful tender remedies, with future service by publication." data-label="Summary"/>
+  <meta name="doc-pinned" content="false" data-style="pinned"/>
+
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+  <!-- Dynamic Header -->
+  <div id="site-header"></div>
+
+  <!-- Page Content -->
+  <main>
+    <h1>Notice of Intent to Discharge Debt</h1>
+    <div class="date">Filed: August 12, 2025</div>
+    <p>Venue: U.S. Department of the Treasury – Identifier: NOD-20250812</p>
+
+    <p>
+      This is a formal and lawful notice to the Honorable Secretary of the Treasury, c/o Janet Yellen, U.S. Department of the Treasury, 1500 Pennsylvania Avenue NW, Washington, D.C. 20220, of my intent to discharge certain public debts under the authority of:
+    </p>
+    <ul>
+      <li>House Joint Resolution 192 (June 5, 1933)</li>
+      <li>31 U.S.C. § 5118(d)(2) – Legal Tender Discharge</li>
+      <li>UCC § 3-603 – Tender of Payment</li>
+    </ul>
+
+    <p>
+      As Trustee for the Williams Family Estate<span class="tm">&trade;</span>, I hereby give notice of intent to tender lawful discharge using the Estate's private credit and Performance Bond as security for the obligation. This Performance Bond, in the amount of $5,000,000, is already published and on public record at <a href="https://williamsfamilyestate.org/notices">williamsfamilyestate.org/notices</a>.
+    </p>
+
+    <p>
+      <strong>Notice of Service Method:</strong> By receipt of this presentment, the U.S. Department of the Treasury and all related parties are hereby placed on notice that all future notices, affidavits, and instruments pertaining to this matter shall be served by publication at the above-referenced Williams Family Estate<span class="tm">&trade;</span> public notice site, which is expressly designated as the official and lawful service venue for the Estate.  
+      A single certified mailing of this notice to the Secretary of the Treasury shall constitute actual and constructive notice to all agents, assigns, and interested parties.
+    </p>
+
+    <p>
+      The undersigned affirms readiness to provide a copy of the Performance Bond, proof of publication, and a Certificate of Service upon request. Failure to respond in good faith within the allotted time shall constitute acceptance and agreement to honor the discharge as presented.
+    </p>
+
+    <p>
+      Remedy sought: full settlement and discharge of the obligation, restoration of the trust res, and confirmation of account closure or balance of zero.
+    </p>
+
+    <p>Respectfully submitted in honor, without prejudice, and with full reservation of rights under UCC § 1-308.</p>
+
+    <p>By: Gregory-Alan: Williams, Trustee<br/>
+    Williams Family Estate<span class="tm">&trade;</span></p>
+
+  </main>
+
+  <!-- Dynamic Footer -->
+  <div id="site-footer"></div>
+
+  <script src="/script.js"></script>
+</body>
+</html>
