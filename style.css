@@ -136,6 +136,12 @@ main {
   font-weight: 500;
 }
 
+.jesus-quote footer {
+  color: #000000;                 
+  font-style: normal;
+  text-align: right;
+}
+
 .announce {
     background-color: #e6f2ff;
     border-radius: 4px;
