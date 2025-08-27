@@ -127,19 +127,23 @@ main {
 /* Light-gold callout for Jesus quotes with red text */
 .jesus-quote {
   background-color: #FFF8DC;     /* parchment gold */
-  border: 4px solid #DAA520;      /* rich gold border */
+  border: 4px solid #DAA520;     /* rich gold border */
   border-radius: 20px;
-  color: #B22222;                 /* deep red text */
+  color: #B22222;                /* deep red text */
   padding: 0rem 1.5rem .75rem;
   margin: 0rem;
   font-style: italic;
   font-weight: 500;
+  display: flex; 
+  justify-content: space-between;  /* pushes left vs right */
+  align-items: center;             /* keeps them vertically aligned */
 }
 
 .jesus-quote footer {
-  color: #000000;                 
-  font-style: normal;
-  text-align: right;
+  color: #000;
+  font-weight: normal;
+  font-size: 0.9em;
+  margin: 0; /* remove default footer spacing */
 }
 
 .announce {
