@@ -130,10 +130,10 @@ main {
   border: 4px solid #DAA520;      /* rich gold border */
   border-radius: 20px;
   color: #B22222;                 /* deep red text */
-  padding: 1rem 1.25rem;
-  margin: 1.5rem 0;
+  padding: 0rem 1.5rem .75rem;
+  margin: 0rem;
   font-style: italic;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .announce {
