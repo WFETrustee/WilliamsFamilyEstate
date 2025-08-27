@@ -124,6 +124,18 @@ main {
 /* Group: Content */
 /* =============================== */
 
+/* Light-gold callout for Jesus quotes with red text */
+.jesus-quote {
+  background-color: #FFF8DC;     /* parchment gold */
+  border: 4px solid #DAA520;      /* rich gold border */
+  border-radius: 20px;
+  color: #B22222;                 /* deep red text */
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  font-weight: bold;
+}
+
 .announce {
     background-color: #e6f2ff;
     border-radius: 4px;
