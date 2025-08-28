@@ -142,6 +142,7 @@ main {
   display: flex; 
   justify-content: space-between;  /* pushes left vs right */
   align-items: center;             /* keeps them vertically aligned */
+  box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .jesus-quote footer {
