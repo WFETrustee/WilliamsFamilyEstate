@@ -80,8 +80,18 @@ img.pinned {
     z-index: 5;
 }
 
-image-wrap {
-    max-width: fit-content;
+.image-wrap {
+  max-width: 100%;     /* wrapper can’t be wider than its parent */
+  margin: 1em 0;       /* add some breathing space */
+  text-align: center;  /* optional: center the image */
+}
+
+.image-wrap img {
+  max-width: 100%;     /* image will scale down with the wrapper */
+  height: auto;        /* keep aspect ratio */
+  display: block;      /* remove inline spacing */
+  margin: 0 auto;      /* center if not using text-align */
+  border-radius: 4px;  /* optional styling */
 }
 
 /* =============================== */
