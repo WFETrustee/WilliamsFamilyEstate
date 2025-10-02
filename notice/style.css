@@ -80,6 +80,10 @@ img.pinned {
     z-index: 5;
 }
 
+image-wrap {
+    max-width: fit-content;
+}
+
 /* =============================== */
 /* Group: Metadata */
 /* =============================== */
