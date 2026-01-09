@@ -19,7 +19,9 @@ main {
     margin: 2rem auto;
     max-width: 720px;
     padding: 0 1rem;
+    clear: both;
 }
+
 
 /* =============================== */
 /* Group: Logo Wrapper */
@@ -124,16 +126,14 @@ main {
 /* Group: Hero */
 /* =============================== */
 
-/* Hero Section */
 .hero {
-    background: linear-gradient(
-        to bottom,
-        #4a4a4a 0%,
-        #3f3f3f 100%
-    );
-    padding: 3rem 1rem 2.5rem;
+    background: linear-gradient(to bottom, #4a4a4a 0%, #3f3f3f 100%);
+    padding: 2.25rem 1rem 2rem;
     text-align: center;
     border-bottom: 1px solid #2f2f2f;
+
+    /* Defensive: contain/neutralize any global floats */
+    overflow: hidden;
 }
 
 .hero-inner {
@@ -142,20 +142,24 @@ main {
 }
 
 .hero-crest {
+    /* Defensive reset against global img rules */
+    float: none;
+    display: block;
     width: 140px;
     max-width: 55%;
     height: auto;
-    margin-bottom: 1.25rem;
+    margin: 0 auto 1.1rem auto;
+
     opacity: 0.95;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
 }
 
 .hero-title {
     font-family: "Georgia", "Times New Roman", serif;
-    font-size: 2.4rem;
+    font-size: 2.25rem;
     font-weight: 500;
     color: #ffffff;
-    margin: 0.25rem 0 0.5rem;
+    margin: 0.1rem 0 0.5rem;
     letter-spacing: 0.03em;
 }
 
@@ -378,11 +382,15 @@ img.pinned {
     }
 
     .hero {
-        padding: 2rem 1rem 1.75rem;
+        padding: 1.75rem 1rem 1.5rem;
     }
 
     .hero-title {
-        font-size: 1.9rem;
+        font-size: 1.85rem;
+    }
+
+    .hero-crest {
+        width: 120px;
     }
     
     #text {
