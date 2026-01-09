@@ -127,12 +127,16 @@ main {
 /* =============================== */
 
 .hero {
-    background: linear-gradient(to bottom, #4a4a4a 0%, #3f3f3f 100%);
-    padding: 2.25rem 1rem 2rem;
+    background: linear-gradient(
+        to bottom,
+        #f4f4f4 0%,
+        #e9e9e9 100%
+    );
+    padding: 2.5rem 1rem 2.25rem;
     text-align: center;
-    border-bottom: 1px solid #2f2f2f;
+    border-bottom: 1px solid #d0d0d0;
 
-    /* Defensive: contain/neutralize any global floats */
+    /* Defensive containment */
     overflow: hidden;
 }
 
@@ -141,32 +145,36 @@ main {
     margin: 0 auto;
 }
 
+/* Estate Seal */
 .hero-crest {
-    /* Defensive reset against global img rules */
     float: none;
     display: block;
-    width: 280px;
-    max-width: 55%;
-    height: auto;
-    margin: 0 auto 1.1rem auto;
 
-    opacity: 0.95;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    width: 280px;        /* ~2× original size */
+    max-width: 75%;
+    height: auto;
+
+    margin: 0 auto 1.35rem auto;
+
+    opacity: 0.96;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
 }
 
+/* Estate Title */
 .hero-title {
     font-family: "Georgia", "Times New Roman", serif;
-    font-size: 2.25rem;
+    font-size: 2.35rem;
     font-weight: 500;
-    color: #ffffff;
-    margin: 0.1rem 0 0.5rem;
+    color: #222222;
+    margin: 0.25rem 0 0.6rem;
     letter-spacing: 0.03em;
 }
 
+/* Estate Descriptor */
 .hero-subtitle {
-    font-size: 0.95rem;
-    color: #d6d6d6;
-    letter-spacing: 0.12em;
+    font-size: 0.9rem;
+    color: #555555;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     margin: 0;
 }
