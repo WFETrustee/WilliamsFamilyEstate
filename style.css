@@ -121,6 +121,53 @@ main {
 }
 
 /* =============================== */
+/* Group: Hero */
+/* =============================== */
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(
+        to bottom,
+        #4a4a4a 0%,
+        #3f3f3f 100%
+    );
+    padding: 3rem 1rem 2.5rem;
+    text-align: center;
+    border-bottom: 1px solid #2f2f2f;
+}
+
+.hero-inner {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.hero-crest {
+    width: 140px;
+    max-width: 55%;
+    height: auto;
+    margin-bottom: 1.25rem;
+    opacity: 0.95;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+}
+
+.hero-title {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 2.4rem;
+    font-weight: 500;
+    color: #ffffff;
+    margin: 0.25rem 0 0.5rem;
+    letter-spacing: 0.03em;
+}
+
+.hero-subtitle {
+    font-size: 0.95rem;
+    color: #d6d6d6;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+/* =============================== */
 /* Group: Content */
 /* =============================== */
 
@@ -330,6 +377,14 @@ img.pinned {
         margin-bottom: -0.25rem;
     }
 
+    .hero {
+        padding: 2rem 1rem 1.75rem;
+    }
+
+    .hero-title {
+        font-size: 1.9rem;
+    }
+    
     #text {
         max-width: 300px;
     }
