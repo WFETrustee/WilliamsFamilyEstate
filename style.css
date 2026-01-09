@@ -127,11 +127,6 @@ main {
 /* =============================== */
 
 .hero {
-    /*background: linear-gradient(
-        to bottom,
-        #f4f4f4 0%,
-        #333 100%
-    );*/
     padding: 2.5rem 1rem 2.25rem;
     text-align: center;
     border-bottom: 1px solid #d0d0d0;
